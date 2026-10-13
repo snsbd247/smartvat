@@ -14,6 +14,8 @@ use App\Modules\FixedAssets\Http\Controllers\FixedAssetController;
 use App\Modules\Vat\Http\Controllers\VatController;
 use App\Modules\Vds\Http\Controllers\VdsController;
 use App\Modules\JobWork\Http\Controllers\JobWorkController;
+use App\Modules\Reporting\Http\Controllers\ReportController;
+use App\Modules\Mis\Http\Controllers\MisController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
 use App\Modules\Organization\Http\Controllers\CompanyController;
 use App\Modules\Organization\Http\Controllers\FactoryController;
@@ -146,5 +148,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('job-work/orders/{jobWorkOrder}/deliver', [JobWorkController::class, 'deliver'])->name('jw.deliver');
         Route::post('job-work/processing-invoices', [JobWorkController::class, 'processingInvoice'])->name('jw.pinv');
         Route::get('job-work/material-reconciliation', [JobWorkController::class, 'reconciliation'])->name('jw.recon');
+
+        // Reporting (secured; PDF/XLSX/HTML/JSON via one engine).
+        Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('reports/{key}', [ReportController::class, 'show'])->name('reports.show');
+
+        // MIS dashboards + Approval Center.
+        Route::get('mis/executive', [MisController::class, 'executive'])->name('mis.exec');
+        Route::get('mis/approvals', [MisController::class, 'approvals'])->name('mis.approvals');
     });
 });

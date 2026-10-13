@@ -33,6 +33,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'vat.view', 'vat.manage',
             'vds.view', 'vds.manage',
             'jobwork.view', 'jobwork.manage',
+            'reports.view', 'mis.view',
         ];
 
         foreach ($permissions as $name) {

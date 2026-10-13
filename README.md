@@ -49,7 +49,7 @@ docs/    ARCHITECTURE.md, PROJECT_STATUS.md, (ERD/data-dictionary: later)
 
 Legend: ✅ done & tested · 🔜 next · ⬜ planned
 
-### Foundation & core (DONE — 100 backend tests green)
+### Foundation & core (DONE — 107 backend tests green)
 - ✅ **Phase 1 — Project skeleton**: Laravel + React/Vite/Tailwind, CI (GitHub Actions), `/api/health`, OpenAPI scaffold, JSON-only API middleware.
 - ✅ **Phase 2 — Organization + Security + multi-tenant isolation**: companies, factories, warehouses, storage locations; users with **NID encrypted at rest + blind index**; Sanctum login; per-company RBAC; audit log; tenant isolation enforced (cross-tenant → 404/403).
 - ✅ **Phase 3 — CompanyConfig (business-type engine + module gate)**: Setup via business types (manufacturing/service/trading + hybrids) & industry templates; **backend module gate** (not just menu hiding).
@@ -68,10 +68,11 @@ Legend: ✅ done & tested · 🔜 next · ⬜ planned
 - ✅ **Phase 14 — VDS (VAT Deduction at Source)**: configurable, verified rules (no hard-coded rate); deduction (Dr AP / Cr VDS payable), certificate, treasury deposit, deducted-vs-deposited reconciliation.
 - ✅ **Phase 15 — Contract Manufacturing / Job Work**: customer-owned material custody via the stock engine (owner=customer, never company inventory/asset, no GL for custody); processing invoice charges the conversion **service**, not goods; material reconciliation.
 
+- ✅ **Phase 16 — Reporting engine**: one `ReportDefinition` → JSON / HTML / PDF (dompdf) / XLSX (PhpSpreadsheet) via a reusable engine; secured, tenant-scoped report route; files streamed, never at public URLs.
+- ✅ **Phase 17 — MIS dashboards + Approval Center**: executive KPIs (revenue, net profit, receivables, payables, VDS payable, stock value, cash/bank, pending approvals, unmapped VAT) and a pending-approvals feed.
+
 ### Remaining
-- 🔜 **Phase 16 — Reporting engine**: reusable PDF (preview + full-screen + new-tab + print + download) + XLSX export; secured document routes; Document Center.
-- ⬜ **Phase 17 — MIS dashboards**: executive / purchase / sales / production / inventory / accounting / VAT-VDS / job-work, with filters + drill-down; Approval Center.
-- ⬜ **Phase 18 — Google Drive backup/restore**: 20-min schedule, compress + encrypt, checksum-verified upload, 30-day retention (never deletes last good backup), restore test, alerts.
+- 🔜 **Phase 18 — Google Drive backup/restore**: 20-min schedule, compress + encrypt, checksum-verified upload, 30-day retention (never deletes last good backup), restore test, alerts.
 - ⬜ **Phase 19 — Hardening**: security pass, rate limiting, headers, E2E acceptance (Playwright), native Ubuntu deployment scripts, production-readiness checklist.
 
 ### Cross-cutting (as phases land)

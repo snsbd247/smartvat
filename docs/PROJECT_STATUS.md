@@ -142,8 +142,18 @@ Last updated: 2026-10-13
   - [x] Account map: processing_income
   - [x] Tests: **100 Pest green total** (+8) — custody has no journal entry & company reconciliation unaffected; material reconciliation; processing invoice is service revenue
   - Deferred: customer-owned FG ownership-transfer workflow, scrap ownership posting, job-work costing report
-- [ ] Phase 16 — Reporting engine (PDF/XLSX)
-- [ ] Phase 17 — MIS dashboards + Approval Center
+- [x] **Phase 16** — Reporting engine (COMPLETE)
+  - [x] `ReportDefinition` + `ReportEngine` (HTML via Blade, PDF via dompdf, XLSX via PhpSpreadsheet) — one definition → every format
+  - [x] `ReportRegistry`: trial-balance, profit-loss, balance-sheet, stock-valuation, vat-note-summary (reuse existing services)
+  - [x] Single secured route `GET /api/reports/{key}?format=json|html|pdf|xlsx` — authorized + tenant-scoped; files streamed, never at public URLs
+  - [x] Tests: list, JSON, XLSX (content-type), PDF (content-type), 403 without reports.view
+  - Note: dompdf used for portability (CI-safe); Browsershot can be swapped for pixel-perfect Mushak forms later
+- [x] **Phase 17** — MIS dashboards + Approval Center (COMPLETE)
+  - [x] `MisService`: executive KPIs (revenue, expense, net profit, receivables, payables, VDS payable, stock value, cash/bank, pending approvals, unmapped VAT) — read-only
+  - [x] Approval Center: pending draft purchase/sales/production orders
+  - [x] Endpoints: mis/executive, mis/approvals
+  - [x] Tests: **107 Pest green total** (+7) — executive KPIs, pending approvals
+  - Deferred: per-module drill-down dashboards wired in SPA, saved filters
 - [ ] Phase 18 — Google Drive backup/restore
 - [ ] Phase 19 — Hardening + E2E + production readiness
 
