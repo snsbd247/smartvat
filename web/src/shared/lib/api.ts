@@ -117,6 +117,30 @@ export async function fetchExecutive(): Promise<Executive> {
   return data
 }
 
+export interface DashboardData {
+  kpis: Executive & {
+    total_sales: string
+    local_sales: string
+    export_sales: string
+    total_purchase: string
+    local_purchase: string
+    import_purchase: string
+    production_output: string
+  }
+  sales_purchase_trend: { month: string; sales: string; purchase: string }[]
+  production_output: { product: string; qty: string }[]
+  inventory_top: { item: string; value: string; pct: string }[]
+  sales_by_category: { category: string; amount: string; pct: string }[]
+  top_customers: { name: string; type: string; amount: string }[]
+  recent_transactions: { date: string; type: string; doc_no: string; amount: string; status: string }[]
+  pending_approvals: { type: string; id: number; number: string; amount: string | null }[]
+}
+
+export async function fetchDashboard(): Promise<DashboardData> {
+  const { data } = await api.get<DashboardData>('/mis/dashboard')
+  return data
+}
+
 // token helpers
 export const tokenStore = {
   get: () => {

@@ -38,6 +38,25 @@ it('returns executive KPIs', function () {
     expect($res->json('pending_approvals'))->toBe(1);
 });
 
+it('returns the consolidated dashboard payload', function () {
+    Sanctum::actingAs(makeUserInCompany($this->company, 'admin'));
+
+    $res = $this->withHeaders($this->headers)->getJson('/api/mis/dashboard')->assertOk()
+        ->assertJsonStructure([
+            'kpis' => ['total_sales', 'total_purchase', 'net_profit', 'receivables', 'stock_value'],
+            'sales_purchase_trend',
+            'production_output',
+            'inventory_top',
+            'sales_by_category',
+            'top_customers',
+            'recent_transactions',
+            'pending_approvals',
+        ]);
+
+    expect((float) $res->json('kpis.total_sales'))->toBe(500.0);
+    expect($res->json('sales_purchase_trend'))->toHaveCount(12);
+});
+
 it('lists pending approvals', function () {
     Sanctum::actingAs(makeUserInCompany($this->company, 'admin'));
 

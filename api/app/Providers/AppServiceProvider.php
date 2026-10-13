@@ -25,6 +25,44 @@ class AppServiceProvider extends ServiceProvider
     {
         // One tenant context per request lifecycle.
         $this->app->singleton(CurrentCompany::class);
+
+        $this->registerBackupServices();
+    }
+
+    private function registerBackupServices(): void
+    {
+        $this->app->bind(\App\Modules\Backup\Contracts\BackupStorage::class, function () {
+            if (config('backup.driver') === 'google') {
+                return new \App\Modules\Backup\Storage\GoogleDriveStorage(
+                    config('backup.google.folder_id'),
+                    config('backup.google.credentials_json'),
+                );
+            }
+
+            return new \App\Modules\Backup\Storage\LocalBackupStorage(config('backup.path'));
+        });
+
+        $this->app->bind(\App\Modules\Backup\Contracts\DatabaseDumper::class, function () {
+            $conn = config('database.default');
+            $cfg = config("database.connections.{$conn}");
+            if (($cfg['driver'] ?? null) === 'sqlite') {
+                return new \App\Modules\Backup\Dumpers\SqliteDumper($cfg['database']);
+            }
+
+            return new \App\Modules\Backup\Dumpers\MysqlDumper(
+                $cfg['host'] ?? '127.0.0.1', (int) ($cfg['port'] ?? 3306),
+                $cfg['database'] ?? '', $cfg['username'] ?? '', (string) ($cfg['password'] ?? ''),
+            );
+        });
+
+        $this->app->bind(\App\Modules\Backup\Services\BackupService::class, function ($app) {
+            return new \App\Modules\Backup\Services\BackupService(
+                $app->make(\App\Modules\Backup\Contracts\BackupStorage::class),
+                $app->make(\App\Modules\Backup\Contracts\DatabaseDumper::class),
+                (string) config('backup.encryption_key'),
+                (int) config('backup.retention_days'),
+            );
+        });
     }
 
     /**

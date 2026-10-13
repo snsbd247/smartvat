@@ -157,6 +157,21 @@ Last updated: 2026-10-13
 - [ ] Phase 18 — Google Drive backup/restore
 - [ ] Phase 19 — Hardening + E2E + production readiness
 
+## Frontend (PLASTEX UI)
+- [x] Auth: login screen, route guard, token + company context, 401 → login, logout
+- [x] PLASTEX layout: navy sidebar with 18 modules + expandable submenus + bottom items
+  (My Profile / Change Password / Notifications / Help / Logout); topbar (global search,
+  company switcher, date, notifications, user)
+- [x] Executive dashboard matching the PLASTEX reference: business-type selector, 8 KPI
+  cards, Sales & Purchase trend (Recharts), Production output chart, Inventory top-5,
+  Sales-by-category donut, Top customers, Recent transactions, Pending approvals
+- [x] Backend `GET /mis/dashboard` — consolidated live aggregates (108 Pest green)
+- [x] DemoSeeder seeds ACME transactions so the dashboard shows live figures
+- [ ] Module screens (per-submenu CRUD pages) — placeholders for now; API ready
+- Note: Phase 18 (backup) scaffolding added (config, models, storage/dumper drivers,
+  BackupService, RunBackup command) — not yet wired to a schedule or tested; Phase 18/19
+  remain open.
+
 ## Legal/compliance watch (must stay true)
 - No statutory VAT/Mushak/9.1 Note/VDS/customs rate, threshold, mapping, or deadline is
   hard-coded or invented. All such rules are configurable, versioned, effective-dated,

@@ -3,6 +3,7 @@
 namespace App\Modules\Mis\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Mis\Services\DashboardService;
 use App\Modules\Mis\Services\MisService;
 use Illuminate\Http\JsonResponse;
 
@@ -15,6 +16,13 @@ class MisController extends Controller
         $this->authorize('mis-view');
 
         return response()->json($this->mis->executive());
+    }
+
+    public function dashboard(DashboardService $dashboard): JsonResponse
+    {
+        $this->authorize('mis-view');
+
+        return response()->json($dashboard->data());
     }
 
     public function approvals(): JsonResponse

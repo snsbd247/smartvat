@@ -96,7 +96,71 @@ class DemoSeeder extends Seeder
         $this->seedFinancialYear($company);
         $this->seedAccountMap($company);
 
+        if ($code === 'ACME') {
+            $this->seedTransactions($company);
+        }
+
         return $company;
+    }
+
+    /** A small set of realistic demo transactions so the dashboard shows live figures. */
+    private function seedTransactions(Company $company): void
+    {
+        $wh = $company->warehouses()->firstOrCreate(['code' => 'WH1'], ['name' => 'Main Warehouse', 'status' => 'active']);
+
+        $fg = \App\Modules\MasterData\Models\Product::firstOrCreate(
+            ['company_id' => $company->id, 'code' => 'FG-PIPE'],
+            ['name' => 'Plastic Pipe', 'type' => 'finished', 'base_uom' => 'PCS', 'costing_method' => 'weighted_average', 'status' => 'active'],
+        );
+        $rm = \App\Modules\MasterData\Models\Product::firstOrCreate(
+            ['company_id' => $company->id, 'code' => 'RM-RESIN'],
+            ['name' => 'Raw Resin', 'type' => 'raw', 'base_uom' => 'KG', 'costing_method' => 'weighted_average', 'status' => 'active'],
+        );
+
+        $supplier = \App\Modules\Purchase\Models\Supplier::firstOrCreate(
+            ['company_id' => $company->id, 'code' => 'SUP-RESIN'],
+            ['name' => 'Bright Chemicals', 'status' => 'active'],
+        );
+        $customer = \App\Modules\Sales\Models\Customer::firstOrCreate(
+            ['company_id' => $company->id, 'code' => 'CUS-ABC'],
+            ['name' => 'ABC Traders', 'status' => 'active'],
+        );
+
+        $purchase = app(\App\Modules\Purchase\Services\PurchaseService::class);
+        $sales = app(\App\Modules\Sales\Services\SalesService::class);
+
+        // Receive stock (FG + RM) with matching purchase invoice.
+        $grn = $purchase->receiveGoods([
+            'supplier_id' => $supplier->id, 'warehouse_id' => $wh->id,
+            'lines' => [
+                ['product_id' => $fg->id, 'qty' => 500, 'unit_cost' => 100],
+                ['product_id' => $rm->id, 'qty' => 1000, 'unit_cost' => 50],
+            ],
+        ]);
+        $purchase->postInvoice([
+            'supplier_id' => $supplier->id, 'type' => 'material', 'goods_receipt_note_id' => $grn->id,
+            'lines' => [['product_id' => $fg->id, 'line_total' => 100000]],
+        ]);
+
+        // Sell some finished goods + deliver (COGS) + partial receipt.
+        $inv = $sales->postInvoice([
+            'customer_id' => $customer->id,
+            'lines' => [['product_id' => $fg->id, 'qty' => 200, 'unit_price' => 150, 'line_total' => 30000]],
+        ]);
+        $sales->deliver([
+            'customer_id' => $customer->id, 'warehouse_id' => $wh->id, 'sales_invoice_id' => $inv->id,
+            'lines' => [['product_id' => $fg->id, 'qty' => 200]],
+        ]);
+        $sales->recordReceipt([
+            'customer_id' => $customer->id, 'amount' => 10000,
+            'received_in_account_id' => Account::where('company_id', $company->id)->where('code', '1010')->value('id'),
+        ]);
+
+        // A draft purchase order awaiting approval (shows in the Approval Center).
+        $purchase->createOrder([
+            'supplier_id' => $supplier->id,
+            'lines' => [['product_id' => $rm->id, 'qty' => 500, 'unit_price' => 50]],
+        ]);
     }
 
     private function seedAccountMap(Company $company): void

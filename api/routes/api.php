@@ -155,6 +155,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // MIS dashboards + Approval Center.
         Route::get('mis/executive', [MisController::class, 'executive'])->name('mis.exec');
+        Route::get('mis/dashboard', [MisController::class, 'dashboard'])->name('mis.dashboard');
         Route::get('mis/approvals', [MisController::class, 'approvals'])->name('mis.approvals');
     });
 });
