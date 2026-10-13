@@ -16,6 +16,12 @@ node_modules/
 /api/public/build/
 /api/public/hot
 
+# Generated SPA artifacts published into Laravel (produced by deploy/build-local.sh)
+/api/public/assets/
+/api/public/favicon.svg
+/api/public/icons.svg
+/api/resources/views/spa.blade.php
+
 # Laravel runtime
 /api/storage/*.key
 /api/storage/framework/cache/*

@@ -49,6 +49,31 @@ npm run test -- --run         # Vitest
 npm run build                 # type-check + production build
 ```
 
+## Browse locally via XAMPP (Apache) at `/irlvat`
+
+Apache serves the whole app (React SPA + Laravel API) under `/irlvat`:
+
+- http://localhost/irlvat
+- http://160.25.9.139/irlvat  (same machine's IP)
+
+Setup already applied on this machine:
+- Apache alias `/irlvat` → `api/public` (in `xampp/apache/conf/extra/httpd-vhosts.conf`)
+- Laravel serves the SPA for non-API routes; `/irlvat/api/*` is the REST API
+- SQLite dev database, seeded demo data
+
+After any **frontend** change, rebuild and republish the SPA into Laravel, then it's live:
+```bash
+bash deploy/build-local.sh        # builds web/ and copies into api/public + spa view
+```
+(If Apache config changes: `xampp/apache/bin/httpd.exe -k restart`.)
+
+**Demo login:** `admin@irlbd.com` / `admin@123` (super-admin, access to all demo companies:
+ACME manufacturing, BETA trading, GAMMA services).
+
+> Note: this XAMPP/Apache setup is a local preview. Production remains the documented
+> native Ubuntu deployment (`deploy/` scripts, later phase). The login screen and full
+> module UIs are built in later frontend phases — the API login already works (tested).
+
 ## Status
 Phase 1 (project skeleton) in progress. Production deployment (MySQL, Nginx, HTTPS,
 scheduler, backup) is delivered in later phases — see the phase checklist in

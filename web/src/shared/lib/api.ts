@@ -7,8 +7,11 @@ import axios from 'axios'
  * backend in dev; Nginx reverse-proxies it in production). Sanctum token, if
  * present, is attached automatically.
  */
+// Default to the API under the app's base path (e.g. "/irlvat/api").
+const defaultBaseUrl = `${import.meta.env.BASE_URL.replace(/\/+$/, '')}/api`
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? defaultBaseUrl,
   headers: {
     Accept: 'application/json',
   },

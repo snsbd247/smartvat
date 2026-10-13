@@ -22,14 +22,41 @@ class DemoSeeder extends Seeder
     public function run(): void
     {
         // ACME: plastic manufacturing (inventory/production/job-work enabled).
-        $this->makeCompany('ACME', 'ACME Plastics Ltd', 'acme.admin@example.test', 'plastic_manufacturing');
+        $acme = $this->makeCompany('ACME', 'ACME Plastics Ltd', 'acme.admin@example.test', 'plastic_manufacturing');
         // BETA: trading (inventory enabled, no production).
-        $this->makeCompany('BETA', 'Beta Trading Co', 'beta.admin@example.test', 'general_trading');
+        $beta = $this->makeCompany('BETA', 'Beta Trading Co', 'beta.admin@example.test', 'general_trading');
         // GAMMA: professional services (no inventory/production).
-        $this->makeCompany('GAMMA', 'Gamma Services Ltd', 'gamma.admin@example.test', 'professional_services');
+        $gamma = $this->makeCompany('GAMMA', 'Gamma Services Ltd', 'gamma.admin@example.test', 'professional_services');
+
+        // Platform super-admin that can access every demo company.
+        $this->makeSuperAdmin('admin@irlbd.com', 'admin@123', [$acme, $beta, $gamma]);
     }
 
-    private function makeCompany(string $code, string $name, string $email, string $template): void
+    /**
+     * @param  array<int, Company>  $companies
+     */
+    private function makeSuperAdmin(string $email, string $password, array $companies): void
+    {
+        $user = User::firstOrCreate(
+            ['email' => $email],
+            [
+                'name' => 'System Administrator',
+                'username' => 'admin',
+                'password' => Hash::make($password),
+                'status' => 'active',
+            ],
+        );
+
+        foreach ($companies as $i => $company) {
+            $company->users()->syncWithoutDetaching([
+                $user->id => ['is_default' => $i === 0],
+            ]);
+            app(PermissionRegistrar::class)->setPermissionsTeamId($company->id);
+            $user->assignRole('super-admin');
+        }
+    }
+
+    private function makeCompany(string $code, string $name, string $email, string $template): Company
     {
         $company = Company::firstOrCreate(
             ['code' => $code],
@@ -67,6 +94,8 @@ class DemoSeeder extends Seeder
 
         $this->seedChartOfAccounts($company);
         $this->seedFinancialYear($company);
+
+        return $company;
     }
 
     private function seedChartOfAccounts(Company $company): void

@@ -11,10 +11,13 @@ const queryClient = new QueryClient({
   },
 })
 
+// Router base path derived from Vite's base (e.g. "/irlvat/" -> "/irlvat").
+const basename = import.meta.env.BASE_URL.replace(/\/+$/, '') || '/'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename={basename}>
         <App />
       </BrowserRouter>
     </QueryClientProvider>
