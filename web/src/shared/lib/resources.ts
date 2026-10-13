@@ -234,6 +234,8 @@ export const Vds = {
     api.post('/vds/deductions', b).then((r) => r.data),
   deposit: (b: { amount: number; paid_from_account_id: number }) => api.post('/vds/deposits', b).then((r) => r.data),
   reconciliation: () => api.get<{ deducted: string; deposited: string; payable: string }>('/vds/reconciliation').then((r) => r.data),
+  deductions: () => api.get<{ id: number; deduction_no: string; service_category: string; base_amount: string; rate: string; vds_amount: string; status: string; date: string }[]>('/vds/deductions').then((r) => r.data),
+  certificate: (id: number) => api.post(`/vds/deductions/${id}/certificate`, {}).then((r) => r.data),
 }
 
 export interface Bom { id: number; bom_no: string; product_id: number; version: number; output_qty: string }

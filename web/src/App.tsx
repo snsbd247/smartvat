@@ -30,6 +30,7 @@ import { VatUnmappedPage } from './modules/vat/VatUnmappedPage'
 import { VdsRulesPage } from './modules/vds/VdsRulesPage'
 import { VdsDeductionPage } from './modules/vds/VdsDeductionPage'
 import { VdsReconPage } from './modules/vds/VdsReconPage'
+import { VdsRegisterPage } from './modules/vds/VdsRegisterPage'
 import { BomsPage } from './modules/production/BomsPage'
 import { ProductionOrdersPage } from './modules/production/ProductionOrdersPage'
 import { AssetCategoriesPage } from './modules/assets/AssetCategoriesPage'
@@ -143,6 +144,8 @@ export default function App() {
         {/* VDS */}
         <Route path="vds/rules" element={<VdsRulesPage />} />
         <Route path="vds/deduction" element={<VdsDeductionPage />} />
+        <Route path="vds/register" element={<VdsRegisterPage />} />
+        <Route path="vds/certificate" element={<VdsRegisterPage />} />
         <Route path="vds/treasury" element={<VdsReconPage />} />
         <Route path="vds/reconciliation" element={<VdsReconPage />} />
 
