@@ -39,7 +39,15 @@ Last updated: 2026-10-13
   - [x] OpenAPI scaffold (`api/openapi/openapi.yaml`)
   - [x] `.env.example` (api + web), README, .gitignore
   - Note: dev/test uses SQLite; MySQL wiring + Nginx/systemd/deploy scripts come in a later phase
-- [ ] Phase 2 — Organization + Security + multi-tenant isolation
+- [x] **Phase 2** — Organization + Security + multi-tenant isolation (COMPLETE)
+  - [x] Tenancy: `companies`, `user_company_access`; `CurrentCompany` context; `CompanyScope` global scope (fail-closed); `BelongsToCompany` trait; `ResolveCompany` middleware (X-Company-Id + access check → 403)
+  - [x] Organization entities: company, factory, warehouse, storage_location (tenant-scoped); Factory full CRUD + Warehouse CRUD endpoints
+  - [x] Security: user ERP fields; **NID encrypted at rest + blind index** (hidden from API); Sanctum login (email/username)/logout/me
+  - [x] RBAC: spatie/permission with **teams = companies** (per-company roles); super-admin Gate::before; policies on Factory/Warehouse
+  - [x] Audit log: `audit_logs` + `Auditable` trait + `AuditLogger` (applied to Factory/Warehouse; login events)
+  - [x] Seeders: RolesAndPermissions (global defs) + Demo (2 companies, fake data)
+  - [x] Tests: **20 Pest green** — tenant isolation (list scope, cross-tenant 404, unauthorized-company 403, company stamping), auth, authZ (viewer vs admin, per-company unique codes), NID encryption
+  - Deferred to later phases: MFA enablement, StorageLocation endpoints, full user-management CRUD UI, factory-scope enforcement per-module
 - [ ] Phase 3 — CompanyConfig (Setup Wizard, business-type engine, module gate)
 - [ ] Phase 4 — Shared engines: Posting + Stock
 - [ ] Phase 5 — MasterData + Inventory ops

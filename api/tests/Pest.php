@@ -12,7 +12,12 @@
 */
 
 pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->beforeEach(function () {
+        // Fresh roles/permissions for every test (DB is reset by RefreshDatabase).
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
+    })
     ->in('Feature');
 
 /*
@@ -41,7 +46,32 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+use App\Models\User;
+use App\Modules\Organization\Models\Company;
+use Spatie\Permission\PermissionRegistrar;
+
+/** Create a company (tenant). */
+function makeCompany(string $code = 'C1'): Company
 {
-    // ..
+    return Company::create([
+        'code' => $code,
+        'name' => $code.' Company',
+        'base_currency' => 'BDT',
+        'country' => 'BD',
+        'status' => 'active',
+    ]);
+}
+
+/** Create an active user bound to a company, optionally with a role in that company. */
+function makeUserInCompany(Company $company, ?string $role = null): User
+{
+    $user = User::factory()->create(['status' => 'active']);
+    $company->users()->attach($user->id, ['is_default' => true]);
+
+    if ($role !== null) {
+        app(PermissionRegistrar::class)->setPermissionsTeamId($company->id);
+        $user->assignRole($role);
+    }
+
+    return $user;
 }

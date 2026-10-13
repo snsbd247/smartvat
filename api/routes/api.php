@@ -1,21 +1,34 @@
 <?php
 
 use App\Http\Controllers\System\HealthController;
-use Illuminate\Http\Request;
+use App\Modules\Organization\Http\Controllers\CompanyController;
+use App\Modules\Organization\Http\Controllers\FactoryController;
+use App\Modules\Organization\Http\Controllers\WarehouseController;
+use App\Modules\Security\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes
+| API Routes (prefix: /api)
 |--------------------------------------------------------------------------
-| All routes here are prefixed with /api. Versioned module routes will be
-| registered per-module from Phase 2 onward.
 */
 
-// Public health / readiness probe (no auth) — used by deploy + monitoring.
+// Public.
 Route::get('/health', HealthController::class)->name('health');
+Route::post('/auth/login', [AuthController::class, 'login'])->name('auth.login');
 
-// Authenticated current-user endpoint (Sanctum).
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum')->name('user.me');
+// Authenticated (any company the user belongs to).
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
+    Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
+
+    // Tenant-scoped: a company must be resolved and authorized for the user.
+    Route::middleware('company')->group(function () {
+        Route::get('/auth/me', [AuthController::class, 'me'])->name('auth.me');
+        Route::get('/company/current', [CompanyController::class, 'current'])->name('company.current');
+
+        Route::apiResource('factories', FactoryController::class);
+        Route::apiResource('warehouses', WarehouseController::class)
+            ->only(['index', 'store', 'show', 'destroy']);
+    });
+});

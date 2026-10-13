@@ -1,0 +1,43 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
+
+class RolesAndPermissionsSeeder extends Seeder
+{
+    /**
+     * Permissions are global definitions. Roles are created as global (team_id null)
+     * so they can be assigned to users within any company (team) context.
+     */
+    public function run(): void
+    {
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $permissions = [
+            'factory.view', 'factory.create', 'factory.update', 'factory.delete',
+            'warehouse.view', 'warehouse.create', 'warehouse.update', 'warehouse.delete',
+        ];
+
+        foreach ($permissions as $name) {
+            Permission::findOrCreate($name, 'web');
+        }
+
+        // Ensure roles are created without a team context (global).
+        app(PermissionRegistrar::class)->setPermissionsTeamId(null);
+
+        $superAdmin = Role::findOrCreate('super-admin', 'web');
+        $admin = Role::findOrCreate('admin', 'web');
+        $viewer = Role::findOrCreate('viewer', 'web');
+
+        // super-admin is also short-circuited by Gate::before, but keep it complete.
+        $superAdmin->syncPermissions(Permission::all());
+        $admin->syncPermissions($permissions);
+        $viewer->syncPermissions(array_filter($permissions, fn ($p) => str_ends_with($p, '.view')));
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+}

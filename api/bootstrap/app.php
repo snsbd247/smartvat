@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\ForceJsonResponse;
+use App\Http\Middleware\ResolveCompany;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,6 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // All API routes always negotiate JSON (clean 401/403 instead of redirects).
         $middleware->api(prepend: [
             ForceJsonResponse::class,
+        ]);
+
+        // Alias for the tenant resolver; applied after auth on company-scoped routes.
+        $middleware->alias([
+            'company' => ResolveCompany::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
