@@ -11,6 +11,10 @@ beforeEach(function () {
     $this->accumAcc = makeAccount($this->company, '1590', 'asset'); // contra-asset
     $this->depExp = makeAccount($this->company, '5300', 'expense');
     $this->cash = makeAccount($this->company, '1000', 'asset');
+    $disposal = makeAccount($this->company, '4400', 'income');
+    App\Modules\Accounting\Models\CompanyAccountMap::create([
+        'company_id' => $this->company->id, 'key' => 'asset_disposal', 'account_id' => $disposal->id,
+    ]);
     $this->svc = app(FixedAssetService::class);
 
     $this->category = $this->svc->createCategory([
@@ -57,6 +61,26 @@ it('posts one month of straight-line depreciation', function () {
     expect((float) $asset->book_value)->toBe(11000.0);
     expect(acc('5300'))->toBe(1000.0);   // depreciation expense
     expect(acc('1590'))->toBe(-1000.0);  // accumulated (contra-asset, credit balance)
+});
+
+it('disposes an asset and recognises the gain over book value', function () {
+    $asset = $this->svc->acquire([
+        'asset_category_id' => $this->category->id, 'name' => 'CNC', 'acquisition_date' => '2026-01-10',
+        'cost' => 12000, 'useful_life_months' => 12, 'credit_account_id' => $this->cash->id,
+    ]);
+    $this->svc->depreciateMonth($asset, '2026-01-31'); // accum 1000, book 11000
+
+    // Sell for 11,500 -> gain 500 over book value 11,000.
+    $this->svc->dispose($asset->fresh(), 11500, $this->cash->id);
+
+    $fresh = $asset->fresh();
+    expect($fresh->status)->toBe('disposed');
+    expect((float) $fresh->book_value)->toBe(0.0);
+    // Asset account cleared (cost 12000 debit from acquisition, 12000 credit on disposal).
+    expect(acc('1500'))->toBe(0.0);
+    expect(acc('1590'))->toBe(0.0); // accumulated cleared
+    // Disposal gain recognised (income account, natural credit balance 500).
+    expect((float) app(App\Modules\Accounting\Services\LedgerService::class)->accountBalance(App\Modules\Accounting\Models\Account::where('code', '4400')->first()))->toBe(500.0);
 });
 
 it('does not depreciate the same month twice (idempotent)', function () {

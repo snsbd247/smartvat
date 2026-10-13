@@ -138,6 +138,7 @@ function mapInventoryAccounts(Company $company): void
         'export_revenue' => ['4100', 'income'],
         'exchange_gain_loss' => ['4200', 'income'],
         'processing_income' => ['4300', 'income'],
+        'asset_disposal' => ['4400', 'income'],
         'vds_payable' => ['2200', 'liability'],
     ];
 

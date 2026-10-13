@@ -8,6 +8,7 @@ use App\Modules\Inventory\Services\StockService;
 use App\Modules\Purchase\Models\GoodsReceiptNote;
 use App\Modules\Purchase\Models\PurchaseInvoice;
 use App\Modules\Purchase\Models\PurchaseOrder;
+use App\Modules\Purchase\Models\PurchaseReturn;
 use App\Modules\Purchase\Models\SupplierPayment;
 use App\Shared\Numbering\NumberGenerator;
 use App\Shared\Support\Num;
@@ -236,6 +237,78 @@ class PurchaseService
             ]);
 
             return $pi->load('lines');
+        });
+    }
+
+    /**
+     * Purchase return: send goods back to the supplier at weighted-average cost.
+     * Stock out + Dr Accounts Payable (supplier) / Cr Inventory.
+     */
+    public function returnGoods(array $data): PurchaseReturn
+    {
+        return DB::transaction(function () use ($data) {
+            $companyId = $this->current->idOrFail();
+
+            $return = PurchaseReturn::create([
+                'company_id' => $companyId,
+                'return_no' => $this->numbers->next('purchase_return', 'PR-'),
+                'supplier_id' => $data['supplier_id'],
+                'warehouse_id' => $data['warehouse_id'],
+                'date' => Carbon::parse($data['date'] ?? now())->toDateString(),
+                'reference' => $data['reference'] ?? null,
+                'status' => 'posted',
+                'created_by' => auth()->id(),
+            ]);
+
+            $stockLines = [];
+            foreach ($data['lines'] as $l) {
+                $stockLines[] = [
+                    'product_id' => $l['product_id'],
+                    'warehouse_id' => $data['warehouse_id'],
+                    'qty' => Num::sub(0, (string) $l['qty']), // outbound
+                    'batch_id' => $l['batch_id'] ?? 0,
+                    'source_type' => 'purchase_return',
+                    'source_id' => $return->id,
+                    'reference' => $return->return_no,
+                ];
+            }
+            $movements = $this->stock->apply($stockLines);
+
+            $total = Num::zero();
+            foreach ($movements as $i => $m) {
+                $value = Num::sub(0, (string) $m->value); // value negative on out
+                $total = Num::add($total, $value);
+                $return->lines()->create([
+                    'company_id' => $companyId,
+                    'product_id' => $data['lines'][$i]['product_id'],
+                    'batch_id' => $data['lines'][$i]['batch_id'] ?? 0,
+                    'qty' => $data['lines'][$i]['qty'],
+                    'unit_cost' => $m->unit_cost,
+                    'line_value' => $value,
+                ]);
+            }
+            $return->update(['amount' => $total]);
+
+            if (! Num::isZero($total)) {
+                $this->posting->post([
+                    'date' => $return->date,
+                    'narration' => "Purchase return {$return->return_no}",
+                    'source_type' => 'purchase_return',
+                    'source_id' => $return->id,
+                    'purpose' => 'primary',
+                    'lines' => [
+                        [
+                            'account_id' => $this->accounts->id('accounts_payable'),
+                            'debit' => $total,
+                            'party_type' => 'supplier',
+                            'party_id' => $return->supplier_id,
+                        ],
+                        ['account_id' => $this->accounts->id('inventory'), 'credit' => $total],
+                    ],
+                ]);
+            }
+
+            return $return->load('lines');
         });
     }
 

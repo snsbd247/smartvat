@@ -78,4 +78,19 @@ class FixedAssetController extends Controller
 
         return response()->json(['depreciated_assets' => $count]);
     }
+
+    public function dispose(Request $request, FixedAsset $fixedAsset): JsonResponse
+    {
+        $this->authorize('assets-manage');
+        $companyId = $this->current->id();
+        $data = $request->validate([
+            'proceeds' => ['required', 'numeric', 'min:0'],
+            'received_account_id' => ['required', Rule::exists('chart_of_accounts', 'id')->where('company_id', $companyId)],
+            'date' => ['sometimes', 'date'],
+        ]);
+
+        return response()->json(
+            $this->assets->dispose($fixedAsset, $data['proceeds'], (int) $data['received_account_id'], $data['date'] ?? null)
+        );
+    }
 }

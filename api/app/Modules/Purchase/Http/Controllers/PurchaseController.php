@@ -107,6 +107,24 @@ class PurchaseController extends Controller
         return response()->json($this->purchase->paySupplier($data), 201);
     }
 
+    public function returnGoods(Request $request): JsonResponse
+    {
+        $this->authorize('purchase-manage');
+        $companyId = $this->current->id();
+
+        $data = $request->validate([
+            'supplier_id' => ['required', Rule::exists('suppliers', 'id')->where('company_id', $companyId)],
+            'warehouse_id' => ['required', Rule::exists('warehouses', 'id')->where('company_id', $companyId)],
+            'date' => ['sometimes', 'date'],
+            'lines' => ['required', 'array', 'min:1'],
+            'lines.*.product_id' => ['required', Rule::exists('products', 'id')->where('company_id', $companyId)],
+            'lines.*.qty' => ['required', 'numeric', 'gt:0'],
+            'lines.*.batch_id' => ['sometimes', 'integer', 'min:0'],
+        ]);
+
+        return response()->json($this->purchase->returnGoods($data), 201);
+    }
+
     public function supplierLedger(Supplier $supplier): JsonResponse
     {
         $this->authorize('purchase-view');

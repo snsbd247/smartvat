@@ -22,6 +22,7 @@ use App\Modules\Organization\Http\Controllers\CompanyController;
 use App\Modules\Organization\Http\Controllers\FactoryController;
 use App\Modules\Organization\Http\Controllers\WarehouseController;
 use App\Modules\Security\Http\Controllers\AuthController;
+use App\Modules\Security\Http\Controllers\SystemController;
 use App\Modules\Security\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,6 +59,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // User management (always-on).
         Route::get('users', [UserController::class, 'index'])->name('users.index');
         Route::post('users', [UserController::class, 'store'])->name('users.store');
+        Route::get('security/roles', [SystemController::class, 'roles'])->name('sec.roles');
+        Route::get('security/permissions', [SystemController::class, 'permissions'])->name('sec.perms');
+        Route::get('security/activity-logs', [SystemController::class, 'activityLogs'])->name('sec.activity');
+        Route::get('security/login-history', [SystemController::class, 'loginHistory'])->name('sec.login');
 
         // Master data (always-on module).
         Route::apiResource('products', ProductController::class);
@@ -69,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('goods-receipts', [PurchaseController::class, 'receiveGoods'])->name('grn.store');
         Route::post('purchase-invoices', [PurchaseController::class, 'postInvoice'])->name('pi.store');
         Route::post('supplier-payments', [PurchaseController::class, 'paySupplier'])->name('supplier.pay');
+        Route::post('purchase-returns', [PurchaseController::class, 'returnGoods'])->name('pr.store');
         Route::get('suppliers/{supplier}/ledger', [PurchaseController::class, 'supplierLedger'])->name('supplier.ledger');
 
         // Import purchase + landed cost.
@@ -129,6 +135,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('asset-categories', [FixedAssetController::class, 'storeCategory'])->name('fa.cat.store');
         Route::post('fixed-assets', [FixedAssetController::class, 'store'])->name('fa.store');
         Route::post('fixed-assets/run-depreciation', [FixedAssetController::class, 'runDepreciation'])->name('fa.depr');
+        Route::post('fixed-assets/{fixedAsset}/dispose', [FixedAssetController::class, 'dispose'])->name('fa.dispose');
 
         // VAT / Mushak (always-on module). Statutory rules are data — configured,
         // approved (= practitioner-verified) before they can classify.

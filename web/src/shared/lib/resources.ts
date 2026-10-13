@@ -125,6 +125,8 @@ export const Sales = {
   receipt: (body: { customer_id: number; amount: number; received_in_account_id: number }) =>
     api.post('/customer-receipts', body).then((r) => r.data),
   ledger: (customerId: number) => api.get(`/customers/${customerId}/ledger`).then((r) => r.data),
+  returnGoods: (body: { customer_id: number; warehouse_id: number; lines: { product_id: number; qty: number; unit_price: number }[] }) =>
+    api.post('/sales-returns', body).then((r) => r.data),
 }
 
 export interface Account {
@@ -159,6 +161,8 @@ export const PurchaseApi = {
   }) => api.post('/purchase-invoices', body).then((r) => r.data),
   payment: (body: { supplier_id: number; amount: number; paid_from_account_id: number }) =>
     api.post('/supplier-payments', body).then((r) => r.data),
+  returnGoods: (body: { supplier_id: number; warehouse_id: number; lines: { product_id: number; qty: number }[] }) =>
+    api.post('/purchase-returns', body).then((r) => r.data),
   ledger: (supplierId: number) => api.get(`/suppliers/${supplierId}/ledger`).then((r) => r.data),
 }
 
@@ -245,6 +249,24 @@ export const FixedAssets = {
   },
   acquire: (b: Record<string, string | number>) => api.post('/fixed-assets', b).then((r) => r.data),
   runDepreciation: () => api.post('/fixed-assets/run-depreciation', {}).then((r) => r.data),
+  dispose: (id: number, b: { proceeds: number; received_account_id: number }) =>
+    api.post(`/fixed-assets/${id}/dispose`, b).then((r) => r.data),
+}
+
+export interface ActivityLog {
+  id: number
+  event: string
+  user: string | null
+  auditable_type: string
+  auditable_id: number | null
+  ip_address: string | null
+  created_at: string | null
+}
+export const System = {
+  activityLogs: () => api.get<ActivityLog[]>('/security/activity-logs').then((r) => r.data),
+  loginHistory: () => api.get<ActivityLog[]>('/security/login-history').then((r) => r.data),
+  roles: () => api.get<string[]>('/security/roles').then((r) => r.data),
+  permissions: () => api.get<string[]>('/security/permissions').then((r) => r.data),
 }
 
 export interface Contract { id: number; contract_no: string; customer_id: number; processing_rate: string; scrap_ownership: string }

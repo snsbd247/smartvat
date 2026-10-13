@@ -2,6 +2,7 @@
 
 namespace App\Modules\FixedAssets\Services;
 
+use App\Modules\Accounting\Services\AccountResolver;
 use App\Modules\Accounting\Services\PostingService;
 use App\Modules\FixedAssets\Models\AssetCategory;
 use App\Modules\FixedAssets\Models\DepreciationEntry;
@@ -25,6 +26,7 @@ class FixedAssetService
         private CurrentCompany $current,
         private PostingService $posting,
         private NumberGenerator $numbers,
+        private AccountResolver $accounts,
     ) {}
 
     public function acquire(array $data): FixedAsset
@@ -141,5 +143,58 @@ class FixedAssetService
     public function createCategory(array $data): AssetCategory
     {
         return AssetCategory::create(array_merge($data, ['company_id' => $this->current->idOrFail()]));
+    }
+
+    /**
+     * Dispose an asset: remove cost and accumulated depreciation, book proceeds, and
+     * recognise the gain/loss vs book value.
+     *   Dr Accumulated depreciation, Dr Cash|Bank (proceeds), Cr Asset (cost),
+     *   and the balancing difference to the asset-disposal gain/loss account.
+     */
+    public function dispose(FixedAsset $asset, string|float $proceeds, int $receivedAccountId, string|\DateTimeInterface|null $date = null): FixedAsset
+    {
+        if ($asset->status === 'disposed') {
+            throw new InvalidArgumentException('Asset is already disposed.');
+        }
+
+        return DB::transaction(function () use ($asset, $proceeds, $receivedAccountId, $date) {
+            $category = $asset->category;
+            $cost = (string) $asset->cost;
+            $accum = (string) $asset->accumulated_depreciation;
+            $bookValue = (string) $asset->book_value;
+            $proceeds = (string) $proceeds;
+
+            $lines = [];
+            if (! Num::isZero($accum)) {
+                $lines[] = ['account_id' => $category->accumulated_account_id, 'debit' => $accum];
+            }
+            if (! Num::isZero($proceeds)) {
+                $lines[] = ['account_id' => $receivedAccountId, 'debit' => $proceeds];
+            }
+            $lines[] = ['account_id' => $category->asset_account_id, 'credit' => $cost];
+
+            $gain = Num::sub($proceeds, $bookValue); // >0 gain, <0 loss
+            if (! Num::isZero($gain)) {
+                $disposal = $this->accounts->id('asset_disposal');
+                if (Num::cmp($gain, 0) > 0) {
+                    $lines[] = ['account_id' => $disposal, 'credit' => $gain];
+                } else {
+                    $lines[] = ['account_id' => $disposal, 'debit' => Num::sub(0, $gain)];
+                }
+            }
+
+            $this->posting->post([
+                'date' => Carbon::parse($date ?? now())->toDateString(),
+                'narration' => "Asset disposal {$asset->asset_no}",
+                'source_type' => 'fixed_asset',
+                'source_id' => $asset->id,
+                'purpose' => 'disposal',
+                'lines' => $lines,
+            ]);
+
+            $asset->update(['status' => 'disposed', 'book_value' => 0]);
+
+            return $asset->fresh();
+        });
     }
 }

@@ -42,6 +42,10 @@ import { WarehousesPage } from './modules/organization/WarehousesPage'
 import { CompanyConfigPage } from './modules/organization/CompanyConfigPage'
 import { UsersPage } from './modules/users/UsersPage'
 import { BackupHealthPage } from './modules/backup/BackupHealthPage'
+import { PurchaseReturnPage } from './modules/purchase/PurchaseReturnPage'
+import { SalesReturnPage } from './modules/sales/SalesReturnPage'
+import { ActivityLogsPage, LoginHistoryPage } from './modules/users/ActivityLogsPage'
+import { RolesPage, PermissionsPage } from './modules/users/RolesPermissionsPage'
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth()
@@ -76,6 +80,10 @@ export default function App() {
 
         {/* Users */}
         <Route path="users/users" element={<UsersPage />} />
+        <Route path="users/roles" element={<RolesPage />} />
+        <Route path="users/permissions" element={<PermissionsPage />} />
+        <Route path="users/login-history" element={<LoginHistoryPage />} />
+        <Route path="users/activity-logs" element={<ActivityLogsPage />} />
 
         {/* Backup & System Health */}
         <Route path="backup/health" element={<BackupHealthPage />} />
@@ -98,12 +106,14 @@ export default function App() {
         <Route path="purchase/grn" element={<GoodsReceiptPage />} />
         <Route path="purchase/invoice" element={<PurchaseInvoicePage />} />
         <Route path="purchase/payment" element={<SupplierPaymentPage />} />
+        <Route path="purchase/return" element={<PurchaseReturnPage />} />
         <Route path="purchase/local" element={<SupplierLedgerPage />} />
 
         {/* Sales */}
         <Route path="sales/invoice" element={<SalesInvoicePage />} />
         <Route path="sales/challan" element={<DeliveryChallanPage />} />
         <Route path="sales/receipt" element={<CustomerReceiptPage />} />
+        <Route path="sales/return" element={<SalesReturnPage />} />
         <Route path="sales/local" element={<CustomerLedgerPage />} />
 
         {/* Accounting */}

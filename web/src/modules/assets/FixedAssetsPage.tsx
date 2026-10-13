@@ -16,6 +16,14 @@ export function FixedAssetsPage() {
   const [open, setOpen] = useState(false)
   const [msg, setMsg] = useState<{ kind: 'error' | 'success'; text: string } | null>(null)
   const [form, setForm] = useState<Record<string, string>>({ acquisition_date: new Date().toISOString().slice(0, 10) })
+  const [disposeId, setDisposeId] = useState<number | null>(null)
+  const [disposeForm, setDisposeForm] = useState<{ proceeds: string; account: string }>({ proceeds: '', account: '' })
+
+  const dispose = useMutation({
+    mutationFn: () => FixedAssets.dispose(disposeId!, { proceeds: Number(disposeForm.proceeds), received_account_id: Number(disposeForm.account) }),
+    onSuccess: () => { setMsg({ kind: 'success', text: 'Asset disposed — gain/loss recognised.' }); setDisposeId(null); setDisposeForm({ proceeds: '', account: '' }); invalidate() },
+    onError: (e) => setMsg({ kind: 'error', text: apiError(e) }),
+  })
 
   const invalidate = () => { qc.invalidateQueries({ queryKey: ['fixed-assets'] }); qc.invalidateQueries({ queryKey: ['dashboard'] }) }
   const acquire = useMutation({
@@ -47,7 +55,7 @@ export function FixedAssetsPage() {
         } />
       {msg && <Banner kind={msg.kind}>{msg.text}</Banner>}
 
-      <Table head={['Asset No', 'Name', 'Cost', 'Accum. Dep.', 'Book Value', 'Status']}>
+      <Table head={['Asset No', 'Name', 'Cost', 'Accum. Dep.', 'Book Value', 'Status', '']}>
         {(assets ?? []).map((a) => (
           <tr key={a.id} className="text-ink">
             <td className="px-4 py-2.5">{a.asset_no}</td>
@@ -56,10 +64,35 @@ export function FixedAssetsPage() {
             <td className="px-4 py-2.5 text-right">{money(a.accumulated_depreciation)}</td>
             <td className="px-4 py-2.5 text-right">{money(a.book_value)}</td>
             <td className="px-4 py-2.5">{a.status}</td>
+            <td className="px-4 py-2.5">
+              {a.status === 'active' && (
+                <Button variant="ghost" onClick={() => { setDisposeId(a.id); setMsg(null) }}>Dispose</Button>
+              )}
+            </td>
           </tr>
         ))}
-        {(assets ?? []).length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-muted">No assets yet.</td></tr>}
+        {(assets ?? []).length === 0 && <tr><td colSpan={7} className="px-4 py-8 text-center text-muted">No assets yet.</td></tr>}
       </Table>
+
+      {disposeId !== null && (
+        <Modal title="Dispose Asset" onClose={() => setDisposeId(null)}>
+          <form onSubmit={(e: FormEvent) => { e.preventDefault(); setMsg(null); dispose.mutate() }} className="grid gap-4">
+            <Field label="Proceeds (sale amount)">
+              <input className={inputClass} type="number" step="any" value={disposeForm.proceeds} onChange={(e) => setDisposeForm((s) => ({ ...s, proceeds: e.target.value }))} required />
+            </Field>
+            <Field label="Received in (Cash/Bank)">
+              <select className={inputClass} value={disposeForm.account} onChange={(e) => setDisposeForm((s) => ({ ...s, account: e.target.value }))} required>
+                <option value="">Select account…</option>
+                {assetAcc.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}
+              </select>
+            </Field>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setDisposeId(null)}>Cancel</Button>
+              <Button type="submit" disabled={dispose.isPending}>{dispose.isPending ? 'Posting…' : 'Dispose'}</Button>
+            </div>
+          </form>
+        </Modal>
+      )}
 
       {open && (
         <Modal title="Acquire Asset" onClose={() => setOpen(false)}>

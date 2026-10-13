@@ -178,6 +178,7 @@ class DemoSeeder extends Seeder
             'export_revenue' => '4100',
             'exchange_gain_loss' => '4200',
             'processing_income' => '4300',
+            'asset_disposal' => '4400',
             'vds_payable' => '2200',
         ];
 
@@ -210,6 +211,7 @@ class DemoSeeder extends Seeder
             ['4100', 'Export Sales', 'income'],
             ['4200', 'Exchange Gain/Loss', 'income'],
             ['4300', 'Processing Income', 'income'],
+            ['4400', 'Asset Disposal Gain/Loss', 'income'],
             ['5000', 'Cost of Goods Sold', 'expense'],
             ['5100', 'Inventory Adjustment', 'expense'],
         ];
