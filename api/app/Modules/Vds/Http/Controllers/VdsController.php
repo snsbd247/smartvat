@@ -18,6 +18,20 @@ class VdsController extends Controller
         private CurrentCompany $current,
     ) {}
 
+    public function rules(): JsonResponse
+    {
+        $this->authorize('vds-view');
+
+        return response()->json(VdsRule::orderByDesc('id')->get());
+    }
+
+    public function deductions(): JsonResponse
+    {
+        $this->authorize('vds-view');
+
+        return response()->json(VdsDeduction::orderByDesc('id')->limit(100)->get());
+    }
+
     public function storeRule(Request $request): JsonResponse
     {
         $this->authorize('vds-manage');

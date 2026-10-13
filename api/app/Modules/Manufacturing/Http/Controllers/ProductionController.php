@@ -3,6 +3,7 @@
 namespace App\Modules\Manufacturing\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Manufacturing\Models\Bom;
 use App\Modules\Manufacturing\Models\ProductionOrder;
 use App\Modules\Manufacturing\Services\ProductionService;
 use App\Shared\Tenancy\CurrentCompany;
@@ -16,6 +17,20 @@ class ProductionController extends Controller
         private ProductionService $production,
         private CurrentCompany $current,
     ) {}
+
+    public function boms(): JsonResponse
+    {
+        $this->authorize('production-view');
+
+        return response()->json(Bom::with('lines')->orderByDesc('id')->get());
+    }
+
+    public function orders(): JsonResponse
+    {
+        $this->authorize('production-view');
+
+        return response()->json(ProductionOrder::orderByDesc('id')->limit(100)->get());
+    }
 
     public function storeBom(Request $request): JsonResponse
     {

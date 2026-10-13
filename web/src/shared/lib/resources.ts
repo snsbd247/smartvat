@@ -120,6 +120,64 @@ export interface ReportDef {
   columns: { key: string; label: string; align?: string }[]
   rows: Record<string, string | number>[]
 }
+export interface VatRate { id: number; code: string; rate: string; effective_from: string | null }
+export interface VatNote { id: number; code: string; title: string; subform: string | null; verification_status: string }
+export interface VatMapping {
+  id: number
+  transaction_type_code: string
+  tax_treatment_code: string
+  vat_rate_code: string | null
+  vat_return_note_id: number
+  approval_status: string
+  verification_status: string
+}
+export const Vat = {
+  rates: () => api.get<VatRate[]>('/vat/rates').then((r) => r.data),
+  createRate: (b: Record<string, string>) => api.post('/vat/rates', b).then((r) => r.data),
+  notes: () => api.get<VatNote[]>('/vat/notes').then((r) => r.data),
+  createNote: (b: Record<string, string>) => api.post('/vat/notes', b).then((r) => r.data),
+  mappings: () => api.get<VatMapping[]>('/vat/mappings').then((r) => r.data),
+  createMapping: (b: Record<string, unknown>) => api.post('/vat/mappings', b).then((r) => r.data),
+  approveMapping: (id: number) => api.patch(`/vat/mappings/${id}/approve`).then((r) => r.data),
+  classify: (b: Record<string, unknown>) => api.post('/vat/classify', b).then((r) => r.data),
+  unmapped: () => api.get<{ rows: Record<string, string>[] }>('/vat/unmapped').then((r) => r.data.rows),
+}
+
+export interface VdsRule { id: number; service_category: string; rate: string; approval_status: string; verification_status: string }
+export const Vds = {
+  rules: () => api.get<VdsRule[]>('/vds/rules').then((r) => r.data),
+  createRule: (b: Record<string, string>) => api.post('/vds/rules', b).then((r) => r.data),
+  approveRule: (id: number) => api.patch(`/vds/rules/${id}/approve`).then((r) => r.data),
+  deduct: (b: { supplier_id: number; service_category: string; base_amount: number }) =>
+    api.post('/vds/deductions', b).then((r) => r.data),
+  deposit: (b: { amount: number; paid_from_account_id: number }) => api.post('/vds/deposits', b).then((r) => r.data),
+  reconciliation: () => api.get<{ deducted: string; deposited: string; payable: string }>('/vds/reconciliation').then((r) => r.data),
+}
+
+export interface Bom { id: number; bom_no: string; product_id: number; version: number; output_qty: string }
+export interface ProductionOrder {
+  id: number
+  order_no: string
+  product_id: number
+  planned_qty: string
+  produced_qty: string
+  status: string
+}
+export const Production = {
+  boms: () => api.get<Bom[]>('/boms').then((r) => r.data),
+  createBom: (b: {
+    product_id: number
+    output_qty: number
+    lines: { component_product_id: number; qty: number }[]
+  }) => api.post('/boms', b).then((r) => r.data),
+  orders: () => api.get<ProductionOrder[]>('/production-orders').then((r) => r.data),
+  createOrder: (b: { product_id: number; bom_id?: number; warehouse_id: number; planned_qty: number }) =>
+    api.post('/production-orders', b).then((r) => r.data),
+  issue: (id: number) => api.post(`/production-orders/${id}/issue`, {}).then((r) => r.data),
+  receive: (id: number, qty: number, scrap_qty = 0) =>
+    api.post(`/production-orders/${id}/receive`, { qty, scrap_qty }).then((r) => r.data),
+}
+
 export const Reports = {
   list: () => api.get<{ reports: string[] }>('/reports').then((r) => r.data.reports),
   json: (key: string) => api.get<ReportDef>(`/reports/${key}?format=json`).then((r) => r.data),

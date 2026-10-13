@@ -28,6 +28,42 @@ class VatController extends Controller
         return $this->current->id();
     }
 
+    // ---- list endpoints (for config screens) ----
+    public function rates(): JsonResponse
+    {
+        $this->authorize('vat-view');
+
+        return response()->json(VatRate::orderBy('code')->get());
+    }
+
+    public function types(): JsonResponse
+    {
+        $this->authorize('vat-view');
+
+        return response()->json(VatTransactionType::orderBy('code')->get());
+    }
+
+    public function treatments(): JsonResponse
+    {
+        $this->authorize('vat-view');
+
+        return response()->json(VatTaxTreatment::orderBy('code')->get());
+    }
+
+    public function notes(): JsonResponse
+    {
+        $this->authorize('vat-view');
+
+        return response()->json(VatReturnNote::orderBy('code')->get());
+    }
+
+    public function mappings(): JsonResponse
+    {
+        $this->authorize('vat-view');
+
+        return response()->json(VatNoteMapping::orderByDesc('id')->get());
+    }
+
     public function storeRate(Request $request): JsonResponse
     {
         $this->authorize('vat-manage');

@@ -110,6 +110,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Manufacturing — gated: only companies with the production module enabled.
         Route::middleware('module:production')->group(function () {
+            Route::get('boms', [ProductionController::class, 'boms'])->name('bom.list');
+            Route::get('production-orders', [ProductionController::class, 'orders'])->name('prod.list');
             Route::post('boms', [ProductionController::class, 'storeBom'])->name('bom.store');
             Route::post('production-orders', [ProductionController::class, 'storeOrder'])->name('prod.store');
             Route::post('production-orders/{productionOrder}/issue', [ProductionController::class, 'issue'])->name('prod.issue');
@@ -124,6 +126,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // VAT / Mushak (always-on module). Statutory rules are data — configured,
         // approved (= practitioner-verified) before they can classify.
+        Route::get('vat/rates', [VatController::class, 'rates'])->name('vat.rates');
+        Route::get('vat/transaction-types', [VatController::class, 'types'])->name('vat.types');
+        Route::get('vat/tax-treatments', [VatController::class, 'treatments'])->name('vat.treatments');
+        Route::get('vat/notes', [VatController::class, 'notes'])->name('vat.notes.list');
+        Route::get('vat/mappings', [VatController::class, 'mappings'])->name('vat.mappings.list');
         Route::post('vat/rates', [VatController::class, 'storeRate'])->name('vat.rate');
         Route::post('vat/transaction-types', [VatController::class, 'storeType'])->name('vat.type');
         Route::post('vat/tax-treatments', [VatController::class, 'storeTreatment'])->name('vat.treatment');
@@ -136,6 +143,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('vat/register', [VatController::class, 'register'])->name('vat.register');
 
         // VDS — configurable, verified rules; deduction / certificate / treasury deposit.
+        Route::get('vds/rules', [VdsController::class, 'rules'])->name('vds.rules');
+        Route::get('vds/deductions', [VdsController::class, 'deductions'])->name('vds.deductions');
         Route::post('vds/rules', [VdsController::class, 'storeRule'])->name('vds.rule');
         Route::patch('vds/rules/{rule}/approve', [VdsController::class, 'approveRule'])->name('vds.rule.approve');
         Route::post('vds/deductions', [VdsController::class, 'deduct'])->name('vds.deduct');

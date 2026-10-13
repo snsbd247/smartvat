@@ -22,6 +22,16 @@ import { ChartOfAccountsPage } from './modules/accounting/ChartOfAccountsPage'
 import { JournalEntryPage } from './modules/accounting/JournalEntryPage'
 import { ReportsPage } from './modules/reports/ReportsPage'
 import { ReportViewPage } from './modules/reports/ReportViewPage'
+import { VatRatesPage } from './modules/vat/VatRatesPage'
+import { VatNotesPage } from './modules/vat/VatNotesPage'
+import { VatMappingsPage } from './modules/vat/VatMappingsPage'
+import { VatClassifyPage } from './modules/vat/VatClassifyPage'
+import { VatUnmappedPage } from './modules/vat/VatUnmappedPage'
+import { VdsRulesPage } from './modules/vds/VdsRulesPage'
+import { VdsDeductionPage } from './modules/vds/VdsDeductionPage'
+import { VdsReconPage } from './modules/vds/VdsReconPage'
+import { BomsPage } from './modules/production/BomsPage'
+import { ProductionOrdersPage } from './modules/production/ProductionOrdersPage'
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth()
@@ -80,7 +90,24 @@ export default function App() {
         <Route path="accounting/balance-sheet" element={<ReportViewPage reportKey="balance-sheet" />} />
 
         {/* VAT */}
+        <Route path="vat/configuration" element={<VatRatesPage />} />
+        <Route path="vat/catalogue" element={<VatNotesPage />} />
+        <Route path="vat/registers" element={<VatMappingsPage />} />
+        <Route path="vat/reconciliation" element={<VatUnmappedPage />} />
+        <Route path="vat/returns" element={<VatClassifyPage />} />
         <Route path="vat/mushak-9-1" element={<ReportViewPage reportKey="vat-note-summary" />} />
+
+        {/* VDS */}
+        <Route path="vds/rules" element={<VdsRulesPage />} />
+        <Route path="vds/deduction" element={<VdsDeductionPage />} />
+        <Route path="vds/treasury" element={<VdsReconPage />} />
+        <Route path="vds/reconciliation" element={<VdsReconPage />} />
+
+        {/* Production */}
+        <Route path="production/bom" element={<BomsPage />} />
+        <Route path="production/orders" element={<ProductionOrdersPage />} />
+        <Route path="production/issue" element={<ProductionOrdersPage />} />
+        <Route path="production/fg-receipt" element={<ProductionOrdersPage />} />
 
         {/* Reports hub */}
         <Route path="reports/builder" element={<ReportsPage />} />
