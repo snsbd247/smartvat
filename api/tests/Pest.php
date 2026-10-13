@@ -132,6 +132,10 @@ function mapInventoryAccounts(Company $company): void
         'inventory_adjustment' => ['5100', 'expense'],
         'accounts_payable' => ['2000', 'liability'],
         'landed_cost_clearing' => ['2060', 'liability'],
+        'accounts_receivable' => ['1200', 'asset'],
+        'sales_revenue' => ['4000', 'income'],
+        'export_revenue' => ['4100', 'income'],
+        'exchange_gain_loss' => ['4200', 'income'],
     ];
 
     foreach ($defs as $key => [$code, $type]) {

@@ -93,8 +93,18 @@ Last updated: 2026-10-13
   - [x] Account map: landed_cost_clearing
   - [x] Tests: **69 Pest green total** (+8: value/quantity-basis allocation, FX conversion, recoverable excluded, idempotent, receive→GL reconciled, double-receive blocked, API flow)
   - Deferred: import PO/proforma/LC-TT/customs-doc tracking, per-charge supplier invoicing of landed costs, import cost reconciliation report
-- [ ] Phase 8 — Sales Local
-- [ ] Phase 9 — Sales Export + FX
+- [x] **Phase 8** — Sales Local (COMPLETE)
+  - [x] customers (CRUD, policy); sales_orders(+lines); sales_invoices(+lines); delivery_challans(+lines); customer_receipts; sales_returns(+lines)
+  - [x] `SalesService`: invoice (Dr AR/Cr Revenue, party=customer) → **delivery challan** (separate doc; stock out at avg cost + Dr COGS/Cr Inventory; partial deliveries) → receipt (Dr Cash|Bank/Cr AR) → return/credit note (goods back + Dr Revenue/Cr AR)
+  - [x] `CustomerLedgerService`: outstanding + ledger from AR party lines
+  - [x] Tests: invoice≠challan, partial delivery, COGS reconciled, receipt, return
+- [x] **Phase 9** — Sales Export + FX (COMPLETE)
+  - [x] Export invoice in foreign currency → AR/revenue booked in base currency at the rate (export_revenue account)
+  - [x] Export realization: exchange **gain/loss** between invoice rate and realization rate posted to exchange_gain_loss; AR fully relieved
+  - [x] Account map: sales_revenue, export_revenue, exchange_gain_loss
+  - [x] Endpoints: customers apiResource; sales-invoices, delivery-challans, customer-receipts, sales-returns, customers/{id}/ledger
+  - [x] Tests: **77 Pest green total** (+8: local + export paths; gain and loss)
+  - Deferred: sales quotation, sales commission, export shipping docs (EXP/COO/shipping bill) tracking, aging buckets
 - [ ] Phase 10 — Manufacturing
 - [ ] Phase 11 — Accounting completion
 - [ ] Phase 12 — Fixed Assets

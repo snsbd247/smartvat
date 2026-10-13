@@ -22,6 +22,10 @@ tags:
     description: Stock operations and reports (requires the inventory module)
   - name: Purchase
     description: Suppliers and local procure-to-pay (PO, GRN, invoice, payment)
+  - name: Import
+    description: Import shipments and landed-cost allocation
+  - name: Sales
+    description: Customers and local/export order-to-cash
 paths:
   /health:
     get:
@@ -305,6 +309,103 @@ paths:
       parameters:
         - $ref: '#/components/parameters/CompanyHeader'
         - { name: supplier, in: path, required: true, schema: { type: integer } }
+      responses: { '200': { description: '{ outstanding, entries[] }' } }
+  /import-shipments:
+    post:
+      tags: [Import]
+      summary: Create an import shipment (FC lines + charges)
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses: { '201': { description: Shipment created } }
+  /import-shipments/{importShipment}/landed-cost:
+    get:
+      tags: [Import]
+      summary: Preview landed-cost allocation (no posting)
+      security: [{ sanctum: [] }]
+      parameters:
+        - $ref: '#/components/parameters/CompanyHeader'
+        - { name: importShipment, in: path, required: true, schema: { type: integer } }
+      responses: { '200': { description: 'Per-line landed cost + totals' } }
+  /import-shipments/{importShipment}/receive:
+    post:
+      tags: [Import]
+      summary: Receive at landed cost (stock in + GL)
+      security: [{ sanctum: [] }]
+      parameters:
+        - $ref: '#/components/parameters/CompanyHeader'
+        - { name: importShipment, in: path, required: true, schema: { type: integer } }
+      responses: { '200': { description: Shipment received } }
+  /customers:
+    get:
+      tags: [Sales]
+      summary: List customers
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses: { '200': { description: Paginated customers } }
+    post:
+      tags: [Sales]
+      summary: Create a customer
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses: { '201': { description: Created } }
+  /sales-invoices:
+    post:
+      tags: [Sales]
+      summary: Sales invoice (local or export) — Dr AR / Cr Revenue
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customer_id, lines]
+              properties:
+                customer_id: { type: integer }
+                kind: { type: string, enum: [local, export] }
+                currency: { type: string }
+                exchange_rate: { type: number }
+                lines:
+                  type: array
+                  items:
+                    type: object
+                    required: [line_total]
+                    properties:
+                      product_id: { type: integer }
+                      qty: { type: number }
+                      unit_price: { type: number }
+                      line_total: { type: number }
+      responses: { '201': { description: Invoice posted } }
+  /delivery-challans:
+    post:
+      tags: [Sales]
+      summary: Delivery challan (separate from invoice) — stock out + COGS
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses: { '201': { description: Challan posted } }
+  /customer-receipts:
+    post:
+      tags: [Sales]
+      summary: Customer receipt (export books exchange gain/loss)
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses: { '201': { description: Receipt posted } }
+  /sales-returns:
+    post:
+      tags: [Sales]
+      summary: Sales return + credit note (goods back + Dr Revenue / Cr AR)
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses: { '201': { description: Return posted } }
+  /customers/{customer}/ledger:
+    get:
+      tags: [Sales]
+      summary: Customer ledger + outstanding balance
+      security: [{ sanctum: [] }]
+      parameters:
+        - $ref: '#/components/parameters/CompanyHeader'
+        - { name: customer, in: path, required: true, schema: { type: integer } }
       responses: { '200': { description: '{ outstanding, entries[] }' } }
 components:
   parameters:

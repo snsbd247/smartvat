@@ -6,6 +6,8 @@ use App\Modules\MasterData\Http\Controllers\ProductController;
 use App\Modules\Purchase\Http\Controllers\ImportController;
 use App\Modules\Purchase\Http\Controllers\PurchaseController;
 use App\Modules\Purchase\Http\Controllers\SupplierController;
+use App\Modules\Sales\Http\Controllers\CustomerController;
+use App\Modules\Sales\Http\Controllers\SalesController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
 use App\Modules\Organization\Http\Controllers\CompanyController;
 use App\Modules\Organization\Http\Controllers\FactoryController;
@@ -57,6 +59,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('import-shipments', [ImportController::class, 'store'])->name('import.store');
         Route::get('import-shipments/{importShipment}/landed-cost', [ImportController::class, 'preview'])->name('import.preview');
         Route::post('import-shipments/{importShipment}/receive', [ImportController::class, 'receive'])->name('import.receive');
+
+        // Sales (always-on module): customers + local/export order-to-cash.
+        Route::apiResource('customers', CustomerController::class);
+        Route::post('sales-invoices', [SalesController::class, 'invoice'])->name('si.store');
+        Route::post('delivery-challans', [SalesController::class, 'deliver'])->name('dc.store');
+        Route::post('customer-receipts', [SalesController::class, 'receipt'])->name('customer.receipt');
+        Route::post('sales-returns', [SalesController::class, 'salesReturn'])->name('sr.store');
+        Route::get('customers/{customer}/ledger', [SalesController::class, 'customerLedger'])->name('customer.ledger');
 
         // Inventory module — gated: only companies with the inventory module enabled.
         Route::middleware('module:inventory')->group(function () {
