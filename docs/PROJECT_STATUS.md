@@ -76,7 +76,15 @@ Last updated: 2026-10-13
   - [x] DemoSeeder: GRN-clearing + inventory-adjustment accounts + account map per company
   - [x] Tests: **54 Pest green total** (+8: receipt/issue/transfer/adjustment reconcile to GL, oversell rollback, product CRUD authZ, module-gated inventory ops)
   - Deferred: batch/expiry tracking flows, physical count UI, UoM-conversion on transactions, opening-stock import
-- [ ] Phase 6 — Purchase Local
+- [x] **Phase 6** — Purchase Local (COMPLETE)
+  - [x] journal_lines gains party_type/party_id (supplier/customer ledger dimension; PostingService carries it)
+  - [x] suppliers (CRUD, policy); purchase_orders(+lines), goods_receipt_notes(+lines), purchase_invoices(+lines), supplier_payments
+  - [x] `PurchaseService`: PO (draft→approve, no GL) → GRN (stock in + Dr Inventory/Cr GRN-clearing) → Purchase Invoice (material: Dr GRN-clearing/Cr AP; service: Dr Expense/Cr AP) → Supplier Payment (Dr AP/Cr Cash|Bank)
+  - [x] `SupplierLedgerService`: outstanding + ledger from AP party lines
+  - [x] Endpoints: suppliers apiResource; purchase-orders(+approve), goods-receipts, purchase-invoices, supplier-payments, suppliers/{id}/ledger
+  - [x] Account map: accounts_payable, accounts_receivable added
+  - [x] Tests: **61 Pest green total** (+7: PO approve, GRN reconciled, material/service invoice→AP, payment reduces outstanding, trial balance balanced, supplier CRUD authZ, API flow)
+  - Deferred: purchase requisition/quotation, purchase return, price comparison, VAT/VDS split (Phase 13/14), aging buckets
 - [ ] Phase 7 — Purchase Import + Landed Cost
 - [ ] Phase 8 — Sales Local
 - [ ] Phase 9 — Sales Export + FX

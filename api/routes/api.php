@@ -3,6 +3,8 @@
 use App\Http\Controllers\System\HealthController;
 use App\Modules\Inventory\Http\Controllers\InventoryController;
 use App\Modules\MasterData\Http\Controllers\ProductController;
+use App\Modules\Purchase\Http\Controllers\PurchaseController;
+use App\Modules\Purchase\Http\Controllers\SupplierController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
 use App\Modules\Organization\Http\Controllers\CompanyController;
 use App\Modules\Organization\Http\Controllers\FactoryController;
@@ -40,6 +42,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Master data (always-on module).
         Route::apiResource('products', ProductController::class);
+
+        // Purchase (always-on module): suppliers + procure-to-pay.
+        Route::apiResource('suppliers', SupplierController::class);
+        Route::post('purchase-orders', [PurchaseController::class, 'storeOrder'])->name('po.store');
+        Route::post('purchase-orders/{purchaseOrder}/approve', [PurchaseController::class, 'approveOrder'])->name('po.approve');
+        Route::post('goods-receipts', [PurchaseController::class, 'receiveGoods'])->name('grn.store');
+        Route::post('purchase-invoices', [PurchaseController::class, 'postInvoice'])->name('pi.store');
+        Route::post('supplier-payments', [PurchaseController::class, 'paySupplier'])->name('supplier.pay');
+        Route::get('suppliers/{supplier}/ledger', [PurchaseController::class, 'supplierLedger'])->name('supplier.ledger');
 
         // Inventory module — gated: only companies with the inventory module enabled.
         Route::middleware('module:inventory')->group(function () {

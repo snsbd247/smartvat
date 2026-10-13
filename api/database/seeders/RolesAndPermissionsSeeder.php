@@ -23,6 +23,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'warehouse.view', 'warehouse.create', 'warehouse.update', 'warehouse.delete',
             'product.view', 'product.create', 'product.update', 'product.delete',
             'inventory.view', 'inventory.operate',
+            'supplier.view', 'supplier.create', 'supplier.update', 'supplier.delete',
+            'purchase.view', 'purchase.manage',
         ];
 
         foreach ($permissions as $name) {

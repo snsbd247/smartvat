@@ -85,6 +85,8 @@ class PostingService
                     'company_id' => $companyId,
                     'account_id' => $line['account_id'],
                     'cost_center_id' => $line['cost_center_id'] ?? null,
+                    'party_type' => $line['party_type'] ?? null,
+                    'party_id' => $line['party_id'] ?? null,
                     'debit' => $line['debit'],
                     'credit' => $line['credit'],
                     'currency' => $data['currency'] ?? 'BDT',
@@ -195,6 +197,8 @@ class PostingService
                 'debit' => Num::add($debit, 0),
                 'credit' => Num::add($credit, 0),
                 'cost_center_id' => $raw['cost_center_id'] ?? null,
+                'party_type' => $raw['party_type'] ?? null,
+                'party_id' => $raw['party_id'] ?? null,
                 'narration' => $raw['narration'] ?? null,
                 'fx_rate' => $raw['fx_rate'] ?? 1,
             ];

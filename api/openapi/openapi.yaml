@@ -20,6 +20,8 @@ tags:
     description: Products, categories, units
   - name: Inventory
     description: Stock operations and reports (requires the inventory module)
+  - name: Purchase
+    description: Suppliers and local procure-to-pay (PO, GRN, invoice, payment)
 paths:
   /health:
     get:
@@ -261,6 +263,49 @@ paths:
       responses:
         '200':
           description: '{ stock_value_total, inventory_gl_balance, difference, in_balance }'
+  /suppliers:
+    get:
+      tags: [Purchase]
+      summary: List suppliers
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses: { '200': { description: Paginated suppliers } }
+    post:
+      tags: [Purchase]
+      summary: Create a supplier
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses: { '201': { description: Created }, '403': { description: Missing supplier.create } }
+  /goods-receipts:
+    post:
+      tags: [Purchase]
+      summary: Goods receipt — stock in + Dr Inventory / Cr GRN-clearing
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses: { '201': { description: GRN created }, '403': { description: Missing purchase.manage } }
+  /purchase-invoices:
+    post:
+      tags: [Purchase]
+      summary: Purchase invoice (material clears GRN-clearing to AP; service debits expense)
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses: { '201': { description: Invoice posted } }
+  /supplier-payments:
+    post:
+      tags: [Purchase]
+      summary: Supplier payment — Dr AP / Cr Cash|Bank
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses: { '201': { description: Payment posted } }
+  /suppliers/{supplier}/ledger:
+    get:
+      tags: [Purchase]
+      summary: Supplier ledger + outstanding balance
+      security: [{ sanctum: [] }]
+      parameters:
+        - $ref: '#/components/parameters/CompanyHeader'
+        - { name: supplier, in: path, required: true, schema: { type: integer } }
+      responses: { '200': { description: '{ outstanding, entries[] }' } }
 components:
   parameters:
     CompanyHeader:

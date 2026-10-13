@@ -106,6 +106,8 @@ class DemoSeeder extends Seeder
             'grn_clearing' => '2050',
             'cogs' => '5000',
             'inventory_adjustment' => '5100',
+            'accounts_payable' => '2000',
+            'accounts_receivable' => '1200',
         ];
 
         foreach ($map as $key => $code) {
