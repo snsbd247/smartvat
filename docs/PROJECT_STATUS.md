@@ -118,8 +118,19 @@ Last updated: 2026-10-13
   - [x] Endpoints: accounting/accounts, cost-centers, journals(+reverse), fund-transfers, trial-balance, profit-loss, balance-sheet, accounts/{id}/cash-book, periods(+status)
   - [x] Tests: **84 Pest green total** (+7: P&L, balance-sheet balances, fund transfer, unbalanced→422)
   - Deferred: journal approval workflow, bank reconciliation, budget vs actual, year-end close automation
-- [ ] Phase 12 — Fixed Assets
-- [ ] Phase 13 — VAT/Mushak + Mushak 9.1 Note engine
+- [x] **Phase 12** — Fixed Assets (COMPLETE)
+  - [x] asset_categories (holds asset/expense/accumulated GL accounts), fixed_assets, depreciation_entries
+  - [x] `FixedAssetService`: acquire (Dr Asset / Cr cash|bank|payable); straight-line monthly depreciation (Dr Dep expense / Cr Accumulated), **idempotent per asset+month**, capped at depreciable base; runDepreciation for all active assets
+  - [x] Endpoints: asset-categories, fixed-assets (acquire/list), fixed-assets/run-depreciation
+  - [x] Tests: acquire posting, one-month depreciation, idempotency
+- [x] **Phase 13** — VAT/Mushak + **Mushak 9.1 Note-number mapping engine** (COMPLETE)
+  - [x] vat_rates, vat_transaction_types, vat_tax_treatments, vat_return_notes (verified data), vat_note_mappings (configurable, versioned, effective-dated, approved+verified), vat_transaction_classifications (frozen rule version)
+  - [x] `VatClassifier`: generic evaluator — **no hard-coded Note Number / note-to-subform logic**; VAT rate alone never determines the note (transaction type + treatment are part of the key); specificity + effective-date resolution; unapproved/unverified mappings ignored
+  - [x] **Unmapped → "review_required", never a guessed Note Number**
+  - [x] `VatReportService`: Mushak 9.1 note-wise summary, unmapped-transaction report, input/output register
+  - [x] Endpoints: rates/transaction-types/tax-treatments/notes/mappings (+approve = practitioner-verify), classify, note-summary, unmapped, register
+  - [x] Tests: **92 Pest green total** (+8: acquire/depreciation/idempotent; classify-verified, review_required, rate-not-sole-determinant, unapproved-ignored, summary+unmapped)
+  - Deferred: VAT return preparation & Mushak document register/print, VAT↔GL reconciliation, auto-classify wired into sales/purchase posting
 - [ ] Phase 14 — VDS
 - [ ] Phase 15 — Job Work (customer-owned)
 - [ ] Phase 16 — Reporting engine (PDF/XLSX)

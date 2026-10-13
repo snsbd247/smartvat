@@ -62,6 +62,14 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('accounting-manage', fn ($user) => $user->can('accounting.manage'));
         Gate::define('accounting-view', fn ($user) => $user->can('accounting.view'));
 
+        // Fixed assets.
+        Gate::define('assets-manage', fn ($user) => $user->can('asset.manage'));
+        Gate::define('assets-view', fn ($user) => $user->can('asset.view'));
+
+        // VAT / Mushak.
+        Gate::define('vat-manage', fn ($user) => $user->can('vat.manage'));
+        Gate::define('vat-view', fn ($user) => $user->can('vat.view'));
+
         // Super-admin bypasses all permission checks (still tenant-scoped by data).
         Gate::before(function ($user, $ability) {
             return $user->hasRole('super-admin') ? true : null;

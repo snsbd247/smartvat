@@ -49,7 +49,7 @@ docs/    ARCHITECTURE.md, PROJECT_STATUS.md, (ERD/data-dictionary: later)
 
 Legend: ✅ done & tested · 🔜 next · ⬜ planned
 
-### Foundation & core (DONE — 84 backend tests green)
+### Foundation & core (DONE — 92 backend tests green)
 - ✅ **Phase 1 — Project skeleton**: Laravel + React/Vite/Tailwind, CI (GitHub Actions), `/api/health`, OpenAPI scaffold, JSON-only API middleware.
 - ✅ **Phase 2 — Organization + Security + multi-tenant isolation**: companies, factories, warehouses, storage locations; users with **NID encrypted at rest + blind index**; Sanctum login; per-company RBAC; audit log; tenant isolation enforced (cross-tenant → 404/403).
 - ✅ **Phase 3 — CompanyConfig (business-type engine + module gate)**: Setup via business types (manufacturing/service/trading + hybrids) & industry templates; **backend module gate** (not just menu hiding).
@@ -62,10 +62,11 @@ Legend: ✅ done & tested · 🔜 next · ⬜ planned
 - ✅ **Phase 10 — Manufacturing**: BOM (versioned, input-output coefficient) + production orders; material issue → **WIP** (Dr WIP / Cr Inventory at avg cost); finished-goods receipt at WIP/qty cost (Dr Inventory / Cr WIP, WIP nets to zero); yield loss absorbed into unit cost.
 - ✅ **Phase 11 — Accounting completion**: manual journal entry + reverse, fund transfer, cost centers, chart-of-accounts management, period open/close/lock; **Profit & Loss**, **Balance Sheet** (balances), cash/bank book, trial balance; domain errors return 422.
 
+- ✅ **Phase 12 — Fixed Assets**: categories (with GL accounts), acquisition (Dr Asset / Cr cash·bank·payable), straight-line monthly depreciation (Dr Expense / Cr Accumulated), idempotent per asset+month.
+- ✅ **Phase 13 — VAT / Mushak + Mushak 9.1 Note-number mapping engine**: rate/transaction-type/treatment/note masters + configurable, versioned, effective-dated, **practitioner-verified** note mappings; classifier where VAT rate alone never determines the note; **unmapped → "review required", never a guessed Note Number**; note-wise summary, unmapped report, input/output registers.
+
 ### Remaining
-- 🔜 **Phase 12 — Fixed Assets**: categories, register, acquisition/transfer/revaluation/disposal/maintenance, depreciation → GL.
-- ⬜ **Phase 13 — VAT / Mushak + Mushak 9.1 Note-number mapping engine**: rate/transaction-type/treatment masters, classifier, note→subform mapping, input/output & purchase/sales registers, return preparation, Mushak document register & print, **unmapped-transaction report**, reconciliation. *(All rules configurable, versioned, effective-dated, practitioner-verified — never hard-coded or guessed.)*
-- ⬜ **Phase 14 — VDS (VAT Deduction at Source)**: rule/rate config, deduction, register, certificate, treasury deposit, payable ledger, deducted-vs-deposited reconciliation.
+- 🔜 **Phase 14 — VDS (VAT Deduction at Source)**: rule/rate config, deduction, register, certificate, treasury deposit, payable ledger, deducted-vs-deposited reconciliation.
 - ⬜ **Phase 15 — Contract Manufacturing / Job Work**: customer-owned material custody (receipt/issue/consumption/return), customer-owned FG, scrap ownership, processing invoices, material reconciliation, job-work costing.
 - ⬜ **Phase 16 — Reporting engine**: reusable PDF (preview + full-screen + new-tab + print + download) + XLSX export; secured document routes; Document Center.
 - ⬜ **Phase 17 — MIS dashboards**: executive / purchase / sales / production / inventory / accounting / VAT-VDS / job-work, with filters + drill-down; Approval Center.

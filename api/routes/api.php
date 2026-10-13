@@ -10,6 +10,8 @@ use App\Modules\Sales\Http\Controllers\CustomerController;
 use App\Modules\Sales\Http\Controllers\SalesController;
 use App\Modules\Manufacturing\Http\Controllers\ProductionController;
 use App\Modules\Accounting\Http\Controllers\AccountingController;
+use App\Modules\FixedAssets\Http\Controllers\FixedAssetController;
+use App\Modules\Vat\Http\Controllers\VatController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
 use App\Modules\Organization\Http\Controllers\CompanyController;
 use App\Modules\Organization\Http\Controllers\FactoryController;
@@ -106,5 +108,24 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('production-orders/{productionOrder}/issue', [ProductionController::class, 'issue'])->name('prod.issue');
             Route::post('production-orders/{productionOrder}/receive', [ProductionController::class, 'receive'])->name('prod.receive');
         });
+
+        // Fixed assets (always-on module).
+        Route::get('fixed-assets', [FixedAssetController::class, 'index'])->name('fa.index');
+        Route::post('asset-categories', [FixedAssetController::class, 'storeCategory'])->name('fa.cat.store');
+        Route::post('fixed-assets', [FixedAssetController::class, 'store'])->name('fa.store');
+        Route::post('fixed-assets/run-depreciation', [FixedAssetController::class, 'runDepreciation'])->name('fa.depr');
+
+        // VAT / Mushak (always-on module). Statutory rules are data — configured,
+        // approved (= practitioner-verified) before they can classify.
+        Route::post('vat/rates', [VatController::class, 'storeRate'])->name('vat.rate');
+        Route::post('vat/transaction-types', [VatController::class, 'storeType'])->name('vat.type');
+        Route::post('vat/tax-treatments', [VatController::class, 'storeTreatment'])->name('vat.treatment');
+        Route::post('vat/notes', [VatController::class, 'storeNote'])->name('vat.note');
+        Route::post('vat/mappings', [VatController::class, 'storeMapping'])->name('vat.mapping');
+        Route::patch('vat/mappings/{mapping}/approve', [VatController::class, 'approveMapping'])->name('vat.mapping.approve');
+        Route::post('vat/classify', [VatController::class, 'classify'])->name('vat.classify');
+        Route::get('vat/note-summary', [VatController::class, 'noteSummary'])->name('vat.notesummary');
+        Route::get('vat/unmapped', [VatController::class, 'unmapped'])->name('vat.unmapped');
+        Route::get('vat/register', [VatController::class, 'register'])->name('vat.register');
     });
 });
