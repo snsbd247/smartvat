@@ -12,6 +12,8 @@ use App\Modules\Manufacturing\Http\Controllers\ProductionController;
 use App\Modules\Accounting\Http\Controllers\AccountingController;
 use App\Modules\FixedAssets\Http\Controllers\FixedAssetController;
 use App\Modules\Vat\Http\Controllers\VatController;
+use App\Modules\Vds\Http\Controllers\VdsController;
+use App\Modules\JobWork\Http\Controllers\JobWorkController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
 use App\Modules\Organization\Http\Controllers\CompanyController;
 use App\Modules\Organization\Http\Controllers\FactoryController;
@@ -127,5 +129,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('vat/note-summary', [VatController::class, 'noteSummary'])->name('vat.notesummary');
         Route::get('vat/unmapped', [VatController::class, 'unmapped'])->name('vat.unmapped');
         Route::get('vat/register', [VatController::class, 'register'])->name('vat.register');
+
+        // VDS — configurable, verified rules; deduction / certificate / treasury deposit.
+        Route::post('vds/rules', [VdsController::class, 'storeRule'])->name('vds.rule');
+        Route::patch('vds/rules/{rule}/approve', [VdsController::class, 'approveRule'])->name('vds.rule.approve');
+        Route::post('vds/deductions', [VdsController::class, 'deduct'])->name('vds.deduct');
+        Route::post('vds/deductions/{deduction}/certificate', [VdsController::class, 'issueCertificate'])->name('vds.cert');
+        Route::post('vds/deposits', [VdsController::class, 'deposit'])->name('vds.deposit');
+        Route::get('vds/reconciliation', [VdsController::class, 'reconciliation'])->name('vds.recon');
+
+        // Contract manufacturing / job work (customer-owned material custody).
+        Route::post('job-work/contracts', [JobWorkController::class, 'storeContract'])->name('jw.contract');
+        Route::post('job-work/orders', [JobWorkController::class, 'storeOrder'])->name('jw.order');
+        Route::post('job-work/orders/{jobWorkOrder}/receive-material', [JobWorkController::class, 'receiveMaterial'])->name('jw.recv');
+        Route::post('job-work/orders/{jobWorkOrder}/consume-material', [JobWorkController::class, 'consumeMaterial'])->name('jw.consume');
+        Route::post('job-work/orders/{jobWorkOrder}/deliver', [JobWorkController::class, 'deliver'])->name('jw.deliver');
+        Route::post('job-work/processing-invoices', [JobWorkController::class, 'processingInvoice'])->name('jw.pinv');
+        Route::get('job-work/material-reconciliation', [JobWorkController::class, 'reconciliation'])->name('jw.recon');
     });
 });

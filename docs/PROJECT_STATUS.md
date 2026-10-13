@@ -131,8 +131,17 @@ Last updated: 2026-10-13
   - [x] Endpoints: rates/transaction-types/tax-treatments/notes/mappings (+approve = practitioner-verify), classify, note-summary, unmapped, register
   - [x] Tests: **92 Pest green total** (+8: acquire/depreciation/idempotent; classify-verified, review_required, rate-not-sole-determinant, unapproved-ignored, summary+unmapped)
   - Deferred: VAT return preparation & Mushak document register/print, VAT↔GL reconciliation, auto-classify wired into sales/purchase posting
-- [ ] Phase 14 — VDS
-- [ ] Phase 15 — Job Work (customer-owned)
+- [x] **Phase 14** — VDS (COMPLETE)
+  - [x] vds_rules (configurable, versioned, effective-dated, approved+verified), vds_deductions, vds_certificates, vds_treasury_deposits
+  - [x] `VdsService`: rateFor (verified rule only, else null — **no hard-coded rate**); deduct (Dr AP supplier / Cr VDS payable); issueCertificate; depositToTreasury (Dr VDS payable / Cr Cash|Bank); deducted-vs-deposited reconciliation
+  - [x] Account map: vds_payable
+  - [x] Tests: refuse without verified rule, unapproved ignored, deduct posting, deposit reconciliation, certificate
+- [x] **Phase 15** — Contract Manufacturing / Job Work (COMPLETE)
+  - [x] manufacturing_contracts, job_work_orders, processing_invoices
+  - [x] `JobWorkService`: customer material receive/consume/deliver via stock engine with **owner_type=customer** — never company inventory/asset, **no GL for custody**; processing invoice charges the conversion **service** (Dr AR / Cr processing income), not goods; material reconciliation (received − consumed/delivered = balance)
+  - [x] Account map: processing_income
+  - [x] Tests: **100 Pest green total** (+8) — custody has no journal entry & company reconciliation unaffected; material reconciliation; processing invoice is service revenue
+  - Deferred: customer-owned FG ownership-transfer workflow, scrap ownership posting, job-work costing report
 - [ ] Phase 16 — Reporting engine (PDF/XLSX)
 - [ ] Phase 17 — MIS dashboards + Approval Center
 - [ ] Phase 18 — Google Drive backup/restore

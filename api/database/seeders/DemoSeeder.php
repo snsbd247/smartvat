@@ -113,6 +113,8 @@ class DemoSeeder extends Seeder
             'sales_revenue' => '4000',
             'export_revenue' => '4100',
             'exchange_gain_loss' => '4200',
+            'processing_income' => '4300',
+            'vds_payable' => '2200',
         ];
 
         foreach ($map as $key => $code) {
@@ -138,10 +140,12 @@ class DemoSeeder extends Seeder
             ['2050', 'GRN Clearing', 'liability'],
             ['2060', 'Landed Cost Clearing', 'liability'],
             ['2100', 'VAT Payable', 'liability'],
+            ['2200', 'VDS Payable', 'liability'],
             ['3000', 'Share Capital', 'equity'],
             ['4000', 'Sales Revenue', 'income'],
             ['4100', 'Export Sales', 'income'],
             ['4200', 'Exchange Gain/Loss', 'income'],
+            ['4300', 'Processing Income', 'income'],
             ['5000', 'Cost of Goods Sold', 'expense'],
             ['5100', 'Inventory Adjustment', 'expense'],
         ];
