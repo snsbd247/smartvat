@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureModuleEnabled;
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\ResolveCompany;
 use Illuminate\Foundation\Application;
@@ -19,9 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
             ForceJsonResponse::class,
         ]);
 
-        // Alias for the tenant resolver; applied after auth on company-scoped routes.
+        // Aliases: tenant resolver + module gate, applied after auth on scoped routes.
         $middleware->alias([
             'company' => ResolveCompany::class,
+            'module' => EnsureModuleEnabled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

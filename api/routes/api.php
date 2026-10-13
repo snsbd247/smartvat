@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\System\HealthController;
+use App\Modules\Organization\Http\Controllers\CompanyConfigController;
 use App\Modules\Organization\Http\Controllers\CompanyController;
 use App\Modules\Organization\Http\Controllers\FactoryController;
 use App\Modules\Organization\Http\Controllers\WarehouseController;
@@ -27,8 +28,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me'])->name('auth.me');
         Route::get('/company/current', [CompanyController::class, 'current'])->name('company.current');
 
+        // Company configuration (business types, industry template, module manifest).
+        Route::get('/company/modules', [CompanyConfigController::class, 'modules'])->name('company.modules');
+        Route::get('/company/config', [CompanyConfigController::class, 'show'])->name('company.config.show');
+        Route::put('/company/config', [CompanyConfigController::class, 'update'])->name('company.config.update');
+
+        // Organization module (always enabled for every company).
         Route::apiResource('factories', FactoryController::class);
-        Route::apiResource('warehouses', WarehouseController::class)
-            ->only(['index', 'store', 'show', 'destroy']);
+
+        // Inventory module — gated: only companies with the inventory module enabled.
+        Route::middleware('module:inventory')->group(function () {
+            Route::apiResource('warehouses', WarehouseController::class)
+                ->only(['index', 'store', 'show', 'destroy']);
+        });
     });
 });

@@ -30,4 +30,31 @@ class Company extends Model
             ->withPivot('is_default')
             ->withTimestamps();
     }
+
+    public function businessTypes(): HasMany
+    {
+        return $this->hasMany(CompanyBusinessType::class);
+    }
+
+    public function modules(): HasMany
+    {
+        return $this->hasMany(CompanyModule::class);
+    }
+
+    /** Whether a given module is enabled for this company (module gate source). */
+    public function hasModule(string $key): bool
+    {
+        return $this->modules()->where('module_key', $key)->where('enabled', true)->exists();
+    }
+
+    /** Enabled module keys (for the frontend sidebar manifest). */
+    public function enabledModuleKeys(): array
+    {
+        return $this->modules()->where('enabled', true)->pluck('module_key')->all();
+    }
+
+    public function primaryBusinessType(): ?string
+    {
+        return $this->businessTypes()->where('is_primary', true)->value('type');
+    }
 }

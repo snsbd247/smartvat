@@ -80,6 +80,54 @@ paths:
       security: [{ sanctum: [] }]
       responses:
         '200': { description: List of companies }
+  /company/modules:
+    get:
+      tags: [Organization]
+      summary: Enabled module keys for the active company (sidebar manifest)
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses:
+        '200': { description: '{ modules: string[] }' }
+  /company/config:
+    get:
+      tags: [Organization]
+      summary: Business types + per-module enabled state
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses:
+        '200': { description: Company configuration }
+    put:
+      tags: [Organization]
+      summary: Reconfigure business types / industry template and re-derive modules
+      description: Requires the company.configure permission.
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [business_types]
+              properties:
+                business_types:
+                  type: array
+                  items: { type: string, enum: [manufacturing, service, trading] }
+                primary_business_type: { type: string, enum: [manufacturing, service, trading] }
+                industry_template: { type: string }
+      responses:
+        '200': { description: Updated configuration }
+        '403': { description: Missing company.configure permission }
+        '422': { description: Validation error }
+  /warehouses:
+    get:
+      tags: [Organization]
+      summary: List warehouses (current company; requires the inventory module)
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses:
+        '200': { description: Paginated warehouses }
+        '403': { description: Inventory module not enabled, or missing warehouse.view }
   /factories:
     get:
       tags: [Organization]

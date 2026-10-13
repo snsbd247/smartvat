@@ -18,6 +18,7 @@ class RolesAndPermissionsSeeder extends Seeder
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $permissions = [
+            'company.view', 'company.configure',
             'factory.view', 'factory.create', 'factory.update', 'factory.delete',
             'warehouse.view', 'warehouse.create', 'warehouse.update', 'warehouse.delete',
         ];

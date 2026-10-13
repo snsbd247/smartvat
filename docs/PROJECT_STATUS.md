@@ -48,7 +48,15 @@ Last updated: 2026-10-13
   - [x] Seeders: RolesAndPermissions (global defs) + Demo (2 companies, fake data)
   - [x] Tests: **20 Pest green** — tenant isolation (list scope, cross-tenant 404, unauthorized-company 403, company stamping), auth, authZ (viewer vs admin, per-company unique codes), NID encryption
   - Deferred to later phases: MFA enablement, StorageLocation endpoints, full user-management CRUD UI, factory-scope enforcement per-module
-- [ ] Phase 3 — CompanyConfig (Setup Wizard, business-type engine, module gate)
+- [x] **Phase 3** — CompanyConfig (business-type engine + module gate) (COMPLETE)
+  - [x] `company_business_types` + `company_modules` tables & models
+  - [x] Module catalog + industry templates in `config/erp.php`
+  - [x] `CompanyConfigurator` service: business types (+ primary, hybrid) + industry template → derived enabled modules
+  - [x] `EnsureModuleEnabled` (`module:<key>`) middleware — backend module gate (not just menu hiding)
+  - [x] Endpoints: GET /company/modules (manifest), GET/PUT /company/config (reconfigure, `company.configure` perm); warehouses gated by `module:inventory`
+  - [x] DemoSeeder: ACME (manufacturing, 18 modules), BETA (trading, 16), GAMMA (service, 15)
+  - [x] Tests: **33 Pest green total** (+13: configurator per type/hybrid/validation, module gate allow/deny, config endpoint authZ)
+  - Deferred: company-creation (setup wizard first-step) endpoint + bootstrap super-admin; frontend wizard UI; per-module menu manifest wiring in SPA
 - [ ] Phase 4 — Shared engines: Posting + Stock
 - [ ] Phase 5 — MasterData + Inventory ops
 - [ ] Phase 6 — Purchase Local
