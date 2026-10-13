@@ -27,5 +27,20 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Domain/business-rule violations surface as 422 (not 500) for API clients.
+        $exceptions->render(function (\Throwable $e, $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+            $domain = $e instanceof \App\Modules\Accounting\Exceptions\UnbalancedEntryException
+                || $e instanceof \App\Modules\Accounting\Exceptions\PeriodClosedException
+                || $e instanceof \App\Modules\Inventory\Exceptions\InsufficientStockException
+                || $e instanceof \InvalidArgumentException;
+
+            if ($domain) {
+                return response()->json(['message' => $e->getMessage()], 422);
+            }
+
+            return null;
+        });
     })->create();

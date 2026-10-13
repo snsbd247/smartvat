@@ -127,6 +127,7 @@ function mapInventoryAccounts(Company $company): void
 {
     $defs = [
         'inventory' => ['1300', 'asset'],
+        'wip' => ['1350', 'asset'],
         'grn_clearing' => ['2050', 'liability'],
         'cogs' => ['5000', 'expense'],
         'inventory_adjustment' => ['5100', 'expense'],

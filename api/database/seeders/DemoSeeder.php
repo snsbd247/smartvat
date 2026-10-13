@@ -103,6 +103,7 @@ class DemoSeeder extends Seeder
     {
         $map = [
             'inventory' => '1300',
+            'wip' => '1350',
             'grn_clearing' => '2050',
             'cogs' => '5000',
             'inventory_adjustment' => '5100',
@@ -132,6 +133,7 @@ class DemoSeeder extends Seeder
             ['1010', 'Bank Account', 'asset'],
             ['1200', 'Accounts Receivable', 'asset'],
             ['1300', 'Inventory', 'asset'],
+            ['1350', 'Work in Progress', 'asset'],
             ['2000', 'Accounts Payable', 'liability'],
             ['2050', 'GRN Clearing', 'liability'],
             ['2060', 'Landed Cost Clearing', 'liability'],

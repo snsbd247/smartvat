@@ -8,6 +8,8 @@ use App\Modules\Purchase\Http\Controllers\PurchaseController;
 use App\Modules\Purchase\Http\Controllers\SupplierController;
 use App\Modules\Sales\Http\Controllers\CustomerController;
 use App\Modules\Sales\Http\Controllers\SalesController;
+use App\Modules\Manufacturing\Http\Controllers\ProductionController;
+use App\Modules\Accounting\Http\Controllers\AccountingController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
 use App\Modules\Organization\Http\Controllers\CompanyController;
 use App\Modules\Organization\Http\Controllers\FactoryController;
@@ -80,6 +82,29 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('inventory/stock', [InventoryController::class, 'stock'])->name('inventory.stock');
             Route::get('inventory/ledger', [InventoryController::class, 'ledger'])->name('inventory.ledger');
             Route::get('inventory/reconciliation', [InventoryController::class, 'reconciliation'])->name('inventory.reconciliation');
+        });
+
+        // Accounting (always-on module).
+        Route::get('accounting/accounts', [AccountingController::class, 'accounts'])->name('acc.accounts');
+        Route::post('accounting/accounts', [AccountingController::class, 'storeAccount'])->name('acc.accounts.store');
+        Route::get('accounting/cost-centers', [AccountingController::class, 'costCenters'])->name('acc.cc');
+        Route::post('accounting/cost-centers', [AccountingController::class, 'storeCostCenter'])->name('acc.cc.store');
+        Route::post('accounting/journals', [AccountingController::class, 'storeJournal'])->name('acc.journal.store');
+        Route::post('accounting/journals/{journalEntry}/reverse', [AccountingController::class, 'reverseJournal'])->name('acc.journal.reverse');
+        Route::post('accounting/fund-transfers', [AccountingController::class, 'fundTransfer'])->name('acc.fund');
+        Route::get('accounting/trial-balance', [AccountingController::class, 'trialBalance'])->name('acc.tb');
+        Route::get('accounting/profit-loss', [AccountingController::class, 'profitAndLoss'])->name('acc.pl');
+        Route::get('accounting/balance-sheet', [AccountingController::class, 'balanceSheet'])->name('acc.bs');
+        Route::get('accounting/accounts/{account}/cash-book', [AccountingController::class, 'cashBook'])->name('acc.cashbook');
+        Route::get('accounting/periods', [AccountingController::class, 'periods'])->name('acc.periods');
+        Route::patch('accounting/periods/{period}/status', [AccountingController::class, 'setPeriodStatus'])->name('acc.period.status');
+
+        // Manufacturing — gated: only companies with the production module enabled.
+        Route::middleware('module:production')->group(function () {
+            Route::post('boms', [ProductionController::class, 'storeBom'])->name('bom.store');
+            Route::post('production-orders', [ProductionController::class, 'storeOrder'])->name('prod.store');
+            Route::post('production-orders/{productionOrder}/issue', [ProductionController::class, 'issue'])->name('prod.issue');
+            Route::post('production-orders/{productionOrder}/receive', [ProductionController::class, 'receive'])->name('prod.receive');
         });
     });
 });

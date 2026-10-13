@@ -105,8 +105,19 @@ Last updated: 2026-10-13
   - [x] Endpoints: customers apiResource; sales-invoices, delivery-challans, customer-receipts, sales-returns, customers/{id}/ledger
   - [x] Tests: **77 Pest green total** (+8: local + export paths; gain and loss)
   - Deferred: sales quotation, sales commission, export shipping docs (EXP/COO/shipping bill) tracking, aging buckets
-- [ ] Phase 10 — Manufacturing
-- [ ] Phase 11 — Accounting completion
+- [x] **Phase 10** — Manufacturing (COMPLETE)
+  - [x] boms(+lines, input-output coefficient, versioned), production_orders (planned/produced/scrap/wip_value)
+  - [x] `ProductionService`: createBom/createOrder; issueMaterials (stock out of raw at avg + Dr WIP/Cr Inventory; BOM scaled to planned qty or explicit lines); receiveFinished (FG in at WIP/qty cost + Dr Inventory/Cr WIP; WIP nets to 0; yield loss absorbed into unit cost)
+  - [x] Endpoints (module:production gated): boms, production-orders(+issue,+receive)
+  - [x] Account map: wip
+  - [x] Tests: issue→WIP, FG receipt reconciled + WIP zero, yield-loss absorption
+- [x] **Phase 11** — Accounting completion (COMPLETE)
+  - [x] cost_centers (table/model); manual journal entry (via PostingService) + reverse; fund transfer; CoA create/list; period status (open/closed/locked)
+  - [x] `AccountingReportService`: Profit & Loss, **Balance Sheet (asset = liab + equity + net profit, in_balance)**, cash/bank book; trial balance
+  - [x] Domain exceptions (unbalanced/period-closed/insufficient-stock/invalid) render as **422** for API clients
+  - [x] Endpoints: accounting/accounts, cost-centers, journals(+reverse), fund-transfers, trial-balance, profit-loss, balance-sheet, accounts/{id}/cash-book, periods(+status)
+  - [x] Tests: **84 Pest green total** (+7: P&L, balance-sheet balances, fund transfer, unbalanced→422)
+  - Deferred: journal approval workflow, bank reconciliation, budget vs actual, year-end close automation
 - [ ] Phase 12 — Fixed Assets
 - [ ] Phase 13 — VAT/Mushak + Mushak 9.1 Note engine
 - [ ] Phase 14 — VDS
