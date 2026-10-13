@@ -32,6 +32,11 @@ import { VdsDeductionPage } from './modules/vds/VdsDeductionPage'
 import { VdsReconPage } from './modules/vds/VdsReconPage'
 import { BomsPage } from './modules/production/BomsPage'
 import { ProductionOrdersPage } from './modules/production/ProductionOrdersPage'
+import { AssetCategoriesPage } from './modules/assets/AssetCategoriesPage'
+import { FixedAssetsPage } from './modules/assets/FixedAssetsPage'
+import { JobWorkContractsPage } from './modules/jobwork/JobWorkContractsPage'
+import { JobWorkOrdersPage } from './modules/jobwork/JobWorkOrdersPage'
+import { ApprovalCenterPage } from './modules/approvals/ApprovalCenterPage'
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth()
@@ -108,6 +113,26 @@ export default function App() {
         <Route path="production/orders" element={<ProductionOrdersPage />} />
         <Route path="production/issue" element={<ProductionOrdersPage />} />
         <Route path="production/fg-receipt" element={<ProductionOrdersPage />} />
+
+        {/* Fixed Assets */}
+        <Route path="assets/register" element={<FixedAssetsPage />} />
+        <Route path="assets/acquisition" element={<FixedAssetsPage />} />
+        <Route path="assets/depreciation" element={<FixedAssetsPage />} />
+        <Route path="assets/categories" element={<AssetCategoriesPage />} />
+
+        {/* Job Work */}
+        <Route path="job-work/contracts" element={<JobWorkContractsPage />} />
+        <Route path="job-work/orders" element={<JobWorkOrdersPage />} />
+        <Route path="job-work/material-receipt" element={<JobWorkOrdersPage />} />
+        <Route path="job-work/processing-fee" element={<JobWorkOrdersPage />} />
+
+        {/* Approval Center */}
+        <Route path="approvals/purchase" element={<ApprovalCenterPage />} />
+        <Route path="approvals/sales" element={<ApprovalCenterPage />} />
+        <Route path="approvals/payment" element={<ApprovalCenterPage />} />
+        <Route path="approvals/journal" element={<ApprovalCenterPage />} />
+        <Route path="approvals/production" element={<ApprovalCenterPage />} />
+        <Route path="approvals/vat" element={<ApprovalCenterPage />} />
 
         {/* Reports hub */}
         <Route path="reports/builder" element={<ReportsPage />} />

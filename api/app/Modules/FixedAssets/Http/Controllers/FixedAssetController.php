@@ -3,6 +3,7 @@
 namespace App\Modules\FixedAssets\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\FixedAssets\Models\AssetCategory;
 use App\Modules\FixedAssets\Models\FixedAsset;
 use App\Modules\FixedAssets\Services\FixedAssetService;
 use App\Shared\Tenancy\CurrentCompany;
@@ -22,6 +23,13 @@ class FixedAssetController extends Controller
         $this->authorize('assets-view');
 
         return response()->json(FixedAsset::orderBy('asset_no')->paginate(25));
+    }
+
+    public function categories(): JsonResponse
+    {
+        $this->authorize('assets-view');
+
+        return response()->json(AssetCategory::orderBy('code')->get());
     }
 
     public function storeCategory(Request $request): JsonResponse

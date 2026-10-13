@@ -4,6 +4,7 @@ namespace App\Modules\JobWork\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\JobWork\Models\JobWorkOrder;
+use App\Modules\JobWork\Models\ManufacturingContract;
 use App\Modules\JobWork\Services\JobWorkService;
 use App\Shared\Tenancy\CurrentCompany;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +17,20 @@ class JobWorkController extends Controller
         private JobWorkService $jobWork,
         private CurrentCompany $current,
     ) {}
+
+    public function contracts(): JsonResponse
+    {
+        $this->authorize('jobwork-view');
+
+        return response()->json(ManufacturingContract::orderByDesc('id')->get());
+    }
+
+    public function orders(): JsonResponse
+    {
+        $this->authorize('jobwork-view');
+
+        return response()->json(JobWorkOrder::orderByDesc('id')->limit(100)->get());
+    }
 
     public function storeContract(Request $request): JsonResponse
     {

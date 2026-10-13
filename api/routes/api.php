@@ -120,6 +120,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Fixed assets (always-on module).
         Route::get('fixed-assets', [FixedAssetController::class, 'index'])->name('fa.index');
+        Route::get('asset-categories', [FixedAssetController::class, 'categories'])->name('fa.cat.list');
         Route::post('asset-categories', [FixedAssetController::class, 'storeCategory'])->name('fa.cat.store');
         Route::post('fixed-assets', [FixedAssetController::class, 'store'])->name('fa.store');
         Route::post('fixed-assets/run-depreciation', [FixedAssetController::class, 'runDepreciation'])->name('fa.depr');
@@ -153,6 +154,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('vds/reconciliation', [VdsController::class, 'reconciliation'])->name('vds.recon');
 
         // Contract manufacturing / job work (customer-owned material custody).
+        Route::get('job-work/contracts', [JobWorkController::class, 'contracts'])->name('jw.contracts');
+        Route::get('job-work/orders', [JobWorkController::class, 'orders'])->name('jw.orders');
         Route::post('job-work/contracts', [JobWorkController::class, 'storeContract'])->name('jw.contract');
         Route::post('job-work/orders', [JobWorkController::class, 'storeOrder'])->name('jw.order');
         Route::post('job-work/orders/{jobWorkOrder}/receive-material', [JobWorkController::class, 'receiveMaterial'])->name('jw.recv');

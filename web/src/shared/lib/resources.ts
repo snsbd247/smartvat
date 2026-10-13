@@ -178,6 +178,48 @@ export const Production = {
     api.post(`/production-orders/${id}/receive`, { qty, scrap_qty }).then((r) => r.data),
 }
 
+export interface AssetCategory { id: number; code: string; name: string; useful_life_months: number }
+export interface FixedAsset {
+  id: number
+  asset_no: string
+  name: string
+  cost: string
+  accumulated_depreciation: string
+  book_value: string
+  status: string
+}
+export const FixedAssets = {
+  categories: () => api.get<AssetCategory[]>('/asset-categories').then((r) => r.data),
+  createCategory: (b: Record<string, string>) => api.post('/asset-categories', b).then((r) => r.data),
+  assets: async (): Promise<FixedAsset[]> => {
+    const { data } = await api.get<{ data: FixedAsset[] }>('/fixed-assets')
+    return data.data ?? (data as unknown as FixedAsset[])
+  },
+  acquire: (b: Record<string, string | number>) => api.post('/fixed-assets', b).then((r) => r.data),
+  runDepreciation: () => api.post('/fixed-assets/run-depreciation', {}).then((r) => r.data),
+}
+
+export interface Contract { id: number; contract_no: string; customer_id: number; processing_rate: string; scrap_ownership: string }
+export interface JobWorkOrderRow { id: number; order_no: string; customer_id: number; status: string }
+export const JobWork = {
+  contracts: () => api.get<Contract[]>('/job-work/contracts').then((r) => r.data),
+  createContract: (b: Record<string, string>) => api.post('/job-work/contracts', b).then((r) => r.data),
+  orders: () => api.get<JobWorkOrderRow[]>('/job-work/orders').then((r) => r.data),
+  createOrder: (b: Record<string, string | number>) => api.post('/job-work/orders', b).then((r) => r.data),
+  receiveMaterial: (orderId: number, lines: { product_id: number; qty: number }[]) =>
+    api.post(`/job-work/orders/${orderId}/receive-material`, { lines }).then((r) => r.data),
+  consumeMaterial: (orderId: number, lines: { product_id: number; qty: number }[]) =>
+    api.post(`/job-work/orders/${orderId}/consume-material`, { lines }).then((r) => r.data),
+  processingInvoice: (b: { customer_id: number; job_work_order_id?: number; qty: number; rate: number }) =>
+    api.post('/job-work/processing-invoices', b).then((r) => r.data),
+}
+
+export interface Approval { type: string; id: number; number: string; amount: string | null }
+export const Approvals = {
+  pending: () => api.get<{ pending: Approval[] }>('/mis/approvals').then((r) => r.data.pending),
+  approvePurchaseOrder: (id: number) => api.post(`/purchase-orders/${id}/approve`, {}).then((r) => r.data),
+}
+
 export const Reports = {
   list: () => api.get<{ reports: string[] }>('/reports').then((r) => r.data.reports),
   json: (key: string) => api.get<ReportDef>(`/reports/${key}?format=json`).then((r) => r.data),
