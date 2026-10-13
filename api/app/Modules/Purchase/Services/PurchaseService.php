@@ -72,6 +72,8 @@ class PurchaseService
                 ]);
             }
 
+            app(\App\Modules\Approval\Services\ApprovalService::class)->request($po, $po->po_no, (string) $po->total);
+
             return $po->load('lines');
         });
     }

@@ -6,10 +6,8 @@ use App\Modules\Accounting\Models\Account;
 use App\Modules\Accounting\Services\AccountingReportService;
 use App\Modules\Accounting\Services\AccountResolver;
 use App\Modules\Accounting\Services\LedgerService;
+use App\Modules\Approval\Models\Approval;
 use App\Modules\Inventory\Services\InventoryReportService;
-use App\Modules\Manufacturing\Models\ProductionOrder;
-use App\Modules\Purchase\Models\PurchaseOrder;
-use App\Modules\Sales\Models\SalesOrder;
 use App\Modules\Vat\Models\VatClassification;
 use App\Shared\Support\Num;
 
@@ -46,26 +44,21 @@ class MisService
 
     public function approvals(): array
     {
-        $items = [];
-
-        foreach (PurchaseOrder::where('status', 'draft')->get() as $po) {
-            $items[] = ['type' => 'purchase_order', 'id' => $po->id, 'number' => $po->po_no, 'amount' => (string) $po->total];
-        }
-        foreach (SalesOrder::where('status', 'draft')->get() as $so) {
-            $items[] = ['type' => 'sales_order', 'id' => $so->id, 'number' => $so->so_no, 'amount' => (string) $so->total];
-        }
-        foreach (ProductionOrder::where('status', 'draft')->get() as $pr) {
-            $items[] = ['type' => 'production_order', 'id' => $pr->id, 'number' => $pr->order_no, 'amount' => null];
-        }
-
-        return $items;
+        return Approval::where('status', 'pending')
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn (Approval $a) => [
+                'approval_id' => $a->id,
+                'type' => $a->typeLabel(),
+                'id' => $a->approvable_id,
+                'number' => $a->document_no,
+                'amount' => $a->amount !== null ? (string) $a->amount : null,
+            ])->all();
     }
 
     private function pendingApprovalsCount(): int
     {
-        return PurchaseOrder::where('status', 'draft')->count()
-            + SalesOrder::where('status', 'draft')->count()
-            + ProductionOrder::where('status', 'draft')->count();
+        return Approval::where('status', 'pending')->count();
     }
 
     private function balance(string $key): string

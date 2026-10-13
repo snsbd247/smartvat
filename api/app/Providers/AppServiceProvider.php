@@ -128,6 +128,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('user-view', fn ($user) => $user->can('user.view'));
         Gate::define('user-manage', fn ($user) => $user->can('user.manage'));
 
+        // Generic document approvals.
+        Gate::define('approval-view', fn ($user) => $user->can('approval.view'));
+        Gate::define('approval-manage', fn ($user) => $user->can('approval.manage'));
+
         // Super-admin bypasses all permission checks (still tenant-scoped by data).
         Gate::before(function ($user, $ability) {
             return $user->hasRole('super-admin') ? true : null;

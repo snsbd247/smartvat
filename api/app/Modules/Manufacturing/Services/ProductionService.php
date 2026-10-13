@@ -57,7 +57,7 @@ class ProductionService
 
     public function createOrder(array $data): ProductionOrder
     {
-        return ProductionOrder::create([
+        $order = ProductionOrder::create([
             'company_id' => $this->current->idOrFail(),
             'order_no' => $this->numbers->next('production_order', 'PRD-'),
             'product_id' => $data['product_id'],
@@ -68,6 +68,10 @@ class ProductionService
             'status' => 'draft',
             'created_by' => auth()->id(),
         ]);
+
+        app(\App\Modules\Approval\Services\ApprovalService::class)->request($order, $order->order_no);
+
+        return $order;
     }
 
     /**

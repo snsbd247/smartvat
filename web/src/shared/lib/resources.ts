@@ -362,10 +362,22 @@ export const JobWork = {
     api.post('/job-work/processing-invoices', b).then((r) => r.data),
 }
 
-export interface Approval { type: string; id: number; number: string; amount: string | null }
+export interface Approval {
+  id: number
+  type: string
+  document_no: string | null
+  amount: string | null
+  status: 'pending' | 'approved' | 'rejected'
+  note: string | null
+  requested_by: string | null
+  acted_by: string | null
+  acted_at: string | null
+}
 export const Approvals = {
-  pending: () => api.get<{ pending: Approval[] }>('/mis/approvals').then((r) => r.data.pending),
-  approvePurchaseOrder: (id: number) => api.post(`/purchase-orders/${id}/approve`, {}).then((r) => r.data),
+  list: (status: 'pending' | 'approved' | 'rejected' = 'pending') =>
+    api.get<Approval[]>(`/approvals?status=${status}`).then((r) => r.data),
+  approve: (id: number) => api.post(`/approvals/${id}/approve`, {}).then((r) => r.data),
+  reject: (id: number, note?: string) => api.post(`/approvals/${id}/reject`, { note }).then((r) => r.data),
 }
 
 export const Reports = {

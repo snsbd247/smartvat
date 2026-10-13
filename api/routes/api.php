@@ -15,6 +15,7 @@ use App\Modules\Vat\Http\Controllers\VatController;
 use App\Modules\Vds\Http\Controllers\VdsController;
 use App\Modules\JobWork\Http\Controllers\JobWorkController;
 use App\Modules\Reporting\Http\Controllers\ReportController;
+use App\Modules\Approval\Http\Controllers\ApprovalController;
 use App\Modules\Mis\Http\Controllers\MisController;
 use App\Modules\Backup\Http\Controllers\BackupController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
@@ -191,6 +192,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('mis/executive', [MisController::class, 'executive'])->name('mis.exec');
         Route::get('mis/dashboard', [MisController::class, 'dashboard'])->name('mis.dashboard');
         Route::get('mis/approvals', [MisController::class, 'approvals'])->name('mis.approvals');
+
+        // Generic approval workflow (all document types).
+        Route::get('approvals', [ApprovalController::class, 'index'])->name('approvals.index');
+        Route::post('approvals/{approval}/approve', [ApprovalController::class, 'approve'])->name('approvals.approve');
+        Route::post('approvals/{approval}/reject', [ApprovalController::class, 'reject'])->name('approvals.reject');
 
         // Backup & System Health.
         Route::get('backup/jobs', [BackupController::class, 'jobs'])->name('backup.jobs');
