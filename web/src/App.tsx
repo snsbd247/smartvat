@@ -37,6 +37,11 @@ import { FixedAssetsPage } from './modules/assets/FixedAssetsPage'
 import { JobWorkContractsPage } from './modules/jobwork/JobWorkContractsPage'
 import { JobWorkOrdersPage } from './modules/jobwork/JobWorkOrdersPage'
 import { ApprovalCenterPage } from './modules/approvals/ApprovalCenterPage'
+import { FactoriesPage } from './modules/organization/FactoriesPage'
+import { WarehousesPage } from './modules/organization/WarehousesPage'
+import { CompanyConfigPage } from './modules/organization/CompanyConfigPage'
+import { UsersPage } from './modules/users/UsersPage'
+import { BackupHealthPage } from './modules/backup/BackupHealthPage'
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth()
@@ -62,6 +67,20 @@ export default function App() {
         }
       >
         <Route index element={<DashboardPage />} />
+
+        {/* Organization */}
+        <Route path="organization/factory-branch" element={<FactoriesPage />} />
+        <Route path="organization/warehouse" element={<WarehousesPage />} />
+        <Route path="organization/configuration" element={<CompanyConfigPage />} />
+        <Route path="organization/business-type" element={<CompanyConfigPage />} />
+
+        {/* Users */}
+        <Route path="users/users" element={<UsersPage />} />
+
+        {/* Backup & System Health */}
+        <Route path="backup/health" element={<BackupHealthPage />} />
+        <Route path="backup/history" element={<BackupHealthPage />} />
+        <Route path="backup/drive" element={<BackupHealthPage />} />
 
         {/* Master data */}
         <Route path="master-data/products" element={<ProductsPage />} />

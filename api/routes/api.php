@@ -22,6 +22,7 @@ use App\Modules\Organization\Http\Controllers\CompanyController;
 use App\Modules\Organization\Http\Controllers\FactoryController;
 use App\Modules\Organization\Http\Controllers\WarehouseController;
 use App\Modules\Security\Http\Controllers\AuthController;
+use App\Modules\Security\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,6 +54,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Organization module (always enabled for every company).
         Route::apiResource('factories', FactoryController::class);
+
+        // User management (always-on).
+        Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::post('users', [UserController::class, 'store'])->name('users.store');
 
         // Master data (always-on module).
         Route::apiResource('products', ProductController::class);

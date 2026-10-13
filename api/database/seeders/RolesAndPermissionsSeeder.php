@@ -35,6 +35,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'jobwork.view', 'jobwork.manage',
             'reports.view', 'mis.view',
             'backup.view', 'backup.manage',
+            'user.view', 'user.manage',
         ];
 
         foreach ($permissions as $name) {

@@ -52,6 +52,54 @@ export const Customers = {
 }
 export const Warehouses = {
   list: () => list<Warehouse>('/warehouses?per_page=100'),
+  create: (b: Record<string, string>) => api.post('/warehouses', b).then((r) => r.data),
+}
+
+export interface Factory { id: number; code: string; name: string; address: string | null; status: string }
+export const Factories = {
+  list: () => list<Factory>('/factories?per_page=100'),
+  create: (b: Record<string, string>) => api.post('/factories', b).then((r) => r.data),
+}
+
+export interface AppUser { id: number; name: string; email: string; username: string | null; status: string }
+export const Users = {
+  list: async (): Promise<AppUser[]> => {
+    const { data } = await api.get<AppUser[]>('/users')
+    return Array.isArray(data) ? data : (data as unknown as { data: AppUser[] }).data
+  },
+  create: (b: Record<string, string>) => api.post('/users', b).then((r) => r.data),
+}
+
+export interface CompanyConfig {
+  primary_business_type: string | null
+  business_types: string[]
+  modules: { module_key: string; enabled: boolean }[]
+}
+export const Company = {
+  config: () => api.get<CompanyConfig>('/company/config').then((r) => r.data),
+  update: (b: { business_types: string[]; primary_business_type?: string; industry_template?: string }) =>
+    api.put('/company/config', b).then((r) => r.data),
+}
+
+export interface BackupHealth {
+  api: string
+  database: string
+  last_successful_backup: string | null
+  last_backup_verified: boolean
+  failed_last_24h: number
+}
+export interface BackupJob {
+  id: number
+  filename: string
+  status: string
+  verified: boolean
+  size: number
+  finished_at: string | null
+}
+export const Backup = {
+  health: () => api.get<BackupHealth>('/backup/health').then((r) => r.data),
+  jobs: () => api.get<BackupJob[]>('/backup/jobs').then((r) => r.data),
+  run: () => api.post('/backup/run', {}).then((r) => r.data),
 }
 export const Inventory = {
   stock: async (): Promise<StockRow[]> => {
