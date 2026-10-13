@@ -51,6 +51,12 @@ import { ImportShipmentPage } from './modules/purchase/ImportShipmentPage'
 import { ExportInvoicePage } from './modules/sales/ExportInvoicePage'
 import { ExportRealizationPage } from './modules/sales/ExportRealizationPage'
 import { CashBookPage } from './modules/accounting/CashBookPage'
+import { MaterialIssuePage } from './modules/inventory/MaterialIssuePage'
+import { StockTransferPage } from './modules/inventory/StockTransferPage'
+import { StockAdjustmentPage } from './modules/inventory/StockAdjustmentPage'
+import { StockLedgerPage } from './modules/inventory/StockLedgerPage'
+import { CostCentersPage } from './modules/accounting/CostCentersPage'
+import { FundTransferPage } from './modules/accounting/FundTransferPage'
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth()
@@ -103,6 +109,10 @@ export default function App() {
         {/* Inventory */}
         <Route path="inventory/overview" element={<StockOverviewPage />} />
         <Route path="inventory/goods-receipt" element={<GoodsReceiptPage />} />
+        <Route path="inventory/material-issue" element={<MaterialIssuePage />} />
+        <Route path="inventory/transfer" element={<StockTransferPage />} />
+        <Route path="inventory/adjustment" element={<StockAdjustmentPage />} />
+        <Route path="inventory/ledger" element={<StockLedgerPage />} />
         <Route path="inventory/valuation" element={<ReportViewPage reportKey="stock-valuation" />} />
 
         {/* Purchase */}
@@ -129,6 +139,8 @@ export default function App() {
         <Route path="accounting/journals" element={<JournalEntryPage />} />
         <Route path="accounting/receipts-payments" element={<CashBookPage />} />
         <Route path="accounting/ledger" element={<CashBookPage />} />
+        <Route path="accounting/fund-transfer" element={<FundTransferPage />} />
+        <Route path="master-data/cost-centres" element={<CostCentersPage />} />
         <Route path="accounting/trial-balance" element={<ReportViewPage reportKey="trial-balance" />} />
         <Route path="accounting/profit-loss" element={<ReportViewPage reportKey="profit-loss" />} />
         <Route path="accounting/balance-sheet" element={<ReportViewPage reportKey="balance-sheet" />} />

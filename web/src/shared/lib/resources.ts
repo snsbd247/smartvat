@@ -111,6 +111,14 @@ export const Inventory = {
     warehouse_id: number
     lines: { product_id: number; qty: number; unit_cost: number }[]
   }) => api.post('/goods-receipts', body).then((r) => r.data),
+  issue: (body: { warehouse_id: number; lines: { product_id: number; qty: number }[] }) =>
+    api.post('/inventory/issues', body).then((r) => r.data),
+  transfer: (body: { warehouse_id: number; to_warehouse_id: number; lines: { product_id: number; qty: number }[] }) =>
+    api.post('/inventory/transfers', body).then((r) => r.data),
+  adjustment: (body: { warehouse_id: number; lines: { product_id: number; qty: number; unit_cost?: number }[] }) =>
+    api.post('/inventory/adjustments', body).then((r) => r.data),
+  ledger: (params: { product_id?: number; warehouse_id?: number }) =>
+    api.get<{ data: Record<string, string>[] }>('/inventory/ledger', { params }).then((r) => r.data.data),
 }
 export const Sales = {
   invoice: (body: {
@@ -180,6 +188,15 @@ export const Journals = {
     lines: { account_id: number; debit?: number; credit?: number }[]
   }) => api.post('/accounting/journals', body).then((r) => r.data),
 }
+export interface CostCenter { id: number; code: string; name: string }
+export const CostCenters = {
+  list: () => api.get<CostCenter[]>('/accounting/cost-centers').then((r) => r.data),
+  create: (b: Record<string, string>) => api.post('/accounting/cost-centers', b).then((r) => r.data),
+}
+export const FundTransfers = {
+  create: (b: { from_account_id: number; to_account_id: number; amount: number; narration?: string }) =>
+    api.post('/accounting/fund-transfers', b).then((r) => r.data),
+}
 
 export const PurchaseApi = {
   order: (body: { supplier_id: number; lines: { product_id: number; qty: number; unit_price: number }[] }) =>
@@ -223,6 +240,10 @@ export const Vat = {
   approveMapping: (id: number) => api.patch(`/vat/mappings/${id}/approve`).then((r) => r.data),
   classify: (b: Record<string, unknown>) => api.post('/vat/classify', b).then((r) => r.data),
   unmapped: () => api.get<{ rows: Record<string, string>[] }>('/vat/unmapped').then((r) => r.data.rows),
+  types: () => api.get<{ id: number; code: string; name: string }[]>('/vat/transaction-types').then((r) => r.data),
+  createType: (b: Record<string, string>) => api.post('/vat/transaction-types', b).then((r) => r.data),
+  treatments: () => api.get<{ id: number; code: string; name: string }[]>('/vat/tax-treatments').then((r) => r.data),
+  createTreatment: (b: Record<string, string>) => api.post('/vat/tax-treatments', b).then((r) => r.data),
 }
 
 export interface VdsRule { id: number; service_category: string; rate: string; approval_status: string; verification_status: string }
@@ -312,6 +333,8 @@ export const JobWork = {
     api.post(`/job-work/orders/${orderId}/receive-material`, { lines }).then((r) => r.data),
   consumeMaterial: (orderId: number, lines: { product_id: number; qty: number }[]) =>
     api.post(`/job-work/orders/${orderId}/consume-material`, { lines }).then((r) => r.data),
+  deliver: (orderId: number, lines: { product_id: number; qty: number }[]) =>
+    api.post(`/job-work/orders/${orderId}/deliver`, { lines }).then((r) => r.data),
   processingInvoice: (b: { customer_id: number; job_work_order_id?: number; qty: number; rate: number }) =>
     api.post('/job-work/processing-invoices', b).then((r) => r.data),
 }

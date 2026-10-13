@@ -14,6 +14,7 @@ export function JobWorkOrdersPage() {
 
   const [open, setOpen] = useState(false)
   const [matFor, setMatFor] = useState<number | null>(null)
+  const [matAction, setMatAction] = useState<'receive' | 'consume' | 'deliver'>('receive')
   const [mat, setMat] = useState<{ product_id: string; qty: string }>({ product_id: '', qty: '' })
   const [msg, setMsg] = useState<{ kind: 'error' | 'success'; text: string } | null>(null)
   const [form, setForm] = useState<Record<string, string>>({})
@@ -31,9 +32,18 @@ export function JobWorkOrdersPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['jw-orders'] }); setOpen(false); setForm({}) },
     onError: (e) => setMsg({ kind: 'error', text: apiError(e) }),
   })
-  const receive = useMutation({
-    mutationFn: () => JobWork.receiveMaterial(matFor!, [{ product_id: Number(mat.product_id), qty: Number(mat.qty) }]),
-    onSuccess: () => { setMsg({ kind: 'success', text: 'Customer material received into custody (not company inventory).' }); setMatFor(null); setMat({ product_id: '', qty: '' }) },
+  const material = useMutation({
+    mutationFn: () => {
+      const lines = [{ product_id: Number(mat.product_id), qty: Number(mat.qty) }]
+      if (matAction === 'receive') return JobWork.receiveMaterial(matFor!, lines)
+      if (matAction === 'consume') return JobWork.consumeMaterial(matFor!, lines)
+      return JobWork.deliver(matFor!, lines)
+    },
+    onSuccess: () => {
+      const label = { receive: 'received into custody', consume: 'consumed', deliver: 'delivered' }[matAction]
+      setMsg({ kind: 'success', text: `Customer material ${label} (not company inventory).` })
+      setMatFor(null); setMat({ product_id: '', qty: '' })
+    },
     onError: (e) => setMsg({ kind: 'error', text: apiError(e) }),
   })
   const invoice = useMutation({
@@ -57,8 +67,10 @@ export function JobWorkOrdersPage() {
             <td className="px-4 py-2.5">{cName(o.customer_id)}</td>
             <td className="px-4 py-2.5">{o.status}</td>
             <td className="px-4 py-2.5">
-              <div className="flex gap-2">
-                <Button variant="ghost" onClick={() => { setMatFor(o.id); setMsg(null) }}>Receive Material</Button>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="ghost" onClick={() => { setMatFor(o.id); setMatAction('receive'); setMsg(null) }}>Receive</Button>
+                <Button variant="ghost" onClick={() => { setMatFor(o.id); setMatAction('consume'); setMsg(null) }}>Consume</Button>
+                <Button variant="ghost" onClick={() => { setMatFor(o.id); setMatAction('deliver'); setMsg(null) }}>Deliver</Button>
                 <Button variant="ghost" onClick={() => {
                   const qty = Number(prompt('Processing qty?'))
                   const rate = Number(prompt('Processing rate per unit?'))
@@ -108,8 +120,8 @@ export function JobWorkOrdersPage() {
       )}
 
       {matFor !== null && (
-        <Modal title="Receive Customer Material" onClose={() => setMatFor(null)}>
-          <form onSubmit={(e: FormEvent) => { e.preventDefault(); receive.mutate() }} className="grid gap-4">
+        <Modal title={`${matAction[0].toUpperCase()}${matAction.slice(1)} Customer Material`} onClose={() => setMatFor(null)}>
+          <form onSubmit={(e: FormEvent) => { e.preventDefault(); material.mutate() }} className="grid gap-4">
             <Field label="Product">
               <select className={inputClass} value={mat.product_id} onChange={(e) => setMat((m) => ({ ...m, product_id: e.target.value }))} required>
                 <option value="">Select…</option>
@@ -119,7 +131,7 @@ export function JobWorkOrdersPage() {
             <Field label="Quantity"><input className={inputClass} type="number" step="any" value={mat.qty} onChange={(e) => setMat((m) => ({ ...m, qty: e.target.value }))} required /></Field>
             <div className="flex justify-end gap-2">
               <Button variant="ghost" onClick={() => setMatFor(null)}>Cancel</Button>
-              <Button type="submit" disabled={receive.isPending}>{receive.isPending ? 'Saving…' : 'Receive'}</Button>
+              <Button type="submit" disabled={material.isPending}>{material.isPending ? 'Saving…' : 'Confirm'}</Button>
             </div>
           </form>
         </Modal>
