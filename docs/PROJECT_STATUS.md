@@ -85,7 +85,14 @@ Last updated: 2026-10-13
   - [x] Account map: accounts_payable, accounts_receivable added
   - [x] Tests: **61 Pest green total** (+7: PO approve, GRN reconciled, material/service invoice→AP, payment reduces outstanding, trial balance balanced, supplier CRUD authZ, API flow)
   - Deferred: purchase requisition/quotation, purchase return, price comparison, VAT/VDS split (Phase 13/14), aging buckets
-- [ ] Phase 7 — Purchase Import + Landed Cost
+- [x] **Phase 7** — Purchase Import + Landed Cost (COMPLETE)
+  - [x] import_shipments(+lines), import_charges, landed_cost_allocations; foreign currency + exchange rate
+  - [x] `LandedCostService`: allocate charges by quantity/weight/volume/value basis; recoverable charges excluded from inventory; last-line remainder for exact totals; idempotent (delete+reinsert — never double-allocates)
+  - [x] `ImportService`: createShipment, preview (no-post), receive → stock in at landed unit cost + Dr Inventory / Cr GRN-clearing (goods) / Cr Landed-cost-clearing (non-recoverable); received-once guard
+  - [x] Endpoints: import-shipments (store), {id}/landed-cost (preview), {id}/receive
+  - [x] Account map: landed_cost_clearing
+  - [x] Tests: **69 Pest green total** (+8: value/quantity-basis allocation, FX conversion, recoverable excluded, idempotent, receive→GL reconciled, double-receive blocked, API flow)
+  - Deferred: import PO/proforma/LC-TT/customs-doc tracking, per-charge supplier invoicing of landed costs, import cost reconciliation report
 - [ ] Phase 8 — Sales Local
 - [ ] Phase 9 — Sales Export + FX
 - [ ] Phase 10 — Manufacturing

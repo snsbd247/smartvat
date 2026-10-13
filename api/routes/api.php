@@ -3,6 +3,7 @@
 use App\Http\Controllers\System\HealthController;
 use App\Modules\Inventory\Http\Controllers\InventoryController;
 use App\Modules\MasterData\Http\Controllers\ProductController;
+use App\Modules\Purchase\Http\Controllers\ImportController;
 use App\Modules\Purchase\Http\Controllers\PurchaseController;
 use App\Modules\Purchase\Http\Controllers\SupplierController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
@@ -51,6 +52,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('purchase-invoices', [PurchaseController::class, 'postInvoice'])->name('pi.store');
         Route::post('supplier-payments', [PurchaseController::class, 'paySupplier'])->name('supplier.pay');
         Route::get('suppliers/{supplier}/ledger', [PurchaseController::class, 'supplierLedger'])->name('supplier.ledger');
+
+        // Import purchase + landed cost.
+        Route::post('import-shipments', [ImportController::class, 'store'])->name('import.store');
+        Route::get('import-shipments/{importShipment}/landed-cost', [ImportController::class, 'preview'])->name('import.preview');
+        Route::post('import-shipments/{importShipment}/receive', [ImportController::class, 'receive'])->name('import.receive');
 
         // Inventory module — gated: only companies with the inventory module enabled.
         Route::middleware('module:inventory')->group(function () {
