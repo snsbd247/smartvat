@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureModuleEnabled;
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\ResolveCompany;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Security headers on every response.
+        $middleware->append(SecurityHeaders::class);
+
         // All API routes always negotiate JSON (clean 401/403 instead of redirects).
         $middleware->api(prepend: [
             ForceJsonResponse::class,

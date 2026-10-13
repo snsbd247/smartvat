@@ -154,8 +154,18 @@ Last updated: 2026-10-13
   - [x] Endpoints: mis/executive, mis/approvals
   - [x] Tests: **107 Pest green total** (+7) — executive KPIs, pending approvals
   - Deferred: per-module drill-down dashboards wired in SPA, saved filters
-- [ ] Phase 18 — Google Drive backup/restore
-- [ ] Phase 19 — Hardening + E2E + production readiness
+- [x] **Phase 18** — Backup / restore (COMPLETE)
+  - [x] backup_jobs; `BackupService` (dump → gzip → AES-256 encrypt → sha256 → upload → **verify**); success only after checksum-verified upload
+  - [x] Retention: 30 days, **never deletes the last good backup**; `restore()` round-trip verified
+  - [x] Drivers: `LocalBackupStorage` (default) + `GoogleDriveStorage` (guarded stub — wire Drive API for prod); `Sqlite`/`Mysql` dumpers
+  - [x] `backup:run` command scheduled every 20 min (`*/20 * * * *`); Backup & System Health endpoints (jobs / run / health)
+  - [x] `deploy/restore.sh`; Tests: run/encrypt/restore/retention
+- [x] **Phase 19** — Hardening + deployment + production readiness (COMPLETE)
+  - [x] `SecurityHeaders` middleware (nosniff, DENY, Referrer-Policy, Permissions-Policy, HSTS over TLS); login `throttle:10,1`
+  - [x] Ubuntu deploy artifacts: `deploy/install.sh`, `nginx/plastex.conf`, `systemd/*` (queue + scheduler), `mysql/secure-setup.sql`, `restore.sh`
+  - [x] `docs/DEPLOYMENT.md` + `docs/PRODUCTION_CHECKLIST.md`
+  - [x] **End-to-end acceptance test**: procure → produce → sell → verify reconciliation + balanced TB + P&L + customer ledger
+  - [x] Tests: **115 Pest green total** (+7: backup, security headers, login throttle, acceptance)
 
 ## Frontend (PLASTEX UI)
 - [x] Auth: login screen, route guard, token + company context, 401 → login, logout

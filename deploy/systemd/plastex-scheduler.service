@@ -1,0 +1,9 @@
+# One-shot that runs Laravel's scheduler, driven by a systemd timer every minute.
+[Unit]
+Description=PLASTEX ERP scheduler run
+
+[Service]
+Type=oneshot
+User=www-data
+WorkingDirectory=/var/www/plastex/api
+ExecStart=/usr/bin/php artisan schedule:run

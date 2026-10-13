@@ -49,7 +49,7 @@ docs/    ARCHITECTURE.md, PROJECT_STATUS.md, (ERD/data-dictionary: later)
 
 Legend: ✅ done & tested · 🔜 next · ⬜ planned
 
-### Foundation & core (DONE — 107 backend tests green)
+### All phases complete (115 backend tests green)
 - ✅ **Phase 1 — Project skeleton**: Laravel + React/Vite/Tailwind, CI (GitHub Actions), `/api/health`, OpenAPI scaffold, JSON-only API middleware.
 - ✅ **Phase 2 — Organization + Security + multi-tenant isolation**: companies, factories, warehouses, storage locations; users with **NID encrypted at rest + blind index**; Sanctum login; per-company RBAC; audit log; tenant isolation enforced (cross-tenant → 404/403).
 - ✅ **Phase 3 — CompanyConfig (business-type engine + module gate)**: Setup via business types (manufacturing/service/trading + hybrids) & industry templates; **backend module gate** (not just menu hiding).
@@ -71,9 +71,13 @@ Legend: ✅ done & tested · 🔜 next · ⬜ planned
 - ✅ **Phase 16 — Reporting engine**: one `ReportDefinition` → JSON / HTML / PDF (dompdf) / XLSX (PhpSpreadsheet) via a reusable engine; secured, tenant-scoped report route; files streamed, never at public URLs.
 - ✅ **Phase 17 — MIS dashboards + Approval Center**: executive KPIs (revenue, net profit, receivables, payables, VDS payable, stock value, cash/bank, pending approvals, unmapped VAT) and a pending-approvals feed.
 
-### Remaining
-- 🔜 **Phase 18 — Google Drive backup/restore**: 20-min schedule, compress + encrypt, checksum-verified upload, 30-day retention (never deletes last good backup), restore test, alerts.
-- ⬜ **Phase 19 — Hardening**: security pass, rate limiting, headers, E2E acceptance (Playwright), native Ubuntu deployment scripts, production-readiness checklist.
+- ✅ **Phase 18 — Backup / restore**: `backup:run` every 20 min; dump → gzip → AES-256 encrypt → checksum → upload → **verify**; 30-day retention that never deletes the last good backup; restore round-trip; local + Google-Drive (stub) drivers; Backup & System Health endpoints.
+- ✅ **Phase 19 — Hardening + deployment**: security-headers middleware, login rate-limiting, Ubuntu install/nginx/systemd/restore scripts, `DEPLOYMENT.md` + `PRODUCTION_CHECKLIST.md`, and an end-to-end acceptance test (procure → produce → sell → reconciled & balanced).
+
+### Frontend (PLASTEX UI)
+- ✅ Login + auth guard + company switcher; navy sidebar with 18 modules + submenus + bottom items; topbar.
+- ✅ Executive dashboard matching the PLASTEX reference (business-type selector, 8 KPI cards, Recharts trend/production charts, category donut, inventory/top-customer/recent/approval tables) fed by `GET /mis/dashboard`.
+- ⬜ Per-submenu module CRUD screens — placeholders for now; the APIs are implemented and tested.
 
 ### Cross-cutting (as phases land)
 - ⬜ Frontend module UIs (login screen, company switcher, auth-connected dashboards, per-module screens) — the SPA is currently a navigable shell; API is built first.

@@ -1,0 +1,16 @@
+# Laravel queue worker. Install: sudo cp to /etc/systemd/system/ then
+#   sudo systemctl enable --now plastex-queue
+[Unit]
+Description=PLASTEX ERP queue worker
+After=network.target mysql.service redis-server.service
+
+[Service]
+User=www-data
+Group=www-data
+Restart=always
+RestartSec=5
+WorkingDirectory=/var/www/plastex/api
+ExecStart=/usr/bin/php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+
+[Install]
+WantedBy=multi-user.target

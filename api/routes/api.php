@@ -16,6 +16,7 @@ use App\Modules\Vds\Http\Controllers\VdsController;
 use App\Modules\JobWork\Http\Controllers\JobWorkController;
 use App\Modules\Reporting\Http\Controllers\ReportController;
 use App\Modules\Mis\Http\Controllers\MisController;
+use App\Modules\Backup\Http\Controllers\BackupController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
 use App\Modules\Organization\Http\Controllers\CompanyController;
 use App\Modules\Organization\Http\Controllers\FactoryController;
@@ -31,7 +32,9 @@ use Illuminate\Support\Facades\Route;
 
 // Public.
 Route::get('/health', HealthController::class)->name('health');
-Route::post('/auth/login', [AuthController::class, 'login'])->name('auth.login');
+Route::post('/auth/login', [AuthController::class, 'login'])
+    ->middleware('throttle:10,1') // brute-force protection: 10 attempts/min/IP
+    ->name('auth.login');
 
 // Authenticated (any company the user belongs to).
 Route::middleware('auth:sanctum')->group(function () {
@@ -157,5 +160,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('mis/executive', [MisController::class, 'executive'])->name('mis.exec');
         Route::get('mis/dashboard', [MisController::class, 'dashboard'])->name('mis.dashboard');
         Route::get('mis/approvals', [MisController::class, 'approvals'])->name('mis.approvals');
+
+        // Backup & System Health.
+        Route::get('backup/jobs', [BackupController::class, 'jobs'])->name('backup.jobs');
+        Route::post('backup/run', [BackupController::class, 'run'])->name('backup.run');
+        Route::get('backup/health', [BackupController::class, 'health'])->name('backup.health');
     });
 });
