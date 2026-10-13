@@ -4,9 +4,10 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
+// Base path is configurable via APP_BASE so the same codebase can be served at
+// a subfolder (local XAMPP: /irlvat/) or at a domain root (cPanel: /).
 export default defineConfig({
-  // The app is served from the /irlvat/ subfolder (Apache alias → Laravel public).
-  base: '/irlvat/',
+  base: process.env.APP_BASE ?? '/irlvat/',
   plugins: [react(), tailwindcss()],
   server: {
     port: 5173,

@@ -69,7 +69,7 @@ return new class extends Migration
             $table->foreignId('verified_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
 
-            $table->index(['company_id', 'transaction_type_code', 'tax_treatment_code']);
+            $table->index(['company_id', 'transaction_type_code', 'tax_treatment_code'], 'vat_note_map_co_txn_treat_idx');
         });
 
         // Result of classifying a source document line; freezes the rule version used.
@@ -93,7 +93,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['company_id', 'status']);
-            $table->index(['company_id', 'vat_return_note_id']);
+            $table->index(['company_id', 'vat_return_note_id'], 'vat_txn_class_co_note_idx');
         });
     }
 
