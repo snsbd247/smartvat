@@ -1,0 +1,68 @@
+# Project Status — Universal Business ERP
+
+> Persistent cross-session tracker. Update at the end of every work session / phase.
+> Authoritative plan: [ARCHITECTURE.md](ARCHITECTURE.md). Scope: multi-company,
+> configurable Universal Business ERP (Manufacturing / Service / Trading + hybrids),
+> Bangladesh VAT/Mushak/VDS. **HR & Payroll is excluded.**
+
+Last updated: 2026-10-13
+
+## Confirmed technical decisions (defaults — change anytime before they're built)
+- Backend: Laravel 12, PHP 8.2 (dev) / 8.3 (prod target), MySQL 8 InnoDB (SQLite for dev/test), Redis 7
+- Frontend: React 19 + TS 6 + Vite 8 + Tailwind 4 (+ shadcn/ui + Lucide)
+- Auth: Sanctum; RBAC: spatie/laravel-permission
+- Deployment: native (Ubuntu 24.04 LTS)
+- PDF: Browsershot (Phase 16); Drive auth: service account (Phase 18)
+- Tenancy: one user may access multiple companies (switchable company context)
+- UI language: English first, i18n-ready (Bangla later)
+- First industry template: Plastic Manufacturing
+
+## Open decisions still pending owner confirmation (§15.3 of ARCHITECTURE)
+1. PDF renderer (Browsershot vs dompdf) — assumed Browsershot
+2. Deployment (native vs Docker) — assumed native
+3. Google Drive auth + which account/folder — assumed service account, folder TBD
+4. Tenancy: multi-company per user? — assumed yes
+5. Bangla UI in v1? — assumed no (English first)
+6. Which industry templates at launch? — assumed Plastic only first
+
+## Phase checklist
+- [~] **Phase 0** — Architecture & planning (ARCHITECTURE.md) — awaiting formal sign-off; proceeding
+- [x] **Phase 1** — Project skeleton (COMPLETE)
+  - [x] Laravel 12 scaffolded in `api/`
+  - [x] React 19 + TS + Vite + Tailwind 4 scaffolded in `web/`
+  - [x] `/api/health` endpoint + tests (green; verified end-to-end via curl)
+  - [x] Sanctum + spatie/permission installed; User model has HasApiTokens + HasRoles
+  - [x] Pest (5 tests) + Vitest (2 tests) configured, all green
+  - [x] ForceJsonResponse middleware (API always returns JSON 401/403, never redirect)
+  - [x] Navy-sidebar SPA shell with 18 modules (HR excluded), dashboard shows live API/DB health
+  - [x] CI workflow (GitHub Actions: backend Pest + frontend build/Vitest)
+  - [x] OpenAPI scaffold (`api/openapi/openapi.yaml`)
+  - [x] `.env.example` (api + web), README, .gitignore
+  - Note: dev/test uses SQLite; MySQL wiring + Nginx/systemd/deploy scripts come in a later phase
+- [ ] Phase 2 — Organization + Security + multi-tenant isolation
+- [ ] Phase 3 — CompanyConfig (Setup Wizard, business-type engine, module gate)
+- [ ] Phase 4 — Shared engines: Posting + Stock
+- [ ] Phase 5 — MasterData + Inventory ops
+- [ ] Phase 6 — Purchase Local
+- [ ] Phase 7 — Purchase Import + Landed Cost
+- [ ] Phase 8 — Sales Local
+- [ ] Phase 9 — Sales Export + FX
+- [ ] Phase 10 — Manufacturing
+- [ ] Phase 11 — Accounting completion
+- [ ] Phase 12 — Fixed Assets
+- [ ] Phase 13 — VAT/Mushak + Mushak 9.1 Note engine
+- [ ] Phase 14 — VDS
+- [ ] Phase 15 — Job Work (customer-owned)
+- [ ] Phase 16 — Reporting engine (PDF/XLSX)
+- [ ] Phase 17 — MIS dashboards + Approval Center
+- [ ] Phase 18 — Google Drive backup/restore
+- [ ] Phase 19 — Hardening + E2E + production readiness
+
+## Legal/compliance watch (must stay true)
+- No statutory VAT/Mushak/9.1 Note/VDS/customs rate, threshold, mapping, or deadline is
+  hard-coded or invented. All such rules are configurable, versioned, effective-dated,
+  and flagged "Requires practitioner review" until verified & approved.
+- Unmapped transactions → "Review Required", never auto-classified into a guessed line.
+
+## Notes / blockers
+- (none yet)

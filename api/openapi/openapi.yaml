@@ -1,0 +1,76 @@
+openapi: 3.1.0
+info:
+  title: Universal Business ERP API
+  description: >
+    REST API for the multi-company Universal Business ERP (Manufacturing /
+    Service / Trading + hybrids), Bangladesh VAT/Mushak/VDS. This document grows
+    one module at a time; Phase 1 covers only the foundation endpoints.
+  version: 0.1.0-dev
+servers:
+  - url: /api
+    description: Same-origin API (served behind Nginx in production)
+tags:
+  - name: System
+    description: Health and readiness
+  - name: Auth
+    description: Authentication (Sanctum)
+paths:
+  /health:
+    get:
+      tags: [System]
+      summary: Health / readiness probe
+      description: Public. Reports app status and database connectivity.
+      security: []
+      responses:
+        '200':
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '503':
+          description: Service degraded (e.g. database unreachable)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+  /user:
+    get:
+      tags: [Auth]
+      summary: Current authenticated user
+      security:
+        - sanctum: []
+      responses:
+        '200':
+          description: The authenticated user
+        '401':
+          description: Unauthenticated
+components:
+  securitySchemes:
+    sanctum:
+      type: http
+      scheme: bearer
+      description: Laravel Sanctum token (or same-site cookie session for the SPA)
+  schemas:
+    Health:
+      type: object
+      required: [status, app, version, environment, time, checks]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        app:
+          type: string
+        version:
+          type: string
+        environment:
+          type: string
+        time:
+          type: string
+          format: date-time
+        checks:
+          type: object
+          properties:
+            database:
+              type: string
+              enum: [ok, unavailable]

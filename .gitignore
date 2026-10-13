@@ -1,0 +1,42 @@
+# Dependencies
+/api/vendor/
+/web/node_modules/
+node_modules/
+
+# Env / secrets — NEVER commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+/deploy/secrets/
+
+# Build output
+/web/dist/
+/api/public/build/
+/api/public/hot
+
+# Laravel runtime
+/api/storage/*.key
+/api/storage/framework/cache/*
+/api/storage/framework/sessions/*
+/api/storage/framework/views/*
+/api/storage/logs/*
+/api/bootstrap/cache/*
+
+# Backups / generated artifacts
+/backup-staging/
+*.sqlite
+*.sqlite-journal
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Test / coverage
+/api/coverage/
+/web/coverage/
+.phpunit.result.cache
