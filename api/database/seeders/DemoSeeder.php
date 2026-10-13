@@ -94,8 +94,29 @@ class DemoSeeder extends Seeder
 
         $this->seedChartOfAccounts($company);
         $this->seedFinancialYear($company);
+        $this->seedAccountMap($company);
 
         return $company;
+    }
+
+    private function seedAccountMap(Company $company): void
+    {
+        $map = [
+            'inventory' => '1300',
+            'grn_clearing' => '2050',
+            'cogs' => '5000',
+            'inventory_adjustment' => '5100',
+        ];
+
+        foreach ($map as $key => $code) {
+            $account = Account::where('company_id', $company->id)->where('code', $code)->first();
+            if ($account !== null) {
+                \App\Modules\Accounting\Models\CompanyAccountMap::firstOrCreate(
+                    ['company_id' => $company->id, 'key' => $key],
+                    ['account_id' => $account->id],
+                );
+            }
+        }
     }
 
     private function seedChartOfAccounts(Company $company): void
@@ -106,10 +127,12 @@ class DemoSeeder extends Seeder
             ['1200', 'Accounts Receivable', 'asset'],
             ['1300', 'Inventory', 'asset'],
             ['2000', 'Accounts Payable', 'liability'],
+            ['2050', 'GRN Clearing', 'liability'],
             ['2100', 'VAT Payable', 'liability'],
             ['3000', 'Share Capital', 'equity'],
             ['4000', 'Sales Revenue', 'income'],
             ['5000', 'Cost of Goods Sold', 'expense'],
+            ['5100', 'Inventory Adjustment', 'expense'],
         ];
 
         foreach ($accounts as [$code, $cname, $type]) {

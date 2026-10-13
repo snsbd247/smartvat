@@ -67,7 +67,15 @@ Last updated: 2026-10-13
   - [x] DemoSeeder: default 9-account CoA + open FY2026 period per company
   - [x] Tests: **46 Pest green total** (+13: balanced/unbalanced/single-line/idempotency/period-lock/reversal/trial-balance; stock inbound/WA/outbound-valuation/oversell/customer-owned)
   - Note: true-concurrency safety relies on SELECT FOR UPDATE on MySQL (SQLite serializes); FIFO costing deferred
-- [ ] Phase 5 — MasterData + Inventory ops
+- [x] **Phase 5** — MasterData + Inventory ops (COMPLETE)
+  - [x] MasterData: units + unit_conversions + product_categories; products extended (category_id, reorder_level); Product CRUD (policy, tenant-unique code)
+  - [x] `company_account_map` + `AccountResolver` (posting roles → GL accounts, configurable)
+  - [x] `inventory_transactions` header; `InventoryService`: receipt / issue / transfer / adjustment — **atomic across Stock + Posting engines**
+  - [x] `InventoryReportService`: valuation, stock ledger, **Inventory↔GL reconciliation**
+  - [x] Endpoints (gated by module:inventory): POST inventory/receipts|issues|adjustments|transfers; GET inventory/stock|ledger|reconciliation; products apiResource
+  - [x] DemoSeeder: GRN-clearing + inventory-adjustment accounts + account map per company
+  - [x] Tests: **54 Pest green total** (+8: receipt/issue/transfer/adjustment reconcile to GL, oversell rollback, product CRUD authZ, module-gated inventory ops)
+  - Deferred: batch/expiry tracking flows, physical count UI, UoM-conversion on transactions, opening-stock import
 - [ ] Phase 6 — Purchase Local
 - [ ] Phase 7 — Purchase Import + Landed Cost
 - [ ] Phase 8 — Sales Local

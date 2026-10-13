@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\System\HealthController;
+use App\Modules\Inventory\Http\Controllers\InventoryController;
+use App\Modules\MasterData\Http\Controllers\ProductController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
 use App\Modules\Organization\Http\Controllers\CompanyController;
 use App\Modules\Organization\Http\Controllers\FactoryController;
@@ -36,10 +38,21 @@ Route::middleware('auth:sanctum')->group(function () {
         // Organization module (always enabled for every company).
         Route::apiResource('factories', FactoryController::class);
 
+        // Master data (always-on module).
+        Route::apiResource('products', ProductController::class);
+
         // Inventory module — gated: only companies with the inventory module enabled.
         Route::middleware('module:inventory')->group(function () {
             Route::apiResource('warehouses', WarehouseController::class)
                 ->only(['index', 'store', 'show', 'destroy']);
+
+            Route::post('inventory/receipts', [InventoryController::class, 'receipt'])->name('inventory.receipt');
+            Route::post('inventory/issues', [InventoryController::class, 'issue'])->name('inventory.issue');
+            Route::post('inventory/adjustments', [InventoryController::class, 'adjustment'])->name('inventory.adjustment');
+            Route::post('inventory/transfers', [InventoryController::class, 'transfer'])->name('inventory.transfer');
+            Route::get('inventory/stock', [InventoryController::class, 'stock'])->name('inventory.stock');
+            Route::get('inventory/ledger', [InventoryController::class, 'ledger'])->name('inventory.ledger');
+            Route::get('inventory/reconciliation', [InventoryController::class, 'reconciliation'])->name('inventory.reconciliation');
         });
     });
 });

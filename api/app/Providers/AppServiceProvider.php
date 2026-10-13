@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Modules\MasterData\Models\Product;
+use App\Modules\MasterData\Policies\ProductPolicy;
 use App\Modules\Organization\Models\Factory;
 use App\Modules\Organization\Models\Warehouse;
 use App\Modules\Organization\Policies\FactoryPolicy;
@@ -29,9 +31,14 @@ class AppServiceProvider extends ServiceProvider
         // Policies for module models (not auto-discovered outside app/Policies).
         Gate::policy(Factory::class, FactoryPolicy::class);
         Gate::policy(Warehouse::class, WarehousePolicy::class);
+        Gate::policy(Product::class, ProductPolicy::class);
 
         // Ability used by the Company Setup/Config endpoints.
         Gate::define('configure-company', fn ($user) => $user->can('company.configure'));
+
+        // Inventory operations / reports.
+        Gate::define('inventory-operate', fn ($user) => $user->can('inventory.operate'));
+        Gate::define('inventory-view', fn ($user) => $user->can('inventory.view'));
 
         // Super-admin bypasses all permission checks (still tenant-scoped by data).
         Gate::before(function ($user, $ability) {

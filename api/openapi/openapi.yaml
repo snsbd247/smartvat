@@ -16,6 +16,10 @@ tags:
     description: Authentication (Sanctum)
   - name: Organization
     description: Companies, factories, warehouses (tenant-scoped)
+  - name: MasterData
+    description: Products, categories, units
+  - name: Inventory
+    description: Stock operations and reports (requires the inventory module)
 paths:
   /health:
     get:
@@ -160,6 +164,103 @@ paths:
         '201': { description: Created factory }
         '403': { description: Missing factory.create permission }
         '422': { description: Validation error (e.g. duplicate code within company) }
+  /products:
+    get:
+      tags: [MasterData]
+      summary: List products (current company)
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses:
+        '200': { description: Paginated products }
+    post:
+      tags: [MasterData]
+      summary: Create a product
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, name]
+              properties:
+                code: { type: string }
+                name: { type: string }
+                type: { type: string, enum: [raw, finished, packaging, consumable, spare, service] }
+                costing_method: { type: string, enum: [weighted_average, fifo] }
+      responses:
+        '201': { description: Created product }
+        '403': { description: Missing product.create }
+  /inventory/receipts:
+    post:
+      tags: [Inventory]
+      summary: Goods receipt (Dr Inventory / Cr GRN clearing)
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [warehouse_id, lines]
+              properties:
+                warehouse_id: { type: integer }
+                date: { type: string, format: date }
+                lines:
+                  type: array
+                  items:
+                    type: object
+                    required: [product_id, qty, unit_cost]
+                    properties:
+                      product_id: { type: integer }
+                      qty: { type: number }
+                      unit_cost: { type: number }
+      responses:
+        '201': { description: Inventory transaction created }
+        '403': { description: Inventory module disabled or missing inventory.operate }
+  /inventory/issues:
+    post:
+      tags: [Inventory]
+      summary: Material issue at weighted-average cost (Dr COGS / Cr Inventory)
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses:
+        '201': { description: Inventory transaction created }
+  /inventory/transfers:
+    post:
+      tags: [Inventory]
+      summary: Warehouse-to-warehouse transfer (no GL impact)
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses:
+        '201': { description: Inventory transaction created }
+  /inventory/adjustments:
+    post:
+      tags: [Inventory]
+      summary: Stock adjustment (net value vs inventory-adjustment account)
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses:
+        '201': { description: Inventory transaction created }
+  /inventory/stock:
+    get:
+      tags: [Inventory]
+      summary: Company-owned stock valuation
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses:
+        '200': { description: Valuation rows }
+  /inventory/reconciliation:
+    get:
+      tags: [Inventory]
+      summary: Inventory-to-GL reconciliation (stock value vs Inventory account)
+      security: [{ sanctum: [] }]
+      parameters: [{ $ref: '#/components/parameters/CompanyHeader' }]
+      responses:
+        '200':
+          description: '{ stock_value_total, inventory_gl_balance, difference, in_balance }'
 components:
   parameters:
     CompanyHeader:

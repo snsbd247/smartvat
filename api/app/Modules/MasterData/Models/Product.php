@@ -10,11 +10,19 @@ class Product extends Model
     use BelongsToCompany;
 
     protected $fillable = [
-        'company_id', 'code', 'name', 'type', 'base_uom',
-        'costing_method', 'track_batches', 'status',
+        'company_id', 'code', 'name', 'type', 'category_id', 'base_uom',
+        'costing_method', 'track_batches', 'reorder_level', 'status',
     ];
 
-    protected $casts = ['track_batches' => 'boolean'];
+    protected $casts = [
+        'track_batches' => 'boolean',
+        'reorder_level' => 'decimal:4',
+    ];
+
+    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(ProductCategory::class, 'category_id');
+    }
 
     public const COSTING_WEIGHTED_AVERAGE = 'weighted_average';
 

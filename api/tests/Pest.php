@@ -121,3 +121,23 @@ function makeWarehouse(Company $company, string $code = 'WH1'): \App\Modules\Org
         'status' => 'active',
     ]);
 }
+
+/** Create the inventory GL accounts and the company account map for inventory posting. */
+function mapInventoryAccounts(Company $company): void
+{
+    $defs = [
+        'inventory' => ['1300', 'asset'],
+        'grn_clearing' => ['2050', 'liability'],
+        'cogs' => ['5000', 'expense'],
+        'inventory_adjustment' => ['5100', 'expense'],
+    ];
+
+    foreach ($defs as $key => [$code, $type]) {
+        $account = makeAccount($company, $code, $type);
+        \App\Modules\Accounting\Models\CompanyAccountMap::create([
+            'company_id' => $company->id,
+            'key' => $key,
+            'account_id' => $account->id,
+        ]);
+    }
+}
