@@ -57,7 +57,16 @@ Last updated: 2026-10-13
   - [x] DemoSeeder: ACME (manufacturing, 18 modules), BETA (trading, 16), GAMMA (service, 15)
   - [x] Tests: **33 Pest green total** (+13: configurator per type/hybrid/validation, module gate allow/deny, config endpoint authZ)
   - Deferred: company-creation (setup wizard first-step) endpoint + bootstrap super-admin; frontend wizard UI; per-module menu manifest wiring in SPA
-- [ ] Phase 4 — Shared engines: Posting + Stock
+- [x] **Phase 4** — Shared engines: Posting + Stock (COMPLETE)
+  - [x] Accounting: chart_of_accounts, financial_years, accounting_periods, journal_entries, journal_lines
+  - [x] `PostingService`: double-entry (balanced), idempotent per (source,purpose), period-lock aware, server-side, transactional; `reverse()` (mirror entry, original never mutated)
+  - [x] `LedgerService`: account balance + balanced trial balance (includes posted+reversed)
+  - [x] `Num` (bcmath precise decimals) + `NumberGenerator` (atomic per-company doc numbers via number_sequences)
+  - [x] Inventory: products (minimal), stock_balances, stock_movements (append-only)
+  - [x] `StockService`: weighted-average costing, row-locked (FOR UPDATE), prevents negative stock, customer-owned kept separate; FIFO guarded (not-yet-supported)
+  - [x] DemoSeeder: default 9-account CoA + open FY2026 period per company
+  - [x] Tests: **46 Pest green total** (+13: balanced/unbalanced/single-line/idempotency/period-lock/reversal/trial-balance; stock inbound/WA/outbound-valuation/oversell/customer-owned)
+  - Note: true-concurrency safety relies on SELECT FOR UPDATE on MySQL (SQLite serializes); FIFO costing deferred
 - [ ] Phase 5 — MasterData + Inventory ops
 - [ ] Phase 6 — Purchase Local
 - [ ] Phase 7 — Purchase Import + Landed Cost

@@ -75,3 +75,49 @@ function makeUserInCompany(Company $company, ?string $role = null): User
 
     return $user;
 }
+
+/** Set the active tenant for service-level (non-HTTP) tests. */
+function setCompanyContext(Company $company): void
+{
+    app(\App\Shared\Tenancy\CurrentCompany::class)->set($company);
+    app(PermissionRegistrar::class)->setPermissionsTeamId($company->id);
+}
+
+/** Create a postable account in the current/given company. */
+function makeAccount(Company $company, string $code, string $type): \App\Modules\Accounting\Models\Account
+{
+    return \App\Modules\Accounting\Models\Account::create([
+        'company_id' => $company->id,
+        'code' => $code,
+        'name' => ucfirst($type).' '.$code,
+        'type' => $type,
+        'normal_balance' => \App\Modules\Accounting\Models\Account::normalBalanceFor($type),
+        'is_postable' => true,
+        'status' => 'active',
+    ]);
+}
+
+/** Create a product (defaults to weighted-average costing). */
+function makeProduct(Company $company, string $code = 'P1'): \App\Modules\MasterData\Models\Product
+{
+    return \App\Modules\MasterData\Models\Product::create([
+        'company_id' => $company->id,
+        'code' => $code,
+        'name' => "Product $code",
+        'type' => 'raw',
+        'base_uom' => 'KG',
+        'costing_method' => 'weighted_average',
+        'status' => 'active',
+    ]);
+}
+
+/** Create a warehouse directly in a company. */
+function makeWarehouse(Company $company, string $code = 'WH1'): \App\Modules\Organization\Models\Warehouse
+{
+    return \App\Modules\Organization\Models\Warehouse::create([
+        'company_id' => $company->id,
+        'code' => $code,
+        'name' => "Warehouse $code",
+        'status' => 'active',
+    ]);
+}
