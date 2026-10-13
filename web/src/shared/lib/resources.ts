@@ -115,8 +115,18 @@ export const Inventory = {
 export const Sales = {
   invoice: (body: {
     customer_id: number
+    kind?: string
+    currency?: string
+    exchange_rate?: number
     lines: { product_id: number; qty: number; unit_price: number; line_total: number }[]
   }) => api.post('/sales-invoices', body).then((r) => r.data),
+  exportReceipt: (body: {
+    customer_id: number
+    fc_amount: number
+    realization_rate: number
+    invoice_rate: number
+    received_in_account_id: number
+  }) => api.post('/customer-receipts', { ...body, kind: 'export' }).then((r) => r.data),
   challan: (body: {
     customer_id: number
     warehouse_id: number
@@ -142,6 +152,26 @@ export const Accounts = {
     return Array.isArray(data) ? data : (data as unknown as { data: Account[] }).data
   },
   create: (body: Record<string, string>) => api.post('/accounting/accounts', body).then((r) => r.data),
+  cashBook: (id: number) =>
+    api.get<{ account: string; balance: string; rows: { date: string; entry_no: string; narration: string | null; debit: string; credit: string; balance: string }[] }>(
+      `/accounting/accounts/${id}/cash-book`,
+    ).then((r) => r.data),
+}
+
+export const Import = {
+  create: (body: {
+    supplier_id: number
+    warehouse_id: number
+    currency: string
+    exchange_rate: number
+    lines: { product_id: number; qty: number; fc_unit_price: number; weight?: number }[]
+    charges: { type: string; fc_amount: number; allocation_basis: string; recoverable?: boolean }[]
+  }) => api.post('/import-shipments', body).then((r) => r.data),
+  preview: (id: number) =>
+    api.get<{ landed_total: string; goods_bc_total: string; nonrecoverable_total: string; lines: Record<string, string>[] }>(
+      `/import-shipments/${id}/landed-cost`,
+    ).then((r) => r.data),
+  receive: (id: number) => api.post(`/import-shipments/${id}/receive`, {}).then((r) => r.data),
 }
 export const Journals = {
   create: (body: {

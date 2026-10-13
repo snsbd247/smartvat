@@ -46,6 +46,10 @@ import { PurchaseReturnPage } from './modules/purchase/PurchaseReturnPage'
 import { SalesReturnPage } from './modules/sales/SalesReturnPage'
 import { ActivityLogsPage, LoginHistoryPage } from './modules/users/ActivityLogsPage'
 import { RolesPage, PermissionsPage } from './modules/users/RolesPermissionsPage'
+import { ImportShipmentPage } from './modules/purchase/ImportShipmentPage'
+import { ExportInvoicePage } from './modules/sales/ExportInvoicePage'
+import { ExportRealizationPage } from './modules/sales/ExportRealizationPage'
+import { CashBookPage } from './modules/accounting/CashBookPage'
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth()
@@ -103,6 +107,7 @@ export default function App() {
         {/* Purchase */}
         <Route path="purchase/po" element={<PurchaseOrderPage />} />
         <Route path="purchase/requisition" element={<PurchaseOrderPage />} />
+        <Route path="purchase/import" element={<ImportShipmentPage />} />
         <Route path="purchase/grn" element={<GoodsReceiptPage />} />
         <Route path="purchase/invoice" element={<PurchaseInvoicePage />} />
         <Route path="purchase/payment" element={<SupplierPaymentPage />} />
@@ -111,6 +116,8 @@ export default function App() {
 
         {/* Sales */}
         <Route path="sales/invoice" element={<SalesInvoicePage />} />
+        <Route path="sales/export" element={<ExportInvoicePage />} />
+        <Route path="sales/realization" element={<ExportRealizationPage />} />
         <Route path="sales/challan" element={<DeliveryChallanPage />} />
         <Route path="sales/receipt" element={<CustomerReceiptPage />} />
         <Route path="sales/return" element={<SalesReturnPage />} />
@@ -119,6 +126,8 @@ export default function App() {
         {/* Accounting */}
         <Route path="accounting/coa" element={<ChartOfAccountsPage />} />
         <Route path="accounting/journals" element={<JournalEntryPage />} />
+        <Route path="accounting/receipts-payments" element={<CashBookPage />} />
+        <Route path="accounting/ledger" element={<CashBookPage />} />
         <Route path="accounting/trial-balance" element={<ReportViewPage reportKey="trial-balance" />} />
         <Route path="accounting/profit-loss" element={<ReportViewPage reportKey="profit-loss" />} />
         <Route path="accounting/balance-sheet" element={<ReportViewPage reportKey="balance-sheet" />} />
