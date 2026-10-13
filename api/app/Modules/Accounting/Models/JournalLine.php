@@ -13,6 +13,7 @@ class JournalLine extends Model
     protected $fillable = [
         'company_id', 'journal_entry_id', 'account_id', 'cost_center_id',
         'party_type', 'party_id', 'debit', 'credit', 'currency', 'fx_rate', 'narration',
+        'reconciled', 'reconciled_at',
     ];
 
     protected $casts = [

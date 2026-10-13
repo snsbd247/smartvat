@@ -5,9 +5,14 @@ namespace App\Modules\Accounting\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Accounting\Models\Account;
 use App\Modules\Accounting\Models\AccountingPeriod;
+use App\Modules\Accounting\Models\Budget;
 use App\Modules\Accounting\Models\CostCenter;
+use App\Modules\Accounting\Models\Expense;
 use App\Modules\Accounting\Models\JournalEntry;
 use App\Modules\Accounting\Services\AccountingReportService;
+use App\Modules\Accounting\Services\BankReconciliationService;
+use App\Modules\Accounting\Services\BudgetService;
+use App\Modules\Accounting\Services\ExpenseService;
 use App\Modules\Accounting\Services\LedgerService;
 use App\Modules\Accounting\Services\PostingService;
 use App\Shared\Tenancy\CurrentCompany;
@@ -174,5 +179,84 @@ class AccountingController extends Controller
         $period->update(['status' => $status]);
 
         return response()->json($period);
+    }
+
+    // ---- Bank reconciliation ----
+    public function bankUnreconciled(Account $account, BankReconciliationService $svc): JsonResponse
+    {
+        $this->authorize('accounting-view');
+
+        return response()->json($svc->unreconciledLines($account->id));
+    }
+
+    public function bankReconcile(Request $request, BankReconciliationService $svc): JsonResponse
+    {
+        $this->authorize('accounting-manage');
+        $companyId = $this->current->id();
+        $data = $request->validate([
+            'account_id' => ['required', Rule::exists('chart_of_accounts', 'id')->where('company_id', $companyId)],
+            'statement_date' => ['required', 'date'],
+            'statement_balance' => ['required', 'numeric'],
+            'line_ids' => ['sometimes', 'array'],
+            'line_ids.*' => ['integer'],
+        ]);
+
+        return response()->json($svc->reconcile(
+            (int) $data['account_id'], $data['statement_date'], $data['statement_balance'], $data['line_ids'] ?? []
+        ), 201);
+    }
+
+    // ---- Budget ----
+    public function budgets(): JsonResponse
+    {
+        $this->authorize('accounting-view');
+
+        return response()->json(Budget::orderByDesc('id')->get());
+    }
+
+    public function storeBudget(Request $request, BudgetService $svc): JsonResponse
+    {
+        $this->authorize('accounting-manage');
+        $companyId = $this->current->id();
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'financial_year_id' => ['nullable', Rule::exists('financial_years', 'id')->where('company_id', $companyId)],
+            'lines' => ['required', 'array', 'min:1'],
+            'lines.*.account_id' => ['required', Rule::exists('chart_of_accounts', 'id')->where('company_id', $companyId)],
+            'lines.*.amount' => ['required', 'numeric'],
+        ]);
+
+        return response()->json($svc->create($data), 201);
+    }
+
+    public function budgetVsActual(Budget $budget, BudgetService $svc): JsonResponse
+    {
+        $this->authorize('accounting-view');
+
+        return response()->json(['rows' => $svc->vsActual($budget)]);
+    }
+
+    // ---- Expenses ----
+    public function expenses(): JsonResponse
+    {
+        $this->authorize('accounting-view');
+
+        return response()->json(Expense::orderByDesc('id')->limit(100)->get());
+    }
+
+    public function storeExpense(Request $request, ExpenseService $svc): JsonResponse
+    {
+        $this->authorize('accounting-manage');
+        $companyId = $this->current->id();
+        $data = $request->validate([
+            'expense_account_id' => ['required', Rule::exists('chart_of_accounts', 'id')->where('company_id', $companyId)],
+            'paid_from_account_id' => ['required', Rule::exists('chart_of_accounts', 'id')->where('company_id', $companyId)],
+            'cost_center_id' => ['nullable', Rule::exists('cost_centers', 'id')->where('company_id', $companyId)],
+            'amount' => ['required', 'numeric', 'gt:0'],
+            'narration' => ['nullable', 'string', 'max:255'],
+            'date' => ['sometimes', 'date'],
+        ]);
+
+        return response()->json($svc->record($data), 201);
     }
 }

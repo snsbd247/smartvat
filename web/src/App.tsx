@@ -57,6 +57,9 @@ import { StockAdjustmentPage } from './modules/inventory/StockAdjustmentPage'
 import { StockLedgerPage } from './modules/inventory/StockLedgerPage'
 import { CostCentersPage } from './modules/accounting/CostCentersPage'
 import { FundTransferPage } from './modules/accounting/FundTransferPage'
+import { ExpensePage } from './modules/accounting/ExpensePage'
+import { BudgetPage } from './modules/accounting/BudgetPage'
+import { BankReconciliationPage } from './modules/accounting/BankReconciliationPage'
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth()
@@ -140,6 +143,9 @@ export default function App() {
         <Route path="accounting/receipts-payments" element={<CashBookPage />} />
         <Route path="accounting/ledger" element={<CashBookPage />} />
         <Route path="accounting/fund-transfer" element={<FundTransferPage />} />
+        <Route path="accounting/bank-rec" element={<BankReconciliationPage />} />
+        <Route path="accounting/expenses" element={<ExpensePage />} />
+        <Route path="accounting/budget" element={<BudgetPage />} />
         <Route path="master-data/cost-centres" element={<CostCentersPage />} />
         <Route path="accounting/trial-balance" element={<ReportViewPage reportKey="trial-balance" />} />
         <Route path="accounting/profit-loss" element={<ReportViewPage reportKey="profit-loss" />} />

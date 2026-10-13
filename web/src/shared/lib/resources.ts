@@ -198,6 +198,29 @@ export const FundTransfers = {
     api.post('/accounting/fund-transfers', b).then((r) => r.data),
 }
 
+export interface BankLine { id: number; date: string; entry_no: string; narration: string | null; debit: string; credit: string }
+export const BankRec = {
+  unreconciled: (accountId: number) => api.get<BankLine[]>(`/accounting/accounts/${accountId}/unreconciled`).then((r) => r.data),
+  reconcile: (b: { account_id: number; statement_date: string; statement_balance: number; line_ids: number[] }) =>
+    api.post('/accounting/bank-reconciliations', b).then((r) => r.data),
+}
+
+export interface BudgetRow { id: number; name: string; status: string }
+export const Budgets = {
+  list: () => api.get<BudgetRow[]>('/accounting/budgets').then((r) => r.data),
+  create: (b: { name: string; lines: { account_id: number; amount: number }[] }) =>
+    api.post('/accounting/budgets', b).then((r) => r.data),
+  vsActual: (id: number) =>
+    api.get<{ rows: { account: string; budget: string; actual: string; variance: string }[] }>(`/accounting/budgets/${id}/vs-actual`).then((r) => r.data.rows),
+}
+
+export interface ExpenseRow { id: number; expense_no: string; date: string; amount: string; narration: string | null }
+export const Expenses = {
+  list: () => api.get<ExpenseRow[]>('/accounting/expenses').then((r) => r.data),
+  create: (b: { expense_account_id: number; paid_from_account_id: number; amount: number; narration?: string; cost_center_id?: number }) =>
+    api.post('/accounting/expenses', b).then((r) => r.data),
+}
+
 export const PurchaseApi = {
   order: (body: { supplier_id: number; lines: { product_id: number; qty: number; unit_price: number }[] }) =>
     api.post('/purchase-orders', body).then((r) => r.data),

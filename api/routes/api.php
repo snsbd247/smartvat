@@ -118,6 +118,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('accounting/accounts/{account}/cash-book', [AccountingController::class, 'cashBook'])->name('acc.cashbook');
         Route::get('accounting/periods', [AccountingController::class, 'periods'])->name('acc.periods');
         Route::patch('accounting/periods/{period}/status', [AccountingController::class, 'setPeriodStatus'])->name('acc.period.status');
+        Route::get('accounting/accounts/{account}/unreconciled', [AccountingController::class, 'bankUnreconciled'])->name('acc.bank.unrec');
+        Route::post('accounting/bank-reconciliations', [AccountingController::class, 'bankReconcile'])->name('acc.bank.rec');
+        Route::get('accounting/budgets', [AccountingController::class, 'budgets'])->name('acc.budgets');
+        Route::post('accounting/budgets', [AccountingController::class, 'storeBudget'])->name('acc.budget.store');
+        Route::get('accounting/budgets/{budget}/vs-actual', [AccountingController::class, 'budgetVsActual'])->name('acc.budget.va');
+        Route::get('accounting/expenses', [AccountingController::class, 'expenses'])->name('acc.expenses');
+        Route::post('accounting/expenses', [AccountingController::class, 'storeExpense'])->name('acc.expense.store');
 
         // Manufacturing — gated: only companies with the production module enabled.
         Route::middleware('module:production')->group(function () {

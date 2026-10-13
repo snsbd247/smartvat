@@ -188,6 +188,8 @@ export const NAV_GROUPS: NavGroup[] = [
       ['receipts-payments', 'Receipts & Payments'],
       ['fund-transfer', 'Fund Transfer'],
       ['bank-rec', 'Bank Reconciliation'],
+      ['expenses', 'Expenses'],
+      ['budget', 'Budget'],
       ['trial-balance', 'Trial Balance'],
       ['profit-loss', 'Profit & Loss'],
       ['balance-sheet', 'Balance Sheet'],
