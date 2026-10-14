@@ -13,7 +13,7 @@ sudo mysql < deploy/mysql/secure-setup.sql   # edit the app-user password first
 ```bash
 sudo mkdir -p /var/www/plastex && sudo chown -R "$USER" /var/www/plastex
 git clone <repo-url> /var/www/plastex
-cd /var/www/plastex/api
+cd /var/www/plastex/backend
 composer install --no-dev --optimize-autoloader
 cp .env.example .env            # set APP_ENV=production, APP_DEBUG=false, APP_URL,
                                 # DB_CONNECTION=mysql + DB_*, REDIS_*, BACKUP_* (see below)
@@ -24,11 +24,11 @@ php artisan config:cache && php artisan route:cache
 
 ### Frontend (SPA)
 ```bash
-cd /var/www/plastex/web
+cd /var/www/plastex/frontend
 npm ci
-bash /var/www/plastex/deploy/build-local.sh   # builds and publishes into api/public
+bash /var/www/plastex/others/deploy/build-local.sh   # builds and publishes into backend/public
 ```
-> Set the SPA base path in `web/vite.config.ts` to `/` for a root-domain deployment
+> Set the SPA base path in `frontend/vite.config.ts` to `/` for a root-domain deployment
 > (the local XAMPP preview uses `/irlvat`). Rebuild after changing it.
 
 ## 3. Web server
@@ -50,7 +50,7 @@ The scheduler runs `backup:run` every 20 minutes (see `routes/console.php`).
 
 ## 5. Permissions, HTTPS, firewall
 ```bash
-sudo chown -R www-data:www-data /var/www/plastex/api/storage /var/www/plastex/api/bootstrap/cache
+sudo chown -R www-data:www-data /var/www/plastex/backend/storage /var/www/plastex/backend/bootstrap/cache
 sudo apt-get install -y certbot python3-certbot-nginx && sudo certbot --nginx
 sudo ufw allow 'Nginx Full' && sudo ufw allow OpenSSH && sudo ufw enable
 ```
@@ -76,7 +76,7 @@ bash deploy/restore.sh          # decrypts + verifies the latest backup and load
 ## Upgrade / rollback
 ```bash
 cd /var/www/plastex && git pull
-cd api && composer install --no-dev -o && php artisan migrate --force
+cd backend && composer install --no-dev -o && php artisan migrate --force
 php artisan config:cache && php artisan route:cache
 cd ../web && npm ci && bash ../deploy/build-local.sh
 sudo systemctl restart plastex-queue

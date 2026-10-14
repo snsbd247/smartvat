@@ -1,5 +1,5 @@
 # Install both, then: sudo systemctl enable --now plastex-scheduler.timer
-# (Alternatively add a crontab: * * * * * php /var/www/plastex/api/artisan schedule:run)
+# (Alternatively add a crontab: * * * * * php /var/www/plastex/backend/artisan schedule:run)
 [Unit]
 Description=Run PLASTEX ERP scheduler every minute
 

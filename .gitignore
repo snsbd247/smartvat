@@ -1,6 +1,6 @@
 # Dependencies
-/api/vendor/
-/web/node_modules/
+/backend/vendor/
+/frontend/node_modules/
 node_modules/
 
 # Env / secrets — NEVER commit
@@ -12,23 +12,23 @@ node_modules/
 /deploy/secrets/
 
 # Build output
-/web/dist/
-/api/public/build/
-/api/public/hot
+/frontend/dist/
+/backend/public/build/
+/backend/public/hot
 
 # Generated SPA artifacts published into Laravel (produced by deploy/build-local.sh)
-/api/public/assets/
-/api/public/favicon.svg
-/api/public/icons.svg
-/api/resources/views/spa.blade.php
+/backend/public/assets/
+/backend/public/favicon.svg
+/backend/public/icons.svg
+/backend/resources/views/spa.blade.php
 
 # Laravel runtime
-/api/storage/*.key
-/api/storage/framework/cache/*
-/api/storage/framework/sessions/*
-/api/storage/framework/views/*
-/api/storage/logs/*
-/api/bootstrap/cache/*
+/backend/storage/*.key
+/backend/storage/framework/cache/*
+/backend/storage/framework/sessions/*
+/backend/storage/framework/views/*
+/backend/storage/logs/*
+/backend/bootstrap/cache/*
 
 # Backups / generated artifacts
 /backup-staging/
@@ -43,6 +43,6 @@ Thumbs.db
 !.vscode/extensions.json
 
 # Test / coverage
-/api/coverage/
-/web/coverage/
+/backend/coverage/
+/frontend/coverage/
 .phpunit.result.cache

@@ -30,15 +30,15 @@ cd ~ && git clone --depth 1 https://github.com/snsbd247/smartvat.git smartvat
 # Composer installed locally (no system composer):
 mkdir -p ~/bin && cd ~ && php -r "copy('https://getcomposer.org/installer','composer-setup.php');" \
   && php composer-setup.php --install-dir=$HOME/bin --filename=composer && rm composer-setup.php
-cd ~/smartvat/api && ~/bin/composer install --no-dev --optimize-autoloader --no-interaction
+cd ~/smartvat/backend && ~/bin/composer install --no-dev --optimize-autoloader --no-interaction
 ```
 
 ## 3. Environment
 
-Create `~/smartvat/api/.env` (production), then:
+Create `~/smartvat/backend/.env` (production), then:
 
 ```bash
-cd ~/smartvat/api
+cd ~/smartvat/backend
 php artisan key:generate --force
 php artisan migrate --force
 php artisan db:seed --class=RolesAndPermissionsSeeder --force
@@ -56,18 +56,18 @@ Key `.env` values: `APP_ENV=production`, `APP_DEBUG=false`,
 
 ## 4. Front controller in public_html
 
-`public_html/index.php` boots the app from `../smartvat/api` (see this file's
+`public_html/index.php` boots the app from `../smartvat/backend` (see this file's
 git history for the exact contents). Also copy Laravel's `public/.htaccess` and
 `public/robots.txt` into `public_html/`. Keep `.well-known` and `cgi-bin`.
 
 ## 5. Frontend (built locally, uploaded)
 
 ```bash
-cd web && APP_BASE=/ MSYS_NO_PATHCONV=1 npx vite build   # root base for a dedicated domain
+cd frontend && APP_BASE=/ MSYS_NO_PATHCONV=1 npx vite build   # root base for a dedicated domain
 # upload:
 #   dist/assets/*      -> ~/public_html/assets/
 #   dist/favicon.svg, dist/icons.svg -> ~/public_html/
-#   dist/index.html    -> ~/smartvat/api/resources/views/spa.blade.php
+#   dist/index.html    -> ~/smartvat/backend/resources/views/spa.blade.php
 ```
 
 The SPA is served by Laravel's `spa` view; `/assets/*`, `/favicon.svg` etc. are
@@ -76,7 +76,7 @@ static files served directly by Apache.
 ## 6. Scheduler (20-minute encrypted backups)
 
 ```
-* * * * * cd /home/<cpuser>/smartvat/api && /usr/local/bin/php artisan schedule:run >> storage/logs/schedule.log 2>&1
+* * * * * cd /home/<cpuser>/smartvat/backend && /usr/local/bin/php artisan schedule:run >> storage/logs/schedule.log 2>&1
 ```
 
 `backup:run` dumps the DB, gzips, AES-256-encrypts, sha256-verifies and stores
@@ -86,12 +86,12 @@ it (currently `BACKUP_DISK=local`; wire the Google Drive driver for off-site).
 
 ```bash
 cd ~/smartvat && git pull origin main
-cd api && ~/bin/composer install --no-dev -o && php artisan migrate --force \
+cd backend && ~/bin/composer install --no-dev -o && php artisan migrate --force \
   && php artisan config:cache && php artisan view:cache
 # rebuild + re-upload the SPA if the frontend changed (step 5)
 ```
 
 ## Secrets
 
-Live DB password and `APP_KEY` live only in the server's `~/smartvat/api/.env`
+Live DB password and `APP_KEY` live only in the server's `~/smartvat/backend/.env`
 — never commit them. SSH/host credentials are kept out of the repo.

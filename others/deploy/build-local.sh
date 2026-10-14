@@ -2,20 +2,20 @@
 # Build the SPA and wire it into Laravel's public dir so Apache (XAMPP) can serve
 # the whole app at /irlvat. Re-run this after any frontend change.
 #
-#   bash deploy/build-local.sh
+#   bash others/deploy/build-local.sh
 #
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-WEB="$ROOT/web"
-PUBLIC="$ROOT/api/public"
-VIEWS="$ROOT/api/resources/views"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+WEB="$ROOT/frontend"
+PUBLIC="$ROOT/backend/public"
+VIEWS="$ROOT/backend/resources/views"
 
 echo "==> Building frontend (base /irlvat/)"
 cd "$WEB"
 npm run build
 
-echo "==> Publishing built assets into api/public"
+echo "==> Publishing built assets into backend/public"
 rm -rf "$PUBLIC/assets"
 cp -r "$WEB/dist/assets" "$PUBLIC/assets"
 # Static files referenced by index.html (favicon, icons, etc.)

@@ -5,5 +5,5 @@ Description=PLASTEX ERP scheduler run
 [Service]
 Type=oneshot
 User=www-data
-WorkingDirectory=/var/www/plastex/api
+WorkingDirectory=/var/www/plastex/backend
 ExecStart=/usr/bin/php artisan schedule:run

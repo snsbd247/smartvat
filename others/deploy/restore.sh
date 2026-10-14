@@ -6,7 +6,7 @@
 # loads it. For MySQL it runs `mysql < dump.sql`; for SQLite it replaces the DB file.
 set -euo pipefail
 
-API_DIR="$(cd "$(dirname "$0")/../api" && pwd)"
+API_DIR="$(cd "$(dirname "$0")/../../backend" && pwd)"
 cd "$API_DIR"
 
 echo "==> Restoring the most recent verified backup via the app"

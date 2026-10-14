@@ -9,9 +9,9 @@ Google Drive backup.
 
 > **HR & Payroll is intentionally out of scope.** User management is included.
 
-- **Architecture & design:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
-- **Live progress tracker:** [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md)
-- **API spec:** [`api/openapi/openapi.yaml`](api/openapi/openapi.yaml)
+- **Architecture & design:** [`others/docs/ARCHITECTURE.md`](others/docs/ARCHITECTURE.md)
+- **Live progress tracker:** [`others/docs/PROJECT_STATUS.md`](others/docs/PROJECT_STATUS.md)
+- **API spec:** [`backend/openapi/openapi.yaml`](backend/openapi/openapi.yaml)
 
 ---
 
@@ -37,10 +37,11 @@ Design principles: **modular monolith**, strict **multi-tenant isolation**
 
 ## Repository layout
 ```
-api/     Laravel 12 REST API (modular: app/Modules/<Domain>, app/Shared)
-web/     React 19 + TS + Vite + Tailwind SPA (navy-sidebar PLASTEX-style shell)
-deploy/  build/deploy scripts (build-local.sh for XAMPP; Ubuntu scripts: later)
-docs/    ARCHITECTURE.md, PROJECT_STATUS.md, (ERD/data-dictionary: later)
+backend/   Laravel 12 REST API (modular: app/Modules/<Domain>, app/Shared)
+frontend/  React 19 + TS + Vite + Tailwind SPA (navy-sidebar PLASTEX-style shell)
+others/    everything else, grouped:
+  deploy/  build/deploy scripts (build-local.sh for XAMPP; Ubuntu scripts)
+  docs/    ARCHITECTURE.md, PROJECT_STATUS.md, (ERD/data-dictionary: later)
 ```
 
 ---
@@ -83,7 +84,7 @@ Legend: ✅ done & tested · 🔜 next · ⬜ planned
 - ⬜ Frontend module UIs (login screen, company switcher, auth-connected dashboards, per-module screens) — the SPA is currently a navigable shell; API is built first.
 - ⬜ ERD + data dictionary documents; full OpenAPI coverage per module.
 
-See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for the detailed per-phase checklist.
+See [`others/docs/PROJECT_STATUS.md`](others/docs/PROJECT_STATUS.md) for the detailed per-phase checklist.
 
 ---
 
@@ -99,9 +100,9 @@ trial balance always balances. 69 automated tests cover these paths.
 
 ## Local development
 
-### Backend (`api/`)
+### Backend (`backend/`)
 ```bash
-cd api
+cd backend
 composer install
 cp .env.example .env
 php artisan key:generate
@@ -110,9 +111,9 @@ php artisan serve               # http://127.0.0.1:8000
 ./vendor/bin/pest               # run tests
 ```
 
-### Frontend (`web/`)
+### Frontend (`frontend/`)
 ```bash
-cd web
+cd frontend
 npm install
 npm run dev                     # http://127.0.0.1:5173
 npm run build                   # type-check + production build
@@ -123,7 +124,7 @@ npm run test -- --run           # Vitest
 Apache serves the whole app (SPA + API) at `http://localhost/irlvat` and
 `http://<server-ip>/irlvat`. Rebuild the SPA into Laravel after frontend changes:
 ```bash
-bash deploy/build-local.sh
+bash others/deploy/build-local.sh
 ```
 
 **Demo login:** `admin@irlbd.com` / `admin@123` (super-admin; demo companies: ACME

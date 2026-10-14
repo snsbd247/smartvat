@@ -9,7 +9,7 @@ User=www-data
 Group=www-data
 Restart=always
 RestartSec=5
-WorkingDirectory=/var/www/plastex/api
+WorkingDirectory=/var/www/plastex/backend
 ExecStart=/usr/bin/php artisan queue:work --sleep=3 --tries=3 --max-time=3600
 
 [Install]

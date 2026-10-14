@@ -28,15 +28,15 @@ Last updated: 2026-10-13
 ## Phase checklist
 - [~] **Phase 0** — Architecture & planning (ARCHITECTURE.md) — awaiting formal sign-off; proceeding
 - [x] **Phase 1** — Project skeleton (COMPLETE)
-  - [x] Laravel 12 scaffolded in `api/`
-  - [x] React 19 + TS + Vite + Tailwind 4 scaffolded in `web/`
+  - [x] Laravel 12 scaffolded in `backend/`
+  - [x] React 19 + TS + Vite + Tailwind 4 scaffolded in `frontend/`
   - [x] `/api/health` endpoint + tests (green; verified end-to-end via curl)
   - [x] Sanctum + spatie/permission installed; User model has HasApiTokens + HasRoles
   - [x] Pest (5 tests) + Vitest (2 tests) configured, all green
   - [x] ForceJsonResponse middleware (API always returns JSON 401/403, never redirect)
   - [x] Navy-sidebar SPA shell with 18 modules (HR excluded), dashboard shows live API/DB health
   - [x] CI workflow (GitHub Actions: backend Pest + frontend build/Vitest)
-  - [x] OpenAPI scaffold (`api/openapi/openapi.yaml`)
+  - [x] OpenAPI scaffold (`backend/openapi/openapi.yaml`)
   - [x] `.env.example` (api + web), README, .gitignore
   - Note: dev/test uses SQLite; MySQL wiring + Nginx/systemd/deploy scripts come in a later phase
 - [x] **Phase 2** — Organization + Security + multi-tenant isolation (COMPLETE)

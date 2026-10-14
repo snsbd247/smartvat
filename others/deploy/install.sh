@@ -29,10 +29,10 @@ cat <<'NEXT'
 ==> Base packages installed. Next steps:
   1. Create the database and a least-privilege app user (see deploy/mysql/secure-setup.sql).
   2. Clone the repo to /var/www/plastex, then:
-       cd /var/www/plastex/api && composer install --no-dev --optimize-autoloader
+       cd /var/www/plastex/backend && composer install --no-dev --optimize-autoloader
        cp .env.example .env   # set APP_KEY, DB_*, REDIS_*, BACKUP_* etc.
        php artisan key:generate && php artisan migrate --force
-       cd ../web && npm ci && bash ../deploy/build-local.sh   # or build + copy dist
+       cd ../frontend && npm ci && bash ../others/deploy/build-local.sh   # or build + copy dist
   3. Install the Nginx site (deploy/nginx/plastex.conf) and reload nginx.
   4. Enable the queue worker + scheduler (deploy/systemd/*).
   5. Configure HTTPS:  sudo apt-get install -y certbot python3-certbot-nginx && sudo certbot --nginx

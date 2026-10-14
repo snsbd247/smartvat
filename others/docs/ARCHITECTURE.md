@@ -88,12 +88,12 @@ tables directly).
 | RBAC | `spatie/laravel-permission` | current | per-action perms |
 | Tests | Pest + Vitest/RTL + Playwright | current | |
 | Web server | Nginx | distro stable | |
-| VCS | Git monorepo | — | `/api /web /deploy /docs` |
+| VCS | Git monorepo | — | `/backend /frontend /others` |
 
 ### 1.3 Repository layout
 ```
 irlvat/
-├─ api/  (Laravel)
+├─ backend/  (Laravel)
 │  ├─ app/
 │  │  ├─ Modules/{Organization, Security, CompanyConfig, MasterData,
 │  │  │           Inventory, Manufacturing, Purchase, Sales, Accounting,
@@ -105,7 +105,7 @@ irlvat/
 │  │             Document, Enums}
 │  ├─ database/{migrations,seeders,factories}/
 │  ├─ tests/{Feature,Unit}/   └─ openapi/
-├─ web/ (React+TS+Vite+Tailwind)
+├─ frontend/ (React+TS+Vite+Tailwind)
 │  └─ src/{modules, shared, api-client, routes, layout}/
 ├─ deploy/ (install/deploy scripts, nginx, php, mysql, systemd, backup, .env samples)
 ├─ docs/  (this file, ERD.md, data-dictionary.md, PROJECT_STATUS.md, runbook.md)
@@ -566,7 +566,7 @@ Target **Ubuntu Server 24.04 LTS**; portable to another PC/VPS via documented st
 `/deploy` provides: version matrix · `install.sh` (PHP 8.3 + ext, MySQL 8, Redis, Nginx,
 Node 20 for build, Composer) · `nginx/` (TLS, SPA, `/api` FastCGI, security headers,
 protected document routes) · `php/` tuning · `mysql/secure-setup.sql` (least-privilege
-app user, strict mode) · `.env.example` (api + web) · `systemd/` (queue worker + scheduler
+app user, strict mode) · `.env.example` (backend + frontend) · `systemd/` (queue worker + scheduler
 via cron/timer) · `deploy.sh` (install→migrate→build→cache→reload, with **rollback**) ·
 `backup/` + `restore/` · logrotate · ufw firewall · certbot HTTPS · `docs/runbook.md`
 (install, upgrade, rollback, backup, restore, troubleshooting). No machine-specific
