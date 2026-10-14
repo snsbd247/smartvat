@@ -325,6 +325,10 @@ export interface ProductionOrder {
   product_id: number
   planned_qty: string
   produced_qty: string
+  scrap_qty: string
+  wip_value: string
+  produced_cost: string
+  date: string
   status: string
 }
 export const Production = {

@@ -69,6 +69,7 @@ it('receives finished goods at WIP/qty cost and nets WIP to zero, reconciled', f
 
     expect($order->status)->toBe('completed');
     expect((float) $order->produced_qty)->toBe(10.0);
+    expect((float) $order->produced_cost)->toBe(250.0); // retained FG cost after WIP nets to zero
     expect(wipBalance())->toBe(0.0);
     expect(invBalance())->toBe(1500.0); // back to original total
 

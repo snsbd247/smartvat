@@ -34,6 +34,7 @@ import { VdsReconPage } from './modules/vds/VdsReconPage'
 import { VdsRegisterPage } from './modules/vds/VdsRegisterPage'
 import { BomsPage } from './modules/production/BomsPage'
 import { ProductionOrdersPage } from './modules/production/ProductionOrdersPage'
+import { ProductionWipPage, ProductionCostingPage, ProductionVariancePage } from './modules/production/ProductionAnalyticsPage'
 import { AssetCategoriesPage } from './modules/assets/AssetCategoriesPage'
 import { FixedAssetsPage } from './modules/assets/FixedAssetsPage'
 import { JobWorkContractsPage } from './modules/jobwork/JobWorkContractsPage'
@@ -206,11 +207,11 @@ export default function App() {
         <Route path="production/planning" element={<ProductionOrdersPage />} />
         <Route path="production/orders" element={<ProductionOrdersPage />} />
         <Route path="production/issue" element={<ProductionOrdersPage />} />
-        <Route path="production/wip" element={<ProductionOrdersPage />} />
+        <Route path="production/wip" element={<ProductionWipPage />} />
         <Route path="production/fg-receipt" element={<ProductionOrdersPage />} />
         <Route path="production/qc" element={<ProductionOrdersPage />} />
-        <Route path="production/costing" element={<ProductionOrdersPage />} />
-        <Route path="production/variance" element={<ProductionOrdersPage />} />
+        <Route path="production/costing" element={<ProductionCostingPage />} />
+        <Route path="production/variance" element={<ProductionVariancePage />} />
 
         {/* Fixed Assets */}
         <Route path="assets/register" element={<FixedAssetsPage />} />

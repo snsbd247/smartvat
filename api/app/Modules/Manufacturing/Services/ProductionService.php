@@ -171,6 +171,7 @@ class ProductionService
             $order->update([
                 'produced_qty' => Num::add((string) $order->produced_qty, $qty),
                 'scrap_qty' => Num::add((string) $order->scrap_qty, (string) $scrapQty),
+                'produced_cost' => Num::add((string) $order->produced_cost, $fgCostTotal),
                 'wip_value' => 0,
                 'status' => 'completed',
             ]);
