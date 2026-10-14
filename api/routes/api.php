@@ -88,6 +88,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Sales (always-on module): customers + local/export order-to-cash.
         Route::apiResource('customers', CustomerController::class);
+        Route::get('sales-orders', [SalesController::class, 'orders'])->name('so.index');
+        Route::post('sales-orders', [SalesController::class, 'storeOrder'])->name('so.store');
+        Route::post('sales-orders/{salesOrder}/confirm', [SalesController::class, 'confirmOrder'])->name('so.confirm');
+        Route::post('sales-orders/{salesOrder}/invoice', [SalesController::class, 'invoiceOrder'])->name('so.invoice');
         Route::post('sales-invoices', [SalesController::class, 'invoice'])->name('si.store');
         Route::post('delivery-challans', [SalesController::class, 'deliver'])->name('dc.store');
         Route::post('customer-receipts', [SalesController::class, 'receipt'])->name('customer.receipt');

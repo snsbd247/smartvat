@@ -193,6 +193,30 @@ export const Import = {
     ).then((r) => r.data),
   receive: (id: number) => api.post(`/import-shipments/${id}/receive`, {}).then((r) => r.data),
 }
+export interface SalesOrderLine { id?: number; product_id: number | null; description?: string | null; qty: string | number; unit_price: string | number; line_total: string | number }
+export interface SalesOrderRow {
+  id: number
+  so_no: string
+  customer_id: number
+  kind: string
+  status: 'quotation' | 'confirmed' | 'invoiced' | 'cancelled'
+  date: string
+  total: string
+  reference: string | null
+  lines: SalesOrderLine[]
+}
+export const SalesOrders = {
+  list: (status?: 'quotation' | 'confirmed' | 'invoiced' | 'cancelled') =>
+    api.get<SalesOrderRow[]>(`/sales-orders${status ? `?status=${status}` : ''}`).then((r) => r.data),
+  create: (body: {
+    customer_id: number
+    status: 'quotation' | 'confirmed'
+    reference?: string
+    lines: { product_id: number | null; qty: number; unit_price: number; line_total: number }[]
+  }) => api.post('/sales-orders', body).then((r) => r.data),
+  confirm: (id: number) => api.post(`/sales-orders/${id}/confirm`, {}).then((r) => r.data),
+  invoice: (id: number) => api.post(`/sales-orders/${id}/invoice`, {}).then((r) => r.data),
+}
 export const Journals = {
   create: (body: {
     date: string

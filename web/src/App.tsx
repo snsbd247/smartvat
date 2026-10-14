@@ -11,6 +11,7 @@ import { CustomersPage } from './modules/masterdata/CustomersPage'
 import { StockOverviewPage } from './modules/inventory/StockOverviewPage'
 import { GoodsReceiptPage } from './modules/inventory/GoodsReceiptPage'
 import { SalesInvoicePage } from './modules/sales/SalesInvoicePage'
+import { SalesOrderPage } from './modules/sales/SalesOrderPage'
 import { DeliveryChallanPage } from './modules/sales/DeliveryChallanPage'
 import { CustomerReceiptPage } from './modules/sales/CustomerReceiptPage'
 import { CustomerLedgerPage } from './modules/sales/CustomerLedgerPage'
@@ -157,8 +158,8 @@ export default function App() {
         <Route path="purchase/local" element={<SupplierLedgerPage />} />
 
         {/* Sales */}
-        <Route path="sales/quotation" element={<SalesInvoicePage />} />
-        <Route path="sales/order" element={<SalesInvoicePage />} />
+        <Route path="sales/quotation" element={<SalesOrderPage mode="quotation" />} />
+        <Route path="sales/order" element={<SalesOrderPage mode="order" />} />
         <Route path="sales/invoice" element={<SalesInvoicePage />} />
         <Route path="sales/export" element={<ExportInvoicePage />} />
         <Route path="sales/realization" element={<ExportRealizationPage />} />

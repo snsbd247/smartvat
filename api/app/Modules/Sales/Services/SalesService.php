@@ -8,6 +8,7 @@ use App\Modules\Inventory\Services\StockService;
 use App\Modules\Sales\Models\CustomerReceipt;
 use App\Modules\Sales\Models\DeliveryChallan;
 use App\Modules\Sales\Models\SalesInvoice;
+use App\Modules\Sales\Models\SalesOrder;
 use App\Modules\Sales\Models\SalesReturn;
 use App\Shared\Numbering\NumberGenerator;
 use App\Shared\Support\Num;
@@ -103,6 +104,109 @@ class SalesService
             ]);
 
             return $invoice->load('lines');
+        });
+    }
+
+    /**
+     * Create a sales order or quotation. These are operational documents only —
+     * no stock movement and no GL posting happen until the order is invoiced.
+     * $status: 'quotation' (offer) or 'confirmed' (firm order).
+     */
+    public function createOrder(array $data, string $status = 'confirmed'): SalesOrder
+    {
+        if (! in_array($status, ['quotation', 'confirmed'], true)) {
+            throw new InvalidArgumentException('A sales order starts as a quotation or a confirmed order.');
+        }
+
+        return DB::transaction(function () use ($data, $status) {
+            $companyId = $this->current->idOrFail();
+            $kind = $data['kind'] ?? 'local';
+            $lines = $data['lines'] ?? [];
+            if ($lines === []) {
+                throw new InvalidArgumentException('A sales order needs at least one line.');
+            }
+
+            $prefix = $status === 'quotation' ? 'QO-' : 'SO-';
+            $sequence = $status === 'quotation' ? 'sales_quotation' : 'sales_order';
+
+            $total = Num::zero();
+            foreach ($lines as $l) {
+                $total = Num::add($total, (string) ($l['line_total'] ?? Num::mul((string) ($l['qty'] ?? 1), (string) ($l['unit_price'] ?? 0))));
+            }
+
+            $order = SalesOrder::create([
+                'company_id' => $companyId,
+                'so_no' => $this->numbers->next($sequence, $prefix),
+                'customer_id' => $data['customer_id'],
+                'kind' => $kind,
+                'currency' => $kind === 'export' ? ($data['currency'] ?? 'USD') : ($this->current->model()->base_currency ?? 'BDT'),
+                'exchange_rate' => $kind === 'export' ? (string) ($data['exchange_rate'] ?? 1) : '1',
+                'date' => Carbon::parse($data['date'] ?? now())->toDateString(),
+                'status' => $status,
+                'reference' => $data['reference'] ?? null,
+                'total' => $total,
+                'created_by' => auth()->id(),
+            ]);
+
+            foreach ($lines as $l) {
+                $order->lines()->create([
+                    'company_id' => $companyId,
+                    'product_id' => $l['product_id'] ?? null,
+                    'description' => $l['description'] ?? null,
+                    'qty' => $l['qty'] ?? 1,
+                    'unit_price' => $l['unit_price'] ?? $l['line_total'] ?? 0,
+                    'line_total' => $l['line_total'] ?? Num::mul((string) ($l['qty'] ?? 1), (string) ($l['unit_price'] ?? 0)),
+                ]);
+            }
+
+            return $order->load('lines');
+        });
+    }
+
+    /**
+     * Accept a quotation, turning it into a firm (confirmed) order.
+     */
+    public function confirmOrder(SalesOrder $order): SalesOrder
+    {
+        if ($order->status !== 'quotation') {
+            throw new InvalidArgumentException('Only a quotation can be confirmed into an order.');
+        }
+
+        $order->update(['status' => 'confirmed']);
+
+        return $order->fresh('lines');
+    }
+
+    /**
+     * Raise a sales invoice from a confirmed order. This is the first step that
+     * touches the GL (Dr AR / Cr Revenue); the order is then marked invoiced.
+     */
+    public function invoiceFromOrder(SalesOrder $order): SalesInvoice
+    {
+        if (! in_array($order->status, ['confirmed'], true)) {
+            throw new InvalidArgumentException('Only a confirmed order can be invoiced.');
+        }
+
+        return DB::transaction(function () use ($order) {
+            $invoice = $this->postInvoice([
+                'customer_id' => $order->customer_id,
+                'kind' => $order->kind,
+                'currency' => $order->currency,
+                'exchange_rate' => (string) $order->exchange_rate,
+                'sales_order_id' => $order->id,
+                'date' => now()->toDateString(),
+                'lines' => $order->lines->map(fn ($l) => [
+                    'product_id' => $l->product_id,
+                    'description' => $l->description,
+                    'qty' => $l->qty,
+                    'unit_price' => $l->unit_price,
+                    'line_total' => $l->line_total,
+                ])->all(),
+            ]);
+
+            $order->update(['status' => 'invoiced']);
+
+            return $invoice;
         });
     }
 
