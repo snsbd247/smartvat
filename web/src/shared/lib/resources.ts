@@ -164,6 +164,18 @@ export const Accounts = {
     api.get<{ account: string; balance: string; rows: { date: string; entry_no: string; narration: string | null; debit: string; credit: string; balance: string }[] }>(
       `/accounting/accounts/${id}/cash-book`,
     ).then((r) => r.data),
+  periods: () =>
+    api.get<AccountingPeriod[]>('/accounting/periods').then((r) => (Array.isArray(r.data) ? r.data : (r.data as unknown as { data: AccountingPeriod[] }).data)),
+  setPeriodStatus: (id: number, status: 'open' | 'closed') =>
+    api.patch(`/accounting/periods/${id}/status`, { status }).then((r) => r.data),
+}
+export interface AccountingPeriod {
+  id: number
+  name: string
+  start_date: string
+  end_date: string
+  status: string
+  fiscal_year?: string | number
 }
 
 export const Import = {
@@ -345,6 +357,20 @@ export const System = {
   permissions: () => api.get<string[]>('/security/permissions').then((r) => r.data),
 }
 
+export interface Me {
+  id: number
+  name: string
+  email: string
+  username: string | null
+  roles?: string[]
+  companies?: { id: number; code: string; name: string }[]
+}
+export const Profile = {
+  me: () => api.get<Me>('/auth/me').then((r) => r.data),
+  changePassword: (b: { current_password: string; password: string; password_confirmation: string }) =>
+    api.post('/auth/change-password', b).then((r) => r.data),
+}
+
 export interface Contract { id: number; contract_no: string; customer_id: number; processing_rate: string; scrap_ownership: string }
 export interface JobWorkOrderRow { id: number; order_no: string; customer_id: number; status: string }
 export const JobWork = {
@@ -360,6 +386,8 @@ export const JobWork = {
     api.post(`/job-work/orders/${orderId}/deliver`, { lines }).then((r) => r.data),
   processingInvoice: (b: { customer_id: number; job_work_order_id?: number; qty: number; rate: number }) =>
     api.post('/job-work/processing-invoices', b).then((r) => r.data),
+  reconciliation: () =>
+    api.get<{ rows: Record<string, string>[] }>('/job-work/material-reconciliation').then((r) => (r.data.rows ?? (r.data as unknown as Record<string, string>[]))),
 }
 
 export interface Approval {
@@ -378,6 +406,44 @@ export const Approvals = {
     api.get<Approval[]>(`/approvals?status=${status}`).then((r) => r.data),
   approve: (id: number) => api.post(`/approvals/${id}/approve`, {}).then((r) => r.data),
   reject: (id: number, note?: string) => api.post(`/approvals/${id}/reject`, { note }).then((r) => r.data),
+}
+
+export const Settings = {
+  get: <T = Record<string, unknown>>(group: string) =>
+    api.get<{ group: string; payload: T }>(`/settings/${group}`).then((r) => r.data.payload),
+  put: <T = Record<string, unknown>>(group: string, payload: T) =>
+    api.put<{ group: string; payload: T }>(`/settings/${group}`, { payload }).then((r) => r.data.payload),
+}
+
+export interface DocRow {
+  id: number
+  title: string
+  filename: string
+  mime: string
+  size: number
+  category: string | null
+  uploaded_by: string | null
+  created_at: string | null
+}
+export const Documents = {
+  list: () => api.get<DocRow[]>('/documents').then((r) => r.data),
+  upload: (file: File, meta: { title?: string; category?: string }) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    if (meta.title) fd.append('title', meta.title)
+    if (meta.category) fd.append('category', meta.category)
+    return api.post('/documents', fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then((r) => r.data)
+  },
+  async download(id: number, filename: string) {
+    const res = await api.get(`/documents/${id}`, { responseType: 'blob' })
+    const url = URL.createObjectURL(res.data as Blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  },
+  remove: (id: number) => api.delete(`/documents/${id}`).then((r) => r.data),
 }
 
 export const Reports = {

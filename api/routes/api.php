@@ -16,6 +16,8 @@ use App\Modules\Vds\Http\Controllers\VdsController;
 use App\Modules\JobWork\Http\Controllers\JobWorkController;
 use App\Modules\Reporting\Http\Controllers\ReportController;
 use App\Modules\Approval\Http\Controllers\ApprovalController;
+use App\Modules\Settings\Http\Controllers\SettingController;
+use App\Modules\Document\Http\Controllers\DocumentController;
 use App\Modules\Mis\Http\Controllers\MisController;
 use App\Modules\Backup\Http\Controllers\BackupController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
@@ -42,6 +44,7 @@ Route::post('/auth/login', [AuthController::class, 'login'])
 // Authenticated (any company the user belongs to).
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
+    Route::post('/auth/change-password', [AuthController::class, 'changePassword'])->name('auth.change-password');
     Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
 
     // Tenant-scoped: a company must be resolved and authorized for the user.
@@ -192,6 +195,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('mis/executive', [MisController::class, 'executive'])->name('mis.exec');
         Route::get('mis/dashboard', [MisController::class, 'dashboard'])->name('mis.dashboard');
         Route::get('mis/approvals', [MisController::class, 'approvals'])->name('mis.approvals');
+
+        // Per-company settings store (general, numbering, email, master lists, …).
+        Route::get('settings/{group}', [SettingController::class, 'show'])->name('settings.show');
+        Route::put('settings/{group}', [SettingController::class, 'update'])->name('settings.update');
+
+        // Document Center (private, tenant-scoped file repository).
+        Route::get('documents', [DocumentController::class, 'index'])->name('documents.index');
+        Route::post('documents', [DocumentController::class, 'store'])->name('documents.store');
+        Route::get('documents/{document}', [DocumentController::class, 'download'])->name('documents.download');
+        Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
 
         // Generic approval workflow (all document types).
         Route::get('approvals', [ApprovalController::class, 'index'])->name('approvals.index');

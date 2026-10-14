@@ -79,6 +79,36 @@ class AuthController extends Controller
     }
 
     /**
+     * Change the authenticated user's password after verifying the current one.
+     * All other tokens are revoked so other sessions must re-authenticate.
+     */
+    public function changePassword(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = $request->user();
+
+        if (! Hash::check($data['current_password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['The current password is incorrect.'],
+            ]);
+        }
+
+        $user->forceFill(['password' => Hash::make($data['password'])])->save();
+
+        // Keep the current token, drop the rest.
+        $currentId = $user->currentAccessToken()->id;
+        $user->tokens()->where('id', '!=', $currentId)->delete();
+
+        AuditLogger::log('password_changed', $user);
+
+        return response()->json(['message' => 'Password updated.']);
+    }
+
+    /**
      * Revoke the token used for the current request.
      */
     public function logout(Request $request): JsonResponse
