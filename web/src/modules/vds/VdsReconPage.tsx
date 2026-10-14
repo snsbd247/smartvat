@@ -5,7 +5,7 @@ import { Accounts, Vds } from '../../shared/lib/resources'
 
 const money = (v: string | undefined) => '৳ ' + Number(v ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })
 
-export function VdsReconPage() {
+export function VdsReconPage({ title = 'VDS Reconciliation & Deposit', subtitle = 'Deducted vs deposited on the VDS-payable account' }: { title?: string; subtitle?: string }) {
   const qc = useQueryClient()
   const { data: recon } = useQuery({ queryKey: ['vds-recon'], queryFn: Vds.reconciliation })
   const { data: accounts } = useQuery({ queryKey: ['accounts'], queryFn: Accounts.list })
@@ -23,7 +23,7 @@ export function VdsReconPage() {
 
   return (
     <div>
-      <PageHeader title="VDS Reconciliation & Deposit" subtitle="Deducted vs deposited on the VDS-payable account" />
+      <PageHeader title={title} subtitle={subtitle} />
       {msg && <Banner kind={msg.kind}>{msg.text}</Banner>}
 
       <div className="mb-5 grid gap-4 sm:grid-cols-3">

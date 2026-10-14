@@ -4,9 +4,21 @@ import { Plus } from 'lucide-react'
 import { Banner, Button, Field, Modal, PageHeader, Table, apiError, inputClass } from '../../shared/ui/primitives'
 import { Production, Products, Warehouses } from '../../shared/lib/resources'
 
-export function ProductionOrdersPage() {
+export type ProdFocus = 'orders' | 'planning' | 'issue' | 'fg-receipt' | 'qc'
+
+const FOCUS: Record<ProdFocus, { title: string; subtitle: string; canCreate: boolean; showIssue: boolean; showReceive: boolean; filter: (s: string) => boolean }> = {
+  orders: { title: 'Production Orders', subtitle: 'Issue materials to WIP, then receive finished goods', canCreate: true, showIssue: true, showReceive: true, filter: () => true },
+  planning: { title: 'Production Planning', subtitle: 'Create and schedule orders before materials are issued', canCreate: true, showIssue: false, showReceive: false, filter: (s) => s === 'draft' },
+  issue: { title: 'Material Issue', subtitle: 'Issue BOM materials to work-in-progress', canCreate: false, showIssue: true, showReceive: false, filter: (s) => s === 'draft' },
+  'fg-receipt': { title: 'Finished Goods Receipt', subtitle: 'Receive produced goods from released orders into stock', canCreate: false, showIssue: false, showReceive: true, filter: (s) => s === 'released' },
+  qc: { title: 'Quality Control', subtitle: 'Completed orders — produced vs scrap for inspection', canCreate: false, showIssue: false, showReceive: false, filter: (s) => s === 'completed' },
+}
+
+export function ProductionOrdersPage({ focus = 'orders' }: { focus?: ProdFocus }) {
+  const cfg = FOCUS[focus]
   const qc = useQueryClient()
-  const { data: orders } = useQuery({ queryKey: ['prod-orders'], queryFn: Production.orders })
+  const { data: allOrders } = useQuery({ queryKey: ['prod-orders'], queryFn: Production.orders })
+  const orders = (allOrders ?? []).filter((o) => cfg.filter(o.status))
   const { data: products } = useQuery({ queryKey: ['products'], queryFn: Products.list })
   const { data: boms } = useQuery({ queryKey: ['boms'], queryFn: Production.boms })
   const { data: warehouses } = useQuery({ queryKey: ['warehouses'], queryFn: Warehouses.list })
@@ -41,34 +53,38 @@ export function ProductionOrdersPage() {
 
   return (
     <div>
-      <PageHeader title="Production Orders" subtitle="Issue materials to WIP, then receive finished goods"
-        action={<Button onClick={() => { setOpen(true); setMsg(null) }}><Plus size={16} /> New Order</Button>} />
+      <PageHeader title={cfg.title} subtitle={cfg.subtitle}
+        action={cfg.canCreate && <Button onClick={() => { setOpen(true); setMsg(null) }}><Plus size={16} /> New Order</Button>} />
       {msg && <Banner kind={msg.kind}>{msg.text}</Banner>}
 
-      <Table head={['Order', 'Product', 'Planned', 'Produced', 'Status', 'Actions']}>
-        {(orders ?? []).map((o) => (
+      <Table head={['Order', 'Product', 'Planned', 'Produced', 'Status', focus === 'qc' ? 'Scrap' : 'Actions']}>
+        {orders.map((o) => (
           <tr key={o.id} className="text-ink">
             <td className="px-4 py-2.5">{o.order_no}</td>
             <td className="px-4 py-2.5">{pName(o.product_id)}</td>
             <td className="px-4 py-2.5">{o.planned_qty}</td>
             <td className="px-4 py-2.5">{o.produced_qty}</td>
-            <td className="px-4 py-2.5">{o.status}</td>
+            <td className="px-4 py-2.5 capitalize">{o.status}</td>
             <td className="px-4 py-2.5">
-              <div className="flex gap-2">
-                {o.status !== 'completed' && (
-                  <>
+              {focus === 'qc' ? (
+                <span>{o.scrap_qty}</span>
+              ) : (
+                <div className="flex gap-2">
+                  {cfg.showIssue && o.status !== 'completed' && (
                     <Button variant="ghost" onClick={() => issue.mutate(o.id)}>Issue</Button>
+                  )}
+                  {cfg.showReceive && o.status !== 'completed' && (
                     <Button variant="ghost" onClick={() => {
                       const qty = Number(prompt('Finished quantity to receive?', o.planned_qty))
                       if (qty > 0) receive.mutate({ id: o.id, qty })
                     }}>Receive</Button>
-                  </>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </td>
           </tr>
         ))}
-        {(orders ?? []).length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-muted">No orders yet.</td></tr>}
+        {orders.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-muted">Nothing here.</td></tr>}
       </Table>
 
       {open && (

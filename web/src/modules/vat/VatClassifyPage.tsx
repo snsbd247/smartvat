@@ -6,7 +6,7 @@ import { Vat } from '../../shared/lib/resources'
 const TX = ['local_sale', 'export_sale', 'local_purchase', 'import_purchase', 'service_purchase']
 const TREAT = ['standard', 'zero_rated', 'exempt']
 
-export function VatClassifyPage() {
+export function VatClassifyPage({ title = 'VAT Classification', subtitle = 'Classify a transaction to a verified Mushak 9.1 Note (never guessed)' }: { title?: string; subtitle?: string }) {
   const [form, setForm] = useState<Record<string, string>>({})
   const [result, setResult] = useState<{ status: string; note?: number | null } | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -30,7 +30,7 @@ export function VatClassifyPage() {
 
   return (
     <div>
-      <PageHeader title="VAT Classification" subtitle="Classify a transaction to a verified Mushak 9.1 Note (never guessed)" />
+      <PageHeader title={title} subtitle={subtitle} />
       {error && <Banner kind="error">{error}</Banner>}
       {result && (
         <Banner kind={result.status === 'classified' ? 'success' : 'error'}>

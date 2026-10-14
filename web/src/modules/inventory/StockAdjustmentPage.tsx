@@ -6,7 +6,7 @@ import { Inventory, Products, Warehouses } from '../../shared/lib/resources'
 
 interface Line { product_id: string; qty: string; unit_cost: string }
 
-export function StockAdjustmentPage() {
+export function StockAdjustmentPage({ title = 'Stock Adjustment', subtitle = 'Positive or negative quantity adjustment (use + / − qty)' }: { title?: string; subtitle?: string }) {
   const qc = useQueryClient()
   const { data: products } = useQuery({ queryKey: ['products'], queryFn: Products.list })
   const { data: warehouses } = useQuery({ queryKey: ['warehouses'], queryFn: Warehouses.list })
@@ -29,7 +29,7 @@ export function StockAdjustmentPage() {
 
   return (
     <div>
-      <PageHeader title="Stock Adjustment" subtitle="Positive or negative quantity adjustment (use + / − qty)" />
+      <PageHeader title={title} subtitle={subtitle} />
       {msg && <Banner kind={msg.kind}>{msg.text}</Banner>}
       <form onSubmit={(e: FormEvent) => { e.preventDefault(); setMsg(null); m.mutate() }} className="space-y-5 rounded-xl border border-slate-200 bg-white p-5">
         <Field label="Warehouse">

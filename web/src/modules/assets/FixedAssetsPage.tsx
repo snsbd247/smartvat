@@ -6,7 +6,7 @@ import { Accounts, FixedAssets } from '../../shared/lib/resources'
 
 const money = (v: string) => Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 })
 
-export function FixedAssetsPage() {
+export function FixedAssetsPage({ title = 'Fixed Assets', subtitle = 'Asset register — acquire and depreciate (straight-line)' }: { title?: string; subtitle?: string }) {
   const qc = useQueryClient()
   const { data: assets } = useQuery({ queryKey: ['fixed-assets'], queryFn: FixedAssets.assets })
   const { data: cats } = useQuery({ queryKey: ['asset-categories'], queryFn: FixedAssets.categories })
@@ -46,7 +46,7 @@ export function FixedAssetsPage() {
 
   return (
     <div>
-      <PageHeader title="Fixed Assets" subtitle="Asset register — acquire and depreciate (straight-line)"
+      <PageHeader title={title} subtitle={subtitle}
         action={
           <div className="flex gap-2">
             <Button variant="ghost" onClick={() => depreciate.mutate()} disabled={depreciate.isPending}><RefreshCw size={15} /> Run Depreciation</Button>

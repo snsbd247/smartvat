@@ -6,7 +6,7 @@ import { Vds } from '../../shared/lib/resources'
 
 const money = (v: string) => Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 })
 
-export function VdsRegisterPage() {
+export function VdsRegisterPage({ title = 'VDS Register', subtitle = 'All deductions — issue certificates' }: { title?: string; subtitle?: string }) {
   const qc = useQueryClient()
   const { data: rows } = useQuery({ queryKey: ['vds-deductions'], queryFn: Vds.deductions })
   const [msg, setMsg] = useState<string | null>(null)
@@ -18,7 +18,7 @@ export function VdsRegisterPage() {
 
   return (
     <div>
-      <PageHeader title="VDS Register" subtitle="All deductions — issue certificates" />
+      <PageHeader title={title} subtitle={subtitle} />
       {msg && <Banner kind="success">{msg}</Banner>}
       <Table head={['Deduction No', 'Date', 'Category', 'Base', 'Rate %', 'VDS', 'Status', '']}>
         {(rows ?? []).map((d) => (

@@ -103,12 +103,12 @@ export default function App() {
         <Route index element={<DashboardPage />} />
 
         {/* Organization */}
-        <Route path="organization/company-profile" element={<CompanyConfigPage />} />
+        <Route path="organization/company-profile" element={<SettingsPage group="general" />} />
         <Route path="organization/factory-branch" element={<FactoriesPage />} />
         <Route path="organization/warehouse" element={<WarehousesPage />} />
         <Route path="organization/financial-year" element={<PeriodsPage mode="view" />} />
-        <Route path="organization/configuration" element={<CompanyConfigPage />} />
-        <Route path="organization/business-type" element={<CompanyConfigPage />} />
+        <Route path="organization/configuration" element={<CompanyConfigPage title="Company Configuration" subtitle="Business types drive which modules are enabled (enforced in the backend)" />} />
+        <Route path="organization/business-type" element={<CompanyConfigPage title="Business Type & Industry" subtitle="Select the business types that activate each module" />} />
 
         {/* Users */}
         <Route path="users/users" element={<UsersPage />} />
@@ -144,18 +144,18 @@ export default function App() {
         <Route path="inventory/transfer" element={<StockTransferPage />} />
         <Route path="inventory/adjustment" element={<StockAdjustmentPage />} />
         <Route path="inventory/ledger" element={<StockLedgerPage />} />
-        <Route path="inventory/count" element={<StockAdjustmentPage />} />
+        <Route path="inventory/count" element={<StockAdjustmentPage title="Physical Stock Count" subtitle="Reconcile counted quantity to system stock (enter the +/− difference)" />} />
         <Route path="inventory/valuation" element={<ReportViewPage reportKey="stock-valuation" />} />
 
         {/* Purchase */}
         <Route path="purchase/po" element={<PurchaseOrderPage />} />
-        <Route path="purchase/requisition" element={<PurchaseOrderPage />} />
+        <Route path="purchase/requisition" element={<PurchaseOrderPage title="Purchase Requisition" subtitle="Raise an internal purchase request (becomes a PO on approval)" />} />
         <Route path="purchase/import" element={<ImportShipmentPage />} />
         <Route path="purchase/grn" element={<GoodsReceiptPage />} />
         <Route path="purchase/invoice" element={<PurchaseInvoicePage />} />
         <Route path="purchase/payment" element={<SupplierPaymentPage />} />
         <Route path="purchase/return" element={<PurchaseReturnPage />} />
-        <Route path="purchase/landed-cost" element={<ImportShipmentPage />} />
+        <Route path="purchase/landed-cost" element={<ImportShipmentPage title="Landed Cost Allocation" subtitle="Allocate freight, duty and charges across an import shipment" />} />
         <Route path="purchase/local" element={<SupplierLedgerPage />} />
 
         {/* Sales */}
@@ -172,8 +172,8 @@ export default function App() {
         {/* Accounting */}
         <Route path="accounting/coa" element={<ChartOfAccountsPage />} />
         <Route path="accounting/journals" element={<JournalEntryPage />} />
-        <Route path="accounting/receipts-payments" element={<CashBookPage />} />
-        <Route path="accounting/ledger" element={<CashBookPage />} />
+        <Route path="accounting/receipts-payments" element={<CashBookPage title="Receipts & Payments" subtitle="Cash/bank account movements — money in and out" />} />
+        <Route path="accounting/ledger" element={<CashBookPage title="General Ledger" subtitle="Account ledger with running balance" />} />
         <Route path="accounting/fund-transfer" element={<FundTransferPage />} />
         <Route path="accounting/bank-rec" element={<BankReconciliationPage />} />
         <Route path="accounting/expenses" element={<ExpensePage />} />
@@ -189,46 +189,46 @@ export default function App() {
         <Route path="vat/catalogue" element={<VatNotesPage />} />
         <Route path="vat/registers" element={<VatMappingsPage />} />
         <Route path="vat/reconciliation" element={<VatUnmappedPage />} />
-        <Route path="vat/returns" element={<VatClassifyPage />} />
-        <Route path="vat/mushak-6-3" element={<VatClassifyPage />} />
+        <Route path="vat/returns" element={<VatClassifyPage title="VAT Return Preparation" subtitle="Classify period transactions to verified Mushak notes for the return" />} />
+        <Route path="vat/mushak-6-3" element={<VatClassifyPage title="Mushak 6.3 — Tax Invoice" subtitle="Classify a transaction to a verified Mushak note (never guessed)" />} />
         <Route path="vat/mushak-9-1" element={<ReportViewPage reportKey="vat-note-summary" />} />
 
         {/* VDS */}
         <Route path="vds/rules" element={<VdsRulesPage />} />
         <Route path="vds/deduction" element={<VdsDeductionPage />} />
         <Route path="vds/register" element={<VdsRegisterPage />} />
-        <Route path="vds/certificate" element={<VdsRegisterPage />} />
-        <Route path="vds/treasury" element={<VdsReconPage />} />
+        <Route path="vds/certificate" element={<VdsRegisterPage title="Certificate Management" subtitle="Issue and track VDS deduction certificates" />} />
+        <Route path="vds/treasury" element={<VdsReconPage title="Treasury Deposit" subtitle="Deposit deducted VDS to the treasury and reconcile" />} />
         <Route path="vds/reconciliation" element={<VdsReconPage />} />
         <Route path="vds/reports" element={<VdsReportsPage />} />
 
         {/* Production */}
         <Route path="production/bom" element={<BomsPage />} />
-        <Route path="production/planning" element={<ProductionOrdersPage />} />
-        <Route path="production/orders" element={<ProductionOrdersPage />} />
-        <Route path="production/issue" element={<ProductionOrdersPage />} />
+        <Route path="production/planning" element={<ProductionOrdersPage focus="planning" />} />
+        <Route path="production/orders" element={<ProductionOrdersPage focus="orders" />} />
+        <Route path="production/issue" element={<ProductionOrdersPage focus="issue" />} />
         <Route path="production/wip" element={<ProductionWipPage />} />
-        <Route path="production/fg-receipt" element={<ProductionOrdersPage />} />
-        <Route path="production/qc" element={<ProductionOrdersPage />} />
+        <Route path="production/fg-receipt" element={<ProductionOrdersPage focus="fg-receipt" />} />
+        <Route path="production/qc" element={<ProductionOrdersPage focus="qc" />} />
         <Route path="production/costing" element={<ProductionCostingPage />} />
         <Route path="production/variance" element={<ProductionVariancePage />} />
 
         {/* Fixed Assets */}
-        <Route path="assets/register" element={<FixedAssetsPage />} />
-        <Route path="assets/acquisition" element={<FixedAssetsPage />} />
-        <Route path="assets/depreciation" element={<FixedAssetsPage />} />
+        <Route path="assets/register" element={<FixedAssetsPage title="Asset Register" subtitle="All fixed assets with cost, depreciation and book value" />} />
+        <Route path="assets/acquisition" element={<FixedAssetsPage title="Asset Acquisition" subtitle="Record a newly acquired fixed asset" />} />
+        <Route path="assets/depreciation" element={<FixedAssetsPage title="Depreciation" subtitle="Run straight-line depreciation for the period" />} />
         <Route path="assets/disposal" element={<AssetDisposalPage />} />
         <Route path="assets/categories" element={<AssetCategoriesPage />} />
         <Route path="assets/reports" element={<ReportsPage />} />
 
         {/* Job Work */}
         <Route path="job-work/contracts" element={<JobWorkContractsPage />} />
-        <Route path="job-work/orders" element={<JobWorkOrdersPage />} />
-        <Route path="job-work/material-receipt" element={<JobWorkOrdersPage />} />
-        <Route path="job-work/consumption" element={<JobWorkOrdersPage />} />
-        <Route path="job-work/output" element={<JobWorkOrdersPage />} />
-        <Route path="job-work/delivery" element={<JobWorkOrdersPage />} />
-        <Route path="job-work/processing-fee" element={<JobWorkOrdersPage />} />
+        <Route path="job-work/orders" element={<JobWorkOrdersPage focus="orders" />} />
+        <Route path="job-work/material-receipt" element={<JobWorkOrdersPage focus="material-receipt" />} />
+        <Route path="job-work/consumption" element={<JobWorkOrdersPage focus="consumption" />} />
+        <Route path="job-work/output" element={<JobWorkOrdersPage focus="output" />} />
+        <Route path="job-work/delivery" element={<JobWorkOrdersPage focus="delivery" />} />
+        <Route path="job-work/processing-fee" element={<JobWorkOrdersPage focus="processing-fee" />} />
         <Route path="job-work/reports" element={<JobWorkReportsPage />} />
 
         {/* Approval Center */}

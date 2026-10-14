@@ -4,7 +4,19 @@ import { Plus } from 'lucide-react'
 import { Banner, Button, Field, Modal, PageHeader, Table, apiError, inputClass } from '../../shared/ui/primitives'
 import { Customers, JobWork, Products, Warehouses } from '../../shared/lib/resources'
 
-export function JobWorkOrdersPage() {
+export type JwFocus = 'orders' | 'material-receipt' | 'consumption' | 'output' | 'delivery' | 'processing-fee'
+
+const FOCUS: Record<JwFocus, { title: string; subtitle: string; canCreate: boolean; receive: boolean; consume: boolean; deliver: boolean; invoice: boolean }> = {
+  orders: { title: 'Job Work Orders', subtitle: 'Customer-owned material custody + processing (service) invoicing', canCreate: true, receive: true, consume: true, deliver: true, invoice: true },
+  'material-receipt': { title: 'Customer Material Receipt', subtitle: 'Receive customer-owned material into custody (not company stock)', canCreate: true, receive: true, consume: false, deliver: false, invoice: false },
+  consumption: { title: 'Material Consumption', subtitle: 'Consume customer material against a job work order', canCreate: false, receive: false, consume: true, deliver: false, invoice: false },
+  output: { title: 'Production Output', subtitle: 'Record finished output produced from customer material', canCreate: false, receive: false, consume: false, deliver: true, invoice: false },
+  delivery: { title: 'Finished Goods Delivery', subtitle: 'Deliver produced goods back to the customer', canCreate: false, receive: false, consume: false, deliver: true, invoice: false },
+  'processing-fee': { title: 'Processing Fee Invoice', subtitle: 'Bill the processing (service) charge — Dr AR / Cr processing income', canCreate: false, receive: false, consume: false, deliver: false, invoice: true },
+}
+
+export function JobWorkOrdersPage({ focus = 'orders' }: { focus?: JwFocus }) {
+  const cfg = FOCUS[focus]
   const qc = useQueryClient()
   const { data: orders } = useQuery({ queryKey: ['jw-orders'], queryFn: JobWork.orders })
   const { data: customers } = useQuery({ queryKey: ['customers'], queryFn: Customers.list })
@@ -56,8 +68,8 @@ export function JobWorkOrdersPage() {
 
   return (
     <div>
-      <PageHeader title="Job Work Orders" subtitle="Customer-owned material custody + processing (service) invoicing"
-        action={<Button onClick={() => { setOpen(true); setMsg(null) }}><Plus size={16} /> New Order</Button>} />
+      <PageHeader title={cfg.title} subtitle={cfg.subtitle}
+        action={cfg.canCreate && <Button onClick={() => { setOpen(true); setMsg(null) }}><Plus size={16} /> New Order</Button>} />
       {msg && <Banner kind={msg.kind}>{msg.text}</Banner>}
 
       <Table head={['Order', 'Customer', 'Status', 'Actions']}>
@@ -68,14 +80,14 @@ export function JobWorkOrdersPage() {
             <td className="px-4 py-2.5">{o.status}</td>
             <td className="px-4 py-2.5">
               <div className="flex flex-wrap gap-2">
-                <Button variant="ghost" onClick={() => { setMatFor(o.id); setMatAction('receive'); setMsg(null) }}>Receive</Button>
-                <Button variant="ghost" onClick={() => { setMatFor(o.id); setMatAction('consume'); setMsg(null) }}>Consume</Button>
-                <Button variant="ghost" onClick={() => { setMatFor(o.id); setMatAction('deliver'); setMsg(null) }}>Deliver</Button>
-                <Button variant="ghost" onClick={() => {
+                {cfg.receive && <Button variant="ghost" onClick={() => { setMatFor(o.id); setMatAction('receive'); setMsg(null) }}>Receive</Button>}
+                {cfg.consume && <Button variant="ghost" onClick={() => { setMatFor(o.id); setMatAction('consume'); setMsg(null) }}>Consume</Button>}
+                {cfg.deliver && <Button variant="ghost" onClick={() => { setMatFor(o.id); setMatAction('deliver'); setMsg(null) }}>Deliver</Button>}
+                {cfg.invoice && <Button variant="ghost" onClick={() => {
                   const qty = Number(prompt('Processing qty?'))
                   const rate = Number(prompt('Processing rate per unit?'))
                   if (qty > 0 && rate >= 0) invoice.mutate({ customer_id: o.customer_id, job_work_order_id: o.id, qty, rate })
-                }}>Invoice</Button>
+                }}>Invoice</Button>}
               </div>
             </td>
           </tr>

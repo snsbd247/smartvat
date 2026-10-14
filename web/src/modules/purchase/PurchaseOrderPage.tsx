@@ -10,7 +10,7 @@ interface Line {
   unit_price: string
 }
 
-export function PurchaseOrderPage() {
+export function PurchaseOrderPage({ title = 'Purchase Order', subtitle = 'Create a draft PO (approve from the Approval Center)' }: { title?: string; subtitle?: string }) {
   const qc = useQueryClient()
   const { data: suppliers } = useQuery({ queryKey: ['suppliers'], queryFn: Suppliers.list })
   const { data: products } = useQuery({ queryKey: ['products'], queryFn: Products.list })
@@ -37,7 +37,7 @@ export function PurchaseOrderPage() {
 
   return (
     <div>
-      <PageHeader title="Purchase Order" subtitle="Create a draft PO (approve from the Approval Center)" />
+      <PageHeader title={title} subtitle={subtitle} />
       {msg && <Banner kind={msg.kind}>{msg.text}</Banner>}
       <form
         onSubmit={(e: FormEvent) => {

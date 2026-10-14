@@ -11,7 +11,7 @@ type Preview = Awaited<ReturnType<typeof Import.preview>>
 const BASIS = ['value', 'quantity', 'weight', 'volume']
 const money = (v: string | number) => '৳ ' + Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 })
 
-export function ImportShipmentPage() {
+export function ImportShipmentPage({ title = 'Import Purchase', subtitle = 'Foreign-currency shipment with landed-cost allocation' }: { title?: string; subtitle?: string }) {
   const qc = useQueryClient()
   const { data: suppliers } = useQuery({ queryKey: ['suppliers'], queryFn: Suppliers.list })
   const { data: warehouses } = useQuery({ queryKey: ['warehouses'], queryFn: Warehouses.list })
@@ -57,7 +57,7 @@ export function ImportShipmentPage() {
 
   return (
     <div>
-      <PageHeader title="Import Purchase" subtitle="Foreign-currency shipment with landed-cost allocation" />
+      <PageHeader title={title} subtitle={subtitle} />
       {msg && <Banner kind={msg.kind}>{msg.text}</Banner>}
 
       {!shipmentId ? (

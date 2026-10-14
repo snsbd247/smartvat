@@ -5,7 +5,7 @@ import { Accounts } from '../../shared/lib/resources'
 
 const money = (v: string) => Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 })
 
-export function CashBookPage() {
+export function CashBookPage({ title = 'Cash / Bank Book', subtitle = 'Ledger of a cash or bank account with running balance' }: { title?: string; subtitle?: string }) {
   const { data: accounts } = useQuery({ queryKey: ['accounts'], queryFn: Accounts.list })
   const [account, setAccount] = useState('')
   const { data: book } = useQuery({
@@ -16,7 +16,7 @@ export function CashBookPage() {
 
   return (
     <div>
-      <PageHeader title="Cash / Bank Book" subtitle="Ledger of a cash or bank account with running balance" />
+      <PageHeader title={title} subtitle={subtitle} />
       <div className="mb-4 max-w-sm">
         <Field label="Account">
           <select className={inputClass} value={account} onChange={(e) => setAccount(e.target.value)}>

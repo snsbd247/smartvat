@@ -5,7 +5,7 @@ import { Company } from '../../shared/lib/resources'
 
 const TYPES = ['manufacturing', 'trading', 'service']
 
-export function CompanyConfigPage() {
+export function CompanyConfigPage({ title = 'Company Configuration', subtitle = 'Business types drive which modules are enabled (enforced in the backend)' }: { title?: string; subtitle?: string }) {
   const qc = useQueryClient()
   const { data: config } = useQuery({ queryKey: ['company-config'], queryFn: Company.config })
   const [selected, setSelected] = useState<string[]>([])
@@ -34,7 +34,7 @@ export function CompanyConfigPage() {
 
   return (
     <div>
-      <PageHeader title="Company Configuration" subtitle="Business types drive which modules are enabled (enforced in the backend)" />
+      <PageHeader title={title} subtitle={subtitle} />
       {msg && <Banner kind={msg.kind}>{msg.text}</Banner>}
 
       <form
