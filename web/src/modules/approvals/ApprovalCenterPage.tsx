@@ -12,12 +12,26 @@ const TABS: { key: 'pending' | 'approved' | 'rejected'; label: string }[] = [
   { key: 'rejected', label: 'Rejected' },
 ]
 
-export function ApprovalCenterPage() {
+export type ApprovalKind = 'all' | 'purchase' | 'sales' | 'payment' | 'journal' | 'production'
+
+// Each Approval Center menu scopes to a set of document types.
+const KIND: Record<ApprovalKind, { title: string; subtitle: string; types: string[] | null }> = {
+  all: { title: 'Approval Center', subtitle: 'Documents across all modules awaiting a decision', types: null },
+  purchase: { title: 'Purchase Approvals', subtitle: 'Purchase orders awaiting a decision', types: ['purchase_order'] },
+  sales: { title: 'Sales Approvals', subtitle: 'Sales orders and invoices awaiting a decision', types: ['sales_order', 'sales_invoice'] },
+  payment: { title: 'Payment Approvals', subtitle: 'Supplier payments and customer receipts awaiting a decision', types: ['supplier_payment', 'customer_receipt'] },
+  journal: { title: 'Journal Approvals', subtitle: 'Manual journal entries awaiting a decision', types: ['journal_entry'] },
+  production: { title: 'Production Approvals', subtitle: 'Production orders awaiting a decision', types: ['production_order'] },
+}
+
+export function ApprovalCenterPage({ kind = 'all' }: { kind?: ApprovalKind }) {
   const qc = useQueryClient()
   const [tab, setTab] = useState<'pending' | 'approved' | 'rejected'>('pending')
   const [msg, setMsg] = useState<string | null>(null)
+  const cfg = KIND[kind]
 
-  const { data: rows } = useQuery({ queryKey: ['approvals', tab], queryFn: () => Approvals.list(tab) })
+  const { data: all } = useQuery({ queryKey: ['approvals', tab], queryFn: () => Approvals.list(tab) })
+  const rows = cfg.types ? (all ?? []).filter((r) => cfg.types!.includes(r.type)) : all
 
   const refresh = () => {
     qc.invalidateQueries({ queryKey: ['approvals'] })
@@ -42,7 +56,7 @@ export function ApprovalCenterPage() {
 
   return (
     <div>
-      <PageHeader title="Approval Center" subtitle="Documents across all modules awaiting a decision" />
+      <PageHeader title={cfg.title} subtitle={cfg.subtitle} />
       {msg && <Banner kind="success">{msg}</Banner>}
 
       <div className="mb-4 flex gap-1 rounded-lg border border-slate-200 bg-workspace p-1 w-fit">

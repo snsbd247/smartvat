@@ -119,12 +119,12 @@ export default function App() {
         <Route path="users/activity-logs" element={<ActivityLogsPage />} />
 
         {/* Backup & System Health */}
-        <Route path="backup/health" element={<BackupHealthPage />} />
-        <Route path="backup/history" element={<BackupHealthPage />} />
-        <Route path="backup/drive" element={<BackupHealthPage />} />
-        <Route path="backup/retention" element={<BackupHealthPage />} />
-        <Route path="backup/restore" element={<BackupHealthPage />} />
-        <Route path="backup/logs" element={<BackupHealthPage />} />
+        <Route path="backup/health" element={<BackupHealthPage view="health" />} />
+        <Route path="backup/history" element={<BackupHealthPage view="history" />} />
+        <Route path="backup/drive" element={<BackupHealthPage view="drive" />} />
+        <Route path="backup/retention" element={<BackupHealthPage view="retention" />} />
+        <Route path="backup/restore" element={<BackupHealthPage view="restore" />} />
+        <Route path="backup/logs" element={<BackupHealthPage view="logs" />} />
 
         {/* Master data */}
         <Route path="master-data/products" element={<ProductsPage />} />
@@ -232,21 +232,21 @@ export default function App() {
         <Route path="job-work/reports" element={<JobWorkReportsPage />} />
 
         {/* Approval Center */}
-        <Route path="approvals/purchase" element={<ApprovalCenterPage />} />
-        <Route path="approvals/sales" element={<ApprovalCenterPage />} />
-        <Route path="approvals/payment" element={<ApprovalCenterPage />} />
-        <Route path="approvals/journal" element={<ApprovalCenterPage />} />
-        <Route path="approvals/production" element={<ApprovalCenterPage />} />
-        <Route path="approvals/vat" element={<ApprovalCenterPage />} />
+        <Route path="approvals/purchase" element={<ApprovalCenterPage kind="purchase" />} />
+        <Route path="approvals/sales" element={<ApprovalCenterPage kind="sales" />} />
+        <Route path="approvals/payment" element={<ApprovalCenterPage kind="payment" />} />
+        <Route path="approvals/journal" element={<ApprovalCenterPage kind="journal" />} />
+        <Route path="approvals/production" element={<ApprovalCenterPage kind="production" />} />
+        <Route path="approvals/vat" element={<VatUnmappedPage />} />
 
         {/* Reports hub */}
-        <Route path="reports/sales" element={<ReportsPage />} />
-        <Route path="reports/purchase" element={<ReportsPage />} />
-        <Route path="reports/inventory" element={<ReportsPage />} />
-        <Route path="reports/accounting" element={<ReportsPage />} />
-        <Route path="reports/vat-vds" element={<ReportsPage />} />
-        <Route path="reports/aging" element={<ReportsPage />} />
-        <Route path="reports/builder" element={<ReportsPage />} />
+        <Route path="reports/sales" element={<ReportsPage category="sales" />} />
+        <Route path="reports/purchase" element={<ReportsPage category="purchase" />} />
+        <Route path="reports/inventory" element={<ReportsPage category="inventory" />} />
+        <Route path="reports/accounting" element={<ReportsPage category="accounting" />} />
+        <Route path="reports/vat-vds" element={<ReportsPage category="vat-vds" />} />
+        <Route path="reports/aging" element={<ReportsPage category="aging" />} />
+        <Route path="reports/builder" element={<ReportsPage category="all" />} />
         <Route path="reports/view/:key" element={<ReportViewRoute />} />
 
         {/* Document Center */}
