@@ -70,6 +70,22 @@ it('refuses to invoice an unconfirmed quotation', function () {
     expect(fn () => $svc->invoiceFromOrder($quote))->toThrow(InvalidArgumentException::class);
 });
 
+it('resolves a bound company-scoped model after clearing context (middleware order)', function () {
+    $quote = app(SalesService::class)->createOrder(orderData(), 'quotation');
+
+    \Laravel\Sanctum\Sanctum::actingAs(makeUserInCompany($this->company, 'admin'));
+    $headers = ['X-Company-Id' => (string) $this->company->id];
+
+    // Simulate a fresh request: the tenant is NOT pre-set, so the request must
+    // resolve the company (via middleware) BEFORE route-model binding runs.
+    app(\App\Shared\Tenancy\CurrentCompany::class)->clear();
+
+    $this->withHeaders($headers)
+        ->postJson("/api/sales-orders/{$quote->id}/confirm")
+        ->assertOk()
+        ->assertJsonPath('status', 'confirmed');
+});
+
 it('exposes the order flow over the API', function () {
     \Laravel\Sanctum\Sanctum::actingAs(makeUserInCompany($this->company, 'admin'));
     $headers = ['X-Company-Id' => (string) $this->company->id];
