@@ -45,6 +45,7 @@ class User extends Authenticatable
         'remember_token',
         'nid_encrypted',
         'nid_index',
+        'two_factor_secret',
     ];
 
     protected function casts(): array
@@ -53,6 +54,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'password' => 'hashed',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_enabled' => 'boolean',
         ];
     }
 

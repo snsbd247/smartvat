@@ -40,6 +40,17 @@ class AuthController extends Controller
             ]);
         }
 
+        // Two-factor challenge, when enabled for this user.
+        if ($user->two_factor_enabled) {
+            $code = (string) $request->input('code', '');
+            if ($code === '') {
+                return response()->json(['two_factor_required' => true]);
+            }
+            if (! \App\Shared\Security\Totp::verify((string) $user->two_factor_secret, $code)) {
+                throw ValidationException::withMessages(['code' => ['The authentication code is invalid.']]);
+            }
+        }
+
         $user->forceFill(['last_login_at' => now()])->save();
 
         $token = $user->createToken($data['device_name'] ?? 'web')->plainTextToken;
@@ -79,6 +90,7 @@ class AuthController extends Controller
             'username' => $user->username,
             'roles' => $user->getRoleNames(),
             'permissions' => $user->getAllPermissions()->pluck('name'),
+            'two_factor_enabled' => (bool) $user->two_factor_enabled,
         ]);
     }
 
@@ -152,6 +164,54 @@ class AuthController extends Controller
         }
 
         return response()->json(['message' => 'Password has been reset. Please sign in.']);
+    }
+
+    /**
+     * Begin two-factor setup: generate a secret and return the provisioning URI.
+     * The secret is stored but 2FA is not active until confirmed with a valid code.
+     */
+    public function enableTwoFactor(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $secret = \App\Shared\Security\Totp::generateSecret();
+        $user->forceFill(['two_factor_secret' => $secret, 'two_factor_enabled' => false])->save();
+
+        return response()->json([
+            'secret' => $secret,
+            'otpauth_uri' => \App\Shared\Security\Totp::uri($secret, $user->email, config('app.name')),
+        ]);
+    }
+
+    /** Confirm two-factor setup by verifying a code from the authenticator app. */
+    public function confirmTwoFactor(Request $request): JsonResponse
+    {
+        $data = $request->validate(['code' => ['required', 'string']]);
+        $user = $request->user();
+
+        if (empty($user->two_factor_secret) || ! \App\Shared\Security\Totp::verify((string) $user->two_factor_secret, $data['code'])) {
+            throw ValidationException::withMessages(['code' => ['The authentication code is invalid.']]);
+        }
+
+        $user->forceFill(['two_factor_enabled' => true])->save();
+        AuditLogger::log('two_factor_enabled', $user);
+
+        return response()->json(['message' => 'Two-factor authentication enabled.']);
+    }
+
+    /** Disable two-factor after verifying the account password. */
+    public function disableTwoFactor(Request $request): JsonResponse
+    {
+        $data = $request->validate(['password' => ['required', 'string']]);
+        $user = $request->user();
+
+        if (! Hash::check($data['password'], $user->password)) {
+            throw ValidationException::withMessages(['password' => ['The password is incorrect.']]);
+        }
+
+        $user->forceFill(['two_factor_secret' => null, 'two_factor_enabled' => false])->save();
+        AuditLogger::log('two_factor_disabled', $user);
+
+        return response()->json(['message' => 'Two-factor authentication disabled.']);
     }
 
     /**

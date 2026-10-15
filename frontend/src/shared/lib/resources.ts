@@ -415,6 +415,7 @@ export interface Me {
   email: string
   username: string | null
   roles?: string[]
+  two_factor_enabled?: boolean
   companies?: { id: number; code: string; name: string }[]
 }
 export const Profile = {
@@ -424,6 +425,9 @@ export const Profile = {
   forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }).then((r) => r.data),
   resetPassword: (b: { token: string; email: string; password: string; password_confirmation: string }) =>
     api.post('/auth/reset-password', b).then((r) => r.data),
+  enable2fa: () => api.post<{ secret: string; otpauth_uri: string }>('/auth/2fa/enable', {}).then((r) => r.data),
+  confirm2fa: (code: string) => api.post('/auth/2fa/confirm', { code }).then((r) => r.data),
+  disable2fa: (password: string) => api.post('/auth/2fa/disable', { password }).then((r) => r.data),
 }
 
 export interface Contract { id: number; contract_no: string; customer_id: number; processing_rate: string; scrap_ownership: string }

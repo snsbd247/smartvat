@@ -78,6 +78,7 @@ import { SettingsPage } from './modules/settings/SettingsPage'
 import { ManagedListPage } from './modules/settings/ManagedListPage'
 import { VatVersionsPage } from './modules/settings/VatVersionsPage'
 import { WorkflowsPage } from './modules/settings/WorkflowsPage'
+import { TwoFactorPage } from './modules/settings/TwoFactorPage'
 import { DocumentRepositoryPage } from './modules/documents/DocumentRepositoryPage'
 import { DocumentAccessPage } from './modules/documents/DocumentAccessPage'
 
@@ -270,6 +271,7 @@ export default function App() {
         <Route path="settings/workflows" element={<WorkflowsPage />} />
         <Route path="settings/notifications" element={<SettingsPage group="notifications" />} />
         <Route path="settings/email" element={<SettingsPage group="email" />} />
+        <Route path="settings/two-factor" element={<TwoFactorPage />} />
         <Route path="settings/vat-versions" element={<VatVersionsPage />} />
         <Route path="settings/audit-policy" element={<SettingsPage group="audit-policy" />} />
 

@@ -47,6 +47,9 @@ Route::post('/auth/login', [AuthController::class, 'login'])
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
     Route::post('/auth/change-password', [AuthController::class, 'changePassword'])->name('auth.change-password');
+    Route::post('/auth/2fa/enable', [AuthController::class, 'enableTwoFactor'])->name('auth.2fa.enable');
+    Route::post('/auth/2fa/confirm', [AuthController::class, 'confirmTwoFactor'])->name('auth.2fa.confirm');
+    Route::post('/auth/2fa/disable', [AuthController::class, 'disableTwoFactor'])->name('auth.2fa.disable');
     Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
 
     // Tenant-scoped: a company must be resolved and authorized for the user.

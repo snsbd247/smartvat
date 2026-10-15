@@ -8,6 +8,8 @@ export function LoginPage() {
   const navigate = useNavigate()
   const [loginId, setLoginId] = useState('')
   const [password, setPassword] = useState('')
+  const [code, setCode] = useState('')
+  const [needCode, setNeedCode] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -16,8 +18,13 @@ export function LoginPage() {
     setError(null)
     setBusy(true)
     try {
-      await login(loginId, password)
-      navigate('/', { replace: true })
+      const { twoFactorRequired } = await login(loginId, password, needCode ? code : undefined)
+      if (twoFactorRequired) {
+        setNeedCode(true)
+        setError(null)
+      } else {
+        navigate('/', { replace: true })
+      }
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
@@ -69,6 +76,19 @@ export function LoginPage() {
           className="mb-6 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
           required
         />
+
+        {needCode && (
+          <>
+            <label className="mb-1 block text-sm font-medium text-ink">Authentication code</label>
+            <input
+              type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6}
+              value={code} onChange={(e) => setCode(e.target.value)} autoFocus
+              placeholder="6-digit code"
+              className="mb-6 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm tracking-widest outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+              required
+            />
+          </>
+        )}
 
         <button
           type="submit"

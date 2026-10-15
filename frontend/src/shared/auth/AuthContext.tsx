@@ -18,7 +18,7 @@ interface AuthState {
   user: AuthUser | null
   companies: Company[]
   companyId: number | null
-  login: (loginId: string, password: string) => Promise<void>
+  login: (loginId: string, password: string, code?: string) => Promise<{ twoFactorRequired: boolean }>
   logout: () => Promise<void>
   setCompany: (companyId: number) => void
 }
@@ -40,14 +40,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       companies,
       companyId,
-      login: async (loginId, password) => {
-        const res = await apiLogin(loginId, password)
+      login: async (loginId, password, code) => {
+        const res = await apiLogin(loginId, password, code)
+        if ('two_factor_required' in res) {
+          return { twoFactorRequired: true }
+        }
         const def = res.companies.find((c) => c.is_default) ?? res.companies[0]
         tokenStore.set(res.token, def?.id)
         setToken(res.token)
         setUser(res.user)
         setCompanies(res.companies)
         setCompanyId(def?.id ?? null)
+        return { twoFactorRequired: false }
       },
       logout: async () => {
         await apiLogout()

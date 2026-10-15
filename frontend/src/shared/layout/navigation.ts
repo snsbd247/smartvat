@@ -309,6 +309,7 @@ export const NAV_GROUPS: NavGroup[] = [
       ['workflows', 'Approval Workflows'],
       ['notifications', 'Notification Settings'],
       ['email', 'Email Configuration'],
+      ['two-factor', 'Two-Factor Auth'],
       ['vat-versions', 'VAT Rule Versions'],
       ['audit-policy', 'Audit Policy'],
     ]),

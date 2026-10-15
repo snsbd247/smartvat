@@ -71,10 +71,12 @@ export interface Executive {
 }
 
 // ---- auth ----
-export async function login(loginId: string, password: string): Promise<LoginResponse> {
-  const { data } = await api.post<LoginResponse>('/auth/login', {
+export type LoginResult = LoginResponse | { two_factor_required: true }
+export async function login(loginId: string, password: string, code?: string): Promise<LoginResult> {
+  const { data } = await api.post<LoginResult>('/auth/login', {
     login: loginId,
     password,
+    ...(code ? { code } : {}),
   })
   return data
 }
