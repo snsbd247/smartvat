@@ -14,7 +14,7 @@ class Document extends Model
 
     protected $fillable = [
         'company_id', 'title', 'filename', 'path', 'mime', 'size',
-        'category', 'attachable_type', 'attachable_id', 'uploaded_by',
+        'category', 'version', 'group_key', 'attachable_type', 'attachable_id', 'uploaded_by',
     ];
 
     public function attachable(): MorphTo

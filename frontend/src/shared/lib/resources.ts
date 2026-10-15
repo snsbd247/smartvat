@@ -499,16 +499,25 @@ export interface DocRow {
   mime: string
   size: number
   category: string | null
+  version: number
+  group_key: string | null
+  attachable_type: string | null
+  attachable_id: number | null
   uploaded_by: string | null
   created_at: string | null
 }
 export const Documents = {
-  list: () => api.get<DocRow[]>('/documents').then((r) => r.data),
-  upload: (file: File, meta: { title?: string; category?: string }) => {
+  list: (params?: { attachable_type?: string; attachable_id?: number }) =>
+    api.get<DocRow[]>('/documents', { params }).then((r) => r.data),
+  versions: (id: number) => api.get<DocRow[]>(`/documents/${id}/versions`).then((r) => r.data),
+  upload: (file: File, meta: { title?: string; category?: string; replaces?: number; attachable_type?: string; attachable_id?: number }) => {
     const fd = new FormData()
     fd.append('file', file)
     if (meta.title) fd.append('title', meta.title)
     if (meta.category) fd.append('category', meta.category)
+    if (meta.replaces) fd.append('replaces', String(meta.replaces))
+    if (meta.attachable_type) fd.append('attachable_type', meta.attachable_type)
+    if (meta.attachable_id) fd.append('attachable_id', String(meta.attachable_id))
     return api.post('/documents', fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then((r) => r.data)
   },
   async download(id: number, filename: string) {

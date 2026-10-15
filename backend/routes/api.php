@@ -219,6 +219,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Document Center (private, tenant-scoped file repository).
         Route::get('documents', [DocumentController::class, 'index'])->name('documents.index');
         Route::post('documents', [DocumentController::class, 'store'])->name('documents.store');
+        Route::get('documents/{document}/versions', [DocumentController::class, 'versions'])->name('documents.versions');
         Route::get('documents/{document}', [DocumentController::class, 'download'])->name('documents.download');
         Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
 
