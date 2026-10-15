@@ -3,6 +3,8 @@ import type { ReactNode } from 'react'
 import { AppLayout } from './shared/layout/AppLayout'
 import { DashboardPage } from './modules/dashboard/DashboardPage'
 import { LoginPage } from './modules/auth/LoginPage'
+import { ForgotPasswordPage } from './modules/auth/ForgotPasswordPage'
+import { ResetPasswordPage } from './modules/auth/ResetPasswordPage'
 import { ModulePlaceholder } from './shared/components/ModulePlaceholder'
 import { useAuth } from './shared/auth/AuthContext'
 import { ProductsPage } from './modules/masterdata/ProductsPage'
@@ -94,6 +96,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route
         path="/*"
         element={

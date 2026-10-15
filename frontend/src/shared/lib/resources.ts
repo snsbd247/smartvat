@@ -421,6 +421,9 @@ export const Profile = {
   me: () => api.get<Me>('/auth/me').then((r) => r.data),
   changePassword: (b: { current_password: string; password: string; password_confirmation: string }) =>
     api.post('/auth/change-password', b).then((r) => r.data),
+  forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }).then((r) => r.data),
+  resetPassword: (b: { token: string; email: string; password: string; password_confirmation: string }) =>
+    api.post('/auth/reset-password', b).then((r) => r.data),
 }
 
 export interface Contract { id: number; contract_no: string; customer_id: number; processing_rate: string; scrap_ownership: string }

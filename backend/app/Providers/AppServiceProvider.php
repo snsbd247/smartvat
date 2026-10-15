@@ -140,5 +140,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return $user->hasRole('super-admin') ? true : null;
         });
+
+        // Password-reset links point at the SPA reset page.
+        \Illuminate\Auth\Notifications\ResetPassword::createUrlUsing(function ($user, string $token) {
+            return rtrim(config('app.url'), '/').'/reset-password?token='.$token.'&email='.urlencode($user->getEmailForPasswordReset());
+        });
     }
 }

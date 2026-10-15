@@ -37,6 +37,8 @@ use Illuminate\Support\Facades\Route;
 
 // Public.
 Route::get('/health', HealthController::class)->name('health');
+Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1')->name('auth.forgot');
+Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1')->name('auth.reset');
 Route::post('/auth/login', [AuthController::class, 'login'])
     ->middleware('throttle:10,1') // brute-force protection: 10 attempts/min/IP
     ->name('auth.login');

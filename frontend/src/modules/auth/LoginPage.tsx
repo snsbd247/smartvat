@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { LogIn } from 'lucide-react'
 import { useAuth } from '../../shared/auth/AuthContext'
 
@@ -78,6 +78,12 @@ export function LoginPage() {
           <LogIn size={16} />
           {busy ? 'Signing in…' : 'Sign in'}
         </button>
+
+        <div className="mt-4 text-center">
+          <Link to="/forgot-password" className="text-sm font-medium text-brand hover:underline">
+            Forgot password?
+          </Link>
+        </div>
       </form>
     </div>
   )
