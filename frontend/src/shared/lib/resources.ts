@@ -367,6 +367,12 @@ export const FixedAssets = {
   runDepreciation: () => api.post('/fixed-assets/run-depreciation', {}).then((r) => r.data),
   dispose: (id: number, b: { proceeds: number; received_account_id: number }) =>
     api.post(`/fixed-assets/${id}/dispose`, b).then((r) => r.data),
+  transfer: (id: number, b: { to_location?: string; to_custodian?: string; note?: string }) =>
+    api.post(`/fixed-assets/${id}/transfer`, b).then((r) => r.data),
+  revalue: (id: number, b: { book_value: number }) =>
+    api.post(`/fixed-assets/${id}/revalue`, b).then((r) => r.data),
+  maintenance: (id: number, b: { amount: number; paid_from_account_id: number; description?: string }) =>
+    api.post(`/fixed-assets/${id}/maintenance`, b).then((r) => r.data),
 }
 
 export interface ActivityLog {

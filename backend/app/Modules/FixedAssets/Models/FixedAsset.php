@@ -13,7 +13,7 @@ class FixedAsset extends Model
     protected $fillable = [
         'company_id', 'asset_no', 'asset_category_id', 'name', 'acquisition_date',
         'cost', 'salvage_value', 'useful_life_months', 'method',
-        'accumulated_depreciation', 'book_value', 'status', 'created_by',
+        'accumulated_depreciation', 'book_value', 'status', 'location', 'custodian', 'created_by',
     ];
 
     protected $casts = [

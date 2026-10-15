@@ -5,6 +5,8 @@ namespace App\Modules\FixedAssets\Services;
 use App\Modules\Accounting\Services\AccountResolver;
 use App\Modules\Accounting\Services\PostingService;
 use App\Modules\FixedAssets\Models\AssetCategory;
+use App\Modules\FixedAssets\Models\AssetMaintenance;
+use App\Modules\FixedAssets\Models\AssetMovement;
 use App\Modules\FixedAssets\Models\DepreciationEntry;
 use App\Modules\FixedAssets\Models\FixedAsset;
 use App\Shared\Numbering\NumberGenerator;
@@ -195,6 +197,132 @@ class FixedAssetService
             $asset->update(['status' => 'disposed', 'book_value' => 0]);
 
             return $asset->fresh();
+        });
+    }
+
+    /**
+     * Transfer an asset's location/custodian. Operational only — no GL impact.
+     */
+    public function transfer(FixedAsset $asset, array $data): AssetMovement
+    {
+        if ($asset->status === 'disposed') {
+            throw new InvalidArgumentException('Cannot transfer a disposed asset.');
+        }
+
+        return DB::transaction(function () use ($asset, $data) {
+            $movement = AssetMovement::create([
+                'company_id' => $asset->company_id,
+                'fixed_asset_id' => $asset->id,
+                'date' => Carbon::parse($data['date'] ?? now())->toDateString(),
+                'from_location' => $asset->location,
+                'to_location' => $data['to_location'] ?? $asset->location,
+                'from_custodian' => $asset->custodian,
+                'to_custodian' => $data['to_custodian'] ?? $asset->custodian,
+                'note' => $data['note'] ?? null,
+                'created_by' => auth()->id(),
+            ]);
+
+            $asset->update([
+                'location' => $movement->to_location,
+                'custodian' => $movement->to_custodian,
+            ]);
+
+            return $movement;
+        });
+    }
+
+    /**
+     * Revalue an asset to a new carrying amount.
+     *   Upward   : Dr Asset / Cr Revaluation Reserve (equity).
+     *   Downward : Dr Revaluation Loss (P&L) / Cr Asset.
+     * The new book value becomes the depreciation base going forward.
+     */
+    public function revalue(FixedAsset $asset, string|float $newBookValue, string|\DateTimeInterface|null $date = null): FixedAsset
+    {
+        if ($asset->status !== 'active') {
+            throw new InvalidArgumentException('Only an active asset can be revalued.');
+        }
+
+        $newBookValue = (string) $newBookValue;
+        if (Num::cmp($newBookValue, 0) < 0) {
+            throw new InvalidArgumentException('Revalued amount cannot be negative.');
+        }
+
+        $delta = Num::sub($newBookValue, (string) $asset->book_value); // >0 up, <0 down
+        if (Num::isZero($delta)) {
+            return $asset->fresh();
+        }
+
+        return DB::transaction(function () use ($asset, $newBookValue, $delta, $date) {
+            $category = $asset->category;
+
+            if (Num::cmp($delta, 0) > 0) {
+                $lines = [
+                    ['account_id' => $category->asset_account_id, 'debit' => $delta],
+                    ['account_id' => $this->accounts->id('revaluation_reserve'), 'credit' => $delta],
+                ];
+            } else {
+                $down = Num::sub(0, $delta);
+                $lines = [
+                    ['account_id' => $this->accounts->id('revaluation_loss'), 'debit' => $down],
+                    ['account_id' => $category->asset_account_id, 'credit' => $down],
+                ];
+            }
+
+            $this->posting->post([
+                'date' => Carbon::parse($date ?? now())->toDateString(),
+                'narration' => "Asset revaluation {$asset->asset_no}",
+                'source_type' => 'fixed_asset',
+                'source_id' => $asset->id,
+                'purpose' => 'revaluation_'.uniqid(),
+                'lines' => $lines,
+            ]);
+
+            // Carry the delta into gross cost so depreciation uses the new base.
+            $asset->update([
+                'cost' => Num::add((string) $asset->cost, $delta),
+                'book_value' => $newBookValue,
+            ]);
+
+            return $asset->fresh();
+        });
+    }
+
+    /**
+     * Record a maintenance expense for an asset: Dr Maintenance Expense / Cr Cash|Bank.
+     * Repairs are expensed, never capitalised.
+     */
+    public function maintenance(FixedAsset $asset, array $data): AssetMaintenance
+    {
+        $amount = (string) ($data['amount'] ?? 0);
+        if (Num::cmp($amount, 0) <= 0) {
+            throw new InvalidArgumentException('Maintenance amount must be positive.');
+        }
+
+        return DB::transaction(function () use ($asset, $amount, $data) {
+            $record = AssetMaintenance::create([
+                'company_id' => $asset->company_id,
+                'fixed_asset_id' => $asset->id,
+                'maint_no' => $this->numbers->next('asset_maintenance', 'AMT-'),
+                'date' => Carbon::parse($data['date'] ?? now())->toDateString(),
+                'amount' => $amount,
+                'description' => $data['description'] ?? null,
+                'created_by' => auth()->id(),
+            ]);
+
+            $this->posting->post([
+                'date' => $record->date->toDateString(),
+                'narration' => "Asset maintenance {$asset->asset_no} ({$record->maint_no})",
+                'source_type' => 'asset_maintenance',
+                'source_id' => $record->id,
+                'purpose' => 'primary',
+                'lines' => [
+                    ['account_id' => $this->accounts->id('asset_maintenance'), 'debit' => $amount],
+                    ['account_id' => $data['paid_from_account_id'], 'credit' => $amount],
+                ],
+            ]);
+
+            return $record;
         });
     }
 }

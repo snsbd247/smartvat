@@ -64,6 +64,7 @@ import { BudgetPage } from './modules/accounting/BudgetPage'
 import { BankReconciliationPage } from './modules/accounting/BankReconciliationPage'
 import { PeriodsPage } from './modules/accounting/PeriodsPage'
 import { AssetDisposalPage } from './modules/assets/AssetDisposalPage'
+import { AssetLifecyclePage } from './modules/assets/AssetLifecyclePage'
 import { JobWorkReportsPage } from './modules/jobwork/JobWorkReportsPage'
 import { VdsReportsPage } from './modules/vds/VdsReportsPage'
 import { NotificationsPage } from './modules/notifications/NotificationsPage'
@@ -217,6 +218,9 @@ export default function App() {
         <Route path="assets/register" element={<FixedAssetsPage title="Asset Register" subtitle="All fixed assets with cost, depreciation and book value" />} />
         <Route path="assets/acquisition" element={<FixedAssetsPage title="Asset Acquisition" subtitle="Record a newly acquired fixed asset" />} />
         <Route path="assets/depreciation" element={<FixedAssetsPage title="Depreciation" subtitle="Run straight-line depreciation for the period" />} />
+        <Route path="assets/transfer" element={<AssetLifecyclePage action="transfer" />} />
+        <Route path="assets/revaluation" element={<AssetLifecyclePage action="revaluation" />} />
+        <Route path="assets/maintenance" element={<AssetLifecyclePage action="maintenance" />} />
         <Route path="assets/disposal" element={<AssetDisposalPage />} />
         <Route path="assets/categories" element={<AssetCategoriesPage />} />
         <Route path="assets/reports" element={<ReportsPage />} />

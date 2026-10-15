@@ -180,6 +180,9 @@ class DemoSeeder extends Seeder
             'processing_income' => '4300',
             'asset_disposal' => '4400',
             'vds_payable' => '2200',
+            'revaluation_reserve' => '3100',
+            'asset_maintenance' => '5200',
+            'revaluation_loss' => '5300',
         ];
 
         foreach ($map as $key => $code) {
@@ -207,6 +210,7 @@ class DemoSeeder extends Seeder
             ['2100', 'VAT Payable', 'liability'],
             ['2200', 'VDS Payable', 'liability'],
             ['3000', 'Share Capital', 'equity'],
+            ['3100', 'Revaluation Reserve', 'equity'],
             ['4000', 'Sales Revenue', 'income'],
             ['4100', 'Export Sales', 'income'],
             ['4200', 'Exchange Gain/Loss', 'income'],
@@ -214,6 +218,8 @@ class DemoSeeder extends Seeder
             ['4400', 'Asset Disposal Gain/Loss', 'income'],
             ['5000', 'Cost of Goods Sold', 'expense'],
             ['5100', 'Inventory Adjustment', 'expense'],
+            ['5200', 'Asset Maintenance Expense', 'expense'],
+            ['5300', 'Revaluation Loss', 'expense'],
         ];
 
         foreach ($accounts as [$code, $cname, $type]) {

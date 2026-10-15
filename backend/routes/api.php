@@ -151,6 +151,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('fixed-assets', [FixedAssetController::class, 'store'])->name('fa.store');
         Route::post('fixed-assets/run-depreciation', [FixedAssetController::class, 'runDepreciation'])->name('fa.depr');
         Route::post('fixed-assets/{fixedAsset}/dispose', [FixedAssetController::class, 'dispose'])->name('fa.dispose');
+        Route::post('fixed-assets/{fixedAsset}/transfer', [FixedAssetController::class, 'transfer'])->name('fa.transfer');
+        Route::post('fixed-assets/{fixedAsset}/revalue', [FixedAssetController::class, 'revalue'])->name('fa.revalue');
+        Route::post('fixed-assets/{fixedAsset}/maintenance', [FixedAssetController::class, 'maintenance'])->name('fa.maint');
 
         // VAT / Mushak (always-on module). Statutory rules are data — configured,
         // approved (= practitioner-verified) before they can classify.

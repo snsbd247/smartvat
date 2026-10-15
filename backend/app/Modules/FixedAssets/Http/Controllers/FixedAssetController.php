@@ -93,4 +93,42 @@ class FixedAssetController extends Controller
             $this->assets->dispose($fixedAsset, $data['proceeds'], (int) $data['received_account_id'], $data['date'] ?? null)
         );
     }
+
+    public function transfer(Request $request, FixedAsset $fixedAsset): JsonResponse
+    {
+        $this->authorize('assets-manage');
+        $data = $request->validate([
+            'to_location' => ['nullable', 'string', 'max:255'],
+            'to_custodian' => ['nullable', 'string', 'max:255'],
+            'note' => ['nullable', 'string', 'max:255'],
+            'date' => ['sometimes', 'date'],
+        ]);
+
+        return response()->json($this->assets->transfer($fixedAsset, $data), 201);
+    }
+
+    public function revalue(Request $request, FixedAsset $fixedAsset): JsonResponse
+    {
+        $this->authorize('assets-manage');
+        $data = $request->validate([
+            'book_value' => ['required', 'numeric', 'min:0'],
+            'date' => ['sometimes', 'date'],
+        ]);
+
+        return response()->json($this->assets->revalue($fixedAsset, $data['book_value'], $data['date'] ?? null));
+    }
+
+    public function maintenance(Request $request, FixedAsset $fixedAsset): JsonResponse
+    {
+        $this->authorize('assets-manage');
+        $companyId = $this->current->id();
+        $data = $request->validate([
+            'amount' => ['required', 'numeric', 'gt:0'],
+            'paid_from_account_id' => ['required', Rule::exists('chart_of_accounts', 'id')->where('company_id', $companyId)],
+            'description' => ['nullable', 'string', 'max:255'],
+            'date' => ['sometimes', 'date'],
+        ]);
+
+        return response()->json($this->assets->maintenance($fixedAsset, $data), 201);
+    }
 }
