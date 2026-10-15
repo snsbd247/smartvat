@@ -66,6 +66,7 @@ import { FundTransferPage } from './modules/accounting/FundTransferPage'
 import { ExpensePage } from './modules/accounting/ExpensePage'
 import { BudgetPage } from './modules/accounting/BudgetPage'
 import { BankReconciliationPage } from './modules/accounting/BankReconciliationPage'
+import { TradePage } from './modules/trade/TradePage'
 import { PeriodsPage } from './modules/accounting/PeriodsPage'
 import { AssetDisposalPage } from './modules/assets/AssetDisposalPage'
 import { AssetLifecyclePage } from './modules/assets/AssetLifecyclePage'
@@ -176,6 +177,11 @@ export default function App() {
         <Route path="sales/receipt" element={<CustomerReceiptPage />} />
         <Route path="sales/return" element={<SalesReturnPage />} />
         <Route path="sales/local" element={<CustomerLedgerPage />} />
+
+        {/* Trade & Logistics */}
+        <Route path="trade/lc-tt" element={<TradePage kind="finance" />} />
+        <Route path="trade/shipments" element={<TradePage kind="shipments" />} />
+        <Route path="trade/export-docs" element={<TradePage kind="export-docs" />} />
 
         {/* Accounting */}
         <Route path="accounting/coa" element={<ChartOfAccountsPage />} />

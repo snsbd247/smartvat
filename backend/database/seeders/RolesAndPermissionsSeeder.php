@@ -38,6 +38,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'user.view', 'user.manage',
             'approval.view', 'approval.manage',
             'document.view', 'document.manage',
+            'trade.view', 'trade.manage',
         ];
 
         foreach ($permissions as $name) {

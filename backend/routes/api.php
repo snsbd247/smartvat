@@ -19,6 +19,7 @@ use App\Modules\Approval\Http\Controllers\ApprovalController;
 use App\Modules\Settings\Http\Controllers\SettingController;
 use App\Modules\Document\Http\Controllers\DocumentController;
 use App\Modules\Notification\Http\Controllers\NotificationController;
+use App\Modules\Trade\Http\Controllers\TradeController;
 use App\Modules\Mis\Http\Controllers\MisController;
 use App\Modules\Backup\Http\Controllers\BackupController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
@@ -222,6 +223,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('documents/{document}/versions', [DocumentController::class, 'versions'])->name('documents.versions');
         Route::get('documents/{document}', [DocumentController::class, 'download'])->name('documents.download');
         Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+
+        // Trade & Logistics: LC/TT, shipments, export documents.
+        Route::get('trade/finance', [TradeController::class, 'financeIndex'])->name('trade.finance.index');
+        Route::post('trade/finance', [TradeController::class, 'financeStore'])->name('trade.finance.store');
+        Route::patch('trade/finance/{tradeFinance}/status', [TradeController::class, 'financeStatus'])->name('trade.finance.status');
+        Route::get('trade/shipments', [TradeController::class, 'shipmentIndex'])->name('trade.ship.index');
+        Route::post('trade/shipments', [TradeController::class, 'shipmentStore'])->name('trade.ship.store');
+        Route::patch('trade/shipments/{shipment}/status', [TradeController::class, 'shipmentStatus'])->name('trade.ship.status');
+        Route::get('trade/export-documents', [TradeController::class, 'exportDocIndex'])->name('trade.exp.index');
+        Route::post('trade/export-documents', [TradeController::class, 'exportDocStore'])->name('trade.exp.store');
+        Route::patch('trade/export-documents/{exportDocument}/status', [TradeController::class, 'exportDocStatus'])->name('trade.exp.status');
 
         // In-app notifications.
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');

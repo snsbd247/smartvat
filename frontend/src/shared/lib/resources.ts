@@ -485,6 +485,25 @@ export const Notify = {
   markAllRead: () => api.post('/notifications/read-all', {}).then((r) => r.data),
 }
 
+export type TradeRow = Record<string, string | number | null> & { id: number; status: string }
+export const Trade = {
+  finance: {
+    list: () => api.get<TradeRow[]>('/trade/finance').then((r) => r.data),
+    create: (b: Record<string, unknown>) => api.post('/trade/finance', b).then((r) => r.data),
+    status: (id: number, status: string) => api.patch(`/trade/finance/${id}/status`, { status }).then((r) => r.data),
+  },
+  shipments: {
+    list: () => api.get<TradeRow[]>('/trade/shipments').then((r) => r.data),
+    create: (b: Record<string, unknown>) => api.post('/trade/shipments', b).then((r) => r.data),
+    status: (id: number, status: string) => api.patch(`/trade/shipments/${id}/status`, { status }).then((r) => r.data),
+  },
+  exportDocs: {
+    list: () => api.get<TradeRow[]>('/trade/export-documents').then((r) => r.data),
+    create: (b: Record<string, unknown>) => api.post('/trade/export-documents', b).then((r) => r.data),
+    status: (id: number, status: string) => api.patch(`/trade/export-documents/${id}/status`, { status }).then((r) => r.data),
+  },
+}
+
 export const Settings = {
   get: <T = Record<string, unknown>>(group: string) =>
     api.get<{ group: string; payload: T }>(`/settings/${group}`).then((r) => r.data.payload),

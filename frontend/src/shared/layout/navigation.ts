@@ -177,6 +177,17 @@ export const NAV_GROUPS: NavGroup[] = [
     ]),
   },
   {
+    key: 'trade',
+    label: 'Trade & Logistics',
+    to: '/trade',
+    icon: Truck,
+    children: sub('/trade', [
+      ['lc-tt', 'LC / TT'],
+      ['shipments', 'Shipment Tracking'],
+      ['export-docs', 'Export Documents'],
+    ]),
+  },
+  {
     key: 'accounting',
     label: 'Accounting & Finance',
     to: '/accounting',
