@@ -2,17 +2,26 @@ import { type FormEvent, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, Trash2 } from 'lucide-react'
 import { Banner, Button, Field, PageHeader, apiError, inputClass } from '../../shared/ui/primitives'
-import { Customers, Products, Sales } from '../../shared/lib/resources'
+import { Customers, Products, Sales, Settings } from '../../shared/lib/resources'
 
 interface Line { product_id: string; qty: string; unit_price: string }
+interface Ccy { code?: string; rate?: string }
 
 export function ExportInvoicePage() {
   const qc = useQueryClient()
   const { data: customers } = useQuery({ queryKey: ['customers'], queryFn: Customers.list })
   const { data: products } = useQuery({ queryKey: ['products'], queryFn: Products.list })
+  const { data: ccyPayload } = useQuery({ queryKey: ['settings', 'master.currencies'], queryFn: () => Settings.get<{ items?: Ccy[] }>('master.currencies') })
+  const currencies = ((ccyPayload as { items?: Ccy[] })?.items ?? []).filter((c) => c.code)
   const [customer, setCustomer] = useState('')
   const [currency, setCurrency] = useState('USD')
   const [rate, setRate] = useState('')
+
+  const pickCurrency = (code: string) => {
+    setCurrency(code)
+    const match = currencies.find((c) => c.code === code)
+    if (match?.rate) setRate(String(match.rate))
+  }
   const [lines, setLines] = useState<Line[]>([{ product_id: '', qty: '', unit_price: '' }])
   const [msg, setMsg] = useState<{ kind: 'error' | 'success'; text: string } | null>(null)
   const fcTotal = lines.reduce((s, l) => s + Number(l.qty || 0) * Number(l.unit_price || 0), 0)
@@ -46,8 +55,20 @@ export function ExportInvoicePage() {
               {customers?.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </Field>
-          <Field label="Currency"><input className={inputClass} value={currency} onChange={(e) => setCurrency(e.target.value)} required /></Field>
-          <Field label="Exchange Rate"><input className={inputClass} type="number" step="any" value={rate} onChange={(e) => setRate(e.target.value)} required /></Field>
+          <Field label="Currency">
+            {currencies.length > 0 ? (
+              <select className={inputClass} value={currency} onChange={(e) => pickCurrency(e.target.value)} required>
+                {!currencies.some((c) => c.code === currency) && <option value={currency}>{currency}</option>}
+                {currencies.map((c) => <option key={c.code} value={c.code}>{c.code}</option>)}
+              </select>
+            ) : (
+              <input className={inputClass} value={currency} onChange={(e) => setCurrency(e.target.value)} required />
+            )}
+          </Field>
+          <Field label="Exchange Rate">
+            <input className={inputClass} type="number" step="any" value={rate} onChange={(e) => setRate(e.target.value)} required />
+            {currencies.find((c) => c.code === currency)?.rate && <span className="mt-1 block text-xs text-muted">Master rate: {currencies.find((c) => c.code === currency)?.rate} (editable)</span>}
+          </Field>
         </div>
         <div className="space-y-2">
           {lines.map((l, i) => (

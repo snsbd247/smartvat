@@ -2,9 +2,10 @@ import { type FormEvent, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, Trash2 } from 'lucide-react'
 import { Banner, Button, Field, PageHeader, Table, apiError, inputClass } from '../../shared/ui/primitives'
-import { Import, Products, Suppliers, Warehouses } from '../../shared/lib/resources'
+import { Import, Products, Settings, Suppliers, Warehouses } from '../../shared/lib/resources'
 
 interface Line { product_id: string; qty: string; fc_unit_price: string; weight: string }
+interface Ccy { code?: string; rate?: string }
 interface Charge { type: string; fc_amount: string; allocation_basis: string; recoverable: boolean }
 type Preview = Awaited<ReturnType<typeof Import.preview>>
 
@@ -16,6 +17,13 @@ export function ImportShipmentPage({ title = 'Import Purchase', subtitle = 'Fore
   const { data: suppliers } = useQuery({ queryKey: ['suppliers'], queryFn: Suppliers.list })
   const { data: warehouses } = useQuery({ queryKey: ['warehouses'], queryFn: Warehouses.list })
   const { data: products } = useQuery({ queryKey: ['products'], queryFn: Products.list })
+  const { data: ccyPayload } = useQuery({ queryKey: ['settings', 'master.currencies'], queryFn: () => Settings.get<{ items?: Ccy[] }>('master.currencies') })
+  const currencies = ((ccyPayload as { items?: Ccy[] })?.items ?? []).filter((c) => c.code)
+
+  const pickCurrency = (code: string) => {
+    const match = currencies.find((c) => c.code === code)
+    setHead((s) => ({ ...s, currency: code, ...(match?.rate ? { exchange_rate: String(match.rate) } : {}) }))
+  }
 
   const [head, setHead] = useState<Record<string, string>>({ currency: 'USD', exchange_rate: '' })
   const [lines, setLines] = useState<Line[]>([{ product_id: '', qty: '', fc_unit_price: '', weight: '' }])
@@ -75,7 +83,16 @@ export function ImportShipmentPage({ title = 'Import Purchase', subtitle = 'Fore
                 {warehouses?.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
               </select>
             </Field>
-            <Field label="Currency"><input className={inputClass} value={head.currency ?? ''} onChange={(e) => setHead((s) => ({ ...s, currency: e.target.value }))} required /></Field>
+            <Field label="Currency">
+              {currencies.length > 0 ? (
+                <select className={inputClass} value={head.currency ?? ''} onChange={(e) => pickCurrency(e.target.value)} required>
+                  {!currencies.some((c) => c.code === head.currency) && <option value={head.currency}>{head.currency}</option>}
+                  {currencies.map((c) => <option key={c.code} value={c.code}>{c.code}</option>)}
+                </select>
+              ) : (
+                <input className={inputClass} value={head.currency ?? ''} onChange={(e) => setHead((s) => ({ ...s, currency: e.target.value }))} required />
+              )}
+            </Field>
             <Field label="Exchange Rate"><input className={inputClass} type="number" step="any" value={head.exchange_rate ?? ''} onChange={(e) => setHead((s) => ({ ...s, exchange_rate: e.target.value }))} required /></Field>
           </div>
 
