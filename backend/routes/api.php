@@ -142,6 +142,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('production-orders', [ProductionController::class, 'storeOrder'])->name('prod.store');
             Route::post('production-orders/{productionOrder}/issue', [ProductionController::class, 'issue'])->name('prod.issue');
             Route::post('production-orders/{productionOrder}/receive', [ProductionController::class, 'receive'])->name('prod.receive');
+            Route::get('production-qc', [ProductionController::class, 'qcList'])->name('prod.qc.list');
+            Route::post('production-orders/{productionOrder}/qc', [ProductionController::class, 'qc'])->name('prod.qc');
         });
 
         // Fixed assets (always-on module).

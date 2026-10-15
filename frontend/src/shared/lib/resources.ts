@@ -329,6 +329,8 @@ export interface ProductionOrder {
   wip_value: string
   produced_cost: string
   date: string
+  planned_start_date: string | null
+  planned_end_date: string | null
   status: string
 }
 export const Production = {
@@ -339,11 +341,27 @@ export const Production = {
     lines: { component_product_id: number; qty: number }[]
   }) => api.post('/boms', b).then((r) => r.data),
   orders: () => api.get<ProductionOrder[]>('/production-orders').then((r) => r.data),
-  createOrder: (b: { product_id: number; bom_id?: number; warehouse_id: number; planned_qty: number }) =>
+  createOrder: (b: { product_id: number; bom_id?: number; warehouse_id: number; planned_qty: number; planned_start_date?: string; planned_end_date?: string }) =>
     api.post('/production-orders', b).then((r) => r.data),
   issue: (id: number) => api.post(`/production-orders/${id}/issue`, {}).then((r) => r.data),
   receive: (id: number, qty: number, scrap_qty = 0) =>
     api.post(`/production-orders/${id}/receive`, { qty, scrap_qty }).then((r) => r.data),
+  qcList: () => api.get<ProductionQcRow[]>('/production-qc').then((r) => r.data),
+  recordQc: (orderId: number, b: { inspected_qty: number; passed_qty: number; rejected_qty?: number; inspector?: string; notes?: string }) =>
+    api.post(`/production-orders/${orderId}/qc`, b).then((r) => r.data),
+}
+export interface ProductionQcRow {
+  id: number
+  qc_no: string
+  production_order_id: number
+  date: string
+  inspected_qty: string
+  passed_qty: string
+  rejected_qty: string
+  inspector: string | null
+  result: 'pass' | 'partial' | 'fail'
+  notes: string | null
+  order?: { id: number; order_no: string }
 }
 
 export interface AssetCategory { id: number; code: string; name: string; useful_life_months: number }

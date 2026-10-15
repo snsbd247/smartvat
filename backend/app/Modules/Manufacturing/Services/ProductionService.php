@@ -65,6 +65,8 @@ class ProductionService
             'warehouse_id' => $data['warehouse_id'],
             'planned_qty' => $data['planned_qty'],
             'date' => Carbon::parse($data['date'] ?? now())->toDateString(),
+            'planned_start_date' => isset($data['planned_start_date']) ? Carbon::parse($data['planned_start_date'])->toDateString() : null,
+            'planned_end_date' => isset($data['planned_end_date']) ? Carbon::parse($data['planned_end_date'])->toDateString() : null,
             'status' => 'draft',
             'created_by' => auth()->id(),
         ]);
@@ -178,6 +180,40 @@ class ProductionService
 
             return $order->fresh();
         });
+    }
+
+    /**
+     * Record a quality-control inspection for a production order. Operational only
+     * (no GL); captures inspected / passed / rejected quantities and the verdict.
+     */
+    public function recordQc(ProductionOrder $order, array $data): \App\Modules\Manufacturing\Models\ProductionQc
+    {
+        $inspected = (string) ($data['inspected_qty'] ?? 0);
+        $passed = (string) ($data['passed_qty'] ?? 0);
+        $rejected = (string) ($data['rejected_qty'] ?? Num::sub($inspected, $passed));
+
+        if (Num::cmp($inspected, 0) <= 0) {
+            throw new InvalidArgumentException('Inspected quantity must be positive.');
+        }
+        if (Num::cmp(Num::add($passed, $rejected), $inspected) > 0) {
+            throw new InvalidArgumentException('Passed + rejected cannot exceed inspected quantity.');
+        }
+
+        $result = Num::isZero($rejected) ? 'pass' : (Num::isZero($passed) ? 'fail' : 'partial');
+
+        return \App\Modules\Manufacturing\Models\ProductionQc::create([
+            'company_id' => $order->company_id,
+            'production_order_id' => $order->id,
+            'qc_no' => $this->numbers->next('production_qc', 'QC-'),
+            'date' => Carbon::parse($data['date'] ?? now())->toDateString(),
+            'inspected_qty' => $inspected,
+            'passed_qty' => $passed,
+            'rejected_qty' => $rejected,
+            'inspector' => $data['inspector'] ?? null,
+            'result' => $result,
+            'notes' => $data['notes'] ?? null,
+            'created_by' => auth()->id(),
+        ]);
     }
 
     /** BOM scaled to the order's planned quantity. */

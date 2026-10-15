@@ -61,9 +61,36 @@ class ProductionController extends Controller
             'warehouse_id' => ['required', Rule::exists('warehouses', 'id')->where('company_id', $companyId)],
             'planned_qty' => ['required', 'numeric', 'gt:0'],
             'date' => ['sometimes', 'date'],
+            'planned_start_date' => ['sometimes', 'nullable', 'date'],
+            'planned_end_date' => ['sometimes', 'nullable', 'date'],
         ]);
 
         return response()->json($this->production->createOrder($data), 201);
+    }
+
+    public function qc(Request $request, ProductionOrder $productionOrder): JsonResponse
+    {
+        $this->authorize('production-manage');
+
+        $data = $request->validate([
+            'inspected_qty' => ['required', 'numeric', 'gt:0'],
+            'passed_qty' => ['required', 'numeric', 'min:0'],
+            'rejected_qty' => ['sometimes', 'numeric', 'min:0'],
+            'inspector' => ['nullable', 'string', 'max:255'],
+            'notes' => ['nullable', 'string', 'max:255'],
+            'date' => ['sometimes', 'date'],
+        ]);
+
+        return response()->json($this->production->recordQc($productionOrder, $data), 201);
+    }
+
+    public function qcList(): JsonResponse
+    {
+        $this->authorize('production-view');
+
+        return response()->json(
+            \App\Modules\Manufacturing\Models\ProductionQc::with('order:id,order_no')->orderByDesc('id')->limit(300)->get()
+        );
     }
 
     public function issue(Request $request, ProductionOrder $productionOrder): JsonResponse

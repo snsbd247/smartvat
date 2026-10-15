@@ -36,6 +36,8 @@ export function ProductionOrdersPage({ focus = 'orders' }: { focus?: ProdFocus }
       bom_id: form.bom_id ? Number(form.bom_id) : undefined,
       warehouse_id: Number(form.warehouse_id),
       planned_qty: Number(form.planned_qty),
+      planned_start_date: form.planned_start_date || undefined,
+      planned_end_date: form.planned_end_date || undefined,
     }),
     onSuccess: () => { invalidate(); setOpen(false); setForm({}) },
     onError: (e) => setMsg({ kind: 'error', text: apiError(e) }),
@@ -57,7 +59,7 @@ export function ProductionOrdersPage({ focus = 'orders' }: { focus?: ProdFocus }
         action={cfg.canCreate && <Button onClick={() => { setOpen(true); setMsg(null) }}><Plus size={16} /> New Order</Button>} />
       {msg && <Banner kind={msg.kind}>{msg.text}</Banner>}
 
-      <Table head={['Order', 'Product', 'Planned', 'Produced', 'Status', focus === 'qc' ? 'Scrap' : 'Actions']}>
+      <Table head={['Order', 'Product', 'Planned', 'Produced', 'Status', focus === 'qc' ? 'Scrap' : focus === 'planning' ? 'Planned window' : 'Actions']}>
         {orders.map((o) => (
           <tr key={o.id} className="text-ink">
             <td className="px-4 py-2.5">{o.order_no}</td>
@@ -68,6 +70,8 @@ export function ProductionOrdersPage({ focus = 'orders' }: { focus?: ProdFocus }
             <td className="px-4 py-2.5">
               {focus === 'qc' ? (
                 <span>{o.scrap_qty}</span>
+              ) : focus === 'planning' ? (
+                <span className="text-muted">{o.planned_start_date ?? '—'}{o.planned_end_date ? ` → ${o.planned_end_date}` : ''}</span>
               ) : (
                 <div className="flex gap-2">
                   {cfg.showIssue && o.status !== 'completed' && (
@@ -110,6 +114,12 @@ export function ProductionOrdersPage({ focus = 'orders' }: { focus?: ProdFocus }
             </Field>
             <Field label="Planned Qty">
               <input className={inputClass} type="number" step="any" value={form.planned_qty ?? ''} onChange={(e) => setForm((s) => ({ ...s, planned_qty: e.target.value }))} required />
+            </Field>
+            <Field label="Planned start (optional)">
+              <input className={inputClass} type="date" value={form.planned_start_date ?? ''} onChange={(e) => setForm((s) => ({ ...s, planned_start_date: e.target.value }))} />
+            </Field>
+            <Field label="Planned end (optional)">
+              <input className={inputClass} type="date" value={form.planned_end_date ?? ''} onChange={(e) => setForm((s) => ({ ...s, planned_end_date: e.target.value }))} />
             </Field>
             <div className="col-span-full flex justify-end gap-2">
               <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>

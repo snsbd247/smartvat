@@ -93,3 +93,31 @@ it('absorbs yield loss into finished-goods unit cost', function () {
     expect(wipBalance())->toBe(0.0);
     expect(app(InventoryReportService::class)->reconciliation()['in_balance'])->toBeTrue();
 });
+
+it('records a QC inspection with pass/partial/fail verdict', function () {
+    $qc = $this->prod->recordQc($this->order, [
+        'inspected_qty' => 10, 'passed_qty' => 8, 'rejected_qty' => 2, 'inspector' => 'QA1',
+    ]);
+
+    expect($qc->qc_no)->toStartWith('QC-');
+    expect($qc->result)->toBe('partial');
+    expect((float) $qc->passed_qty)->toBe(8.0);
+
+    $allPass = $this->prod->recordQc($this->order, ['inspected_qty' => 5, 'passed_qty' => 5]);
+    expect($allPass->result)->toBe('pass');
+    expect((float) $allPass->rejected_qty)->toBe(0.0);
+});
+
+it('rejects a QC where passed + rejected exceeds inspected', function () {
+    expect(fn () => $this->prod->recordQc($this->order, ['inspected_qty' => 5, 'passed_qty' => 4, 'rejected_qty' => 3]))
+        ->toThrow(InvalidArgumentException::class);
+});
+
+it('stores planned start/end dates on an order', function () {
+    $o = $this->prod->createOrder([
+        'product_id' => $this->fg->id, 'warehouse_id' => $this->wh->id, 'planned_qty' => 5,
+        'planned_start_date' => '2026-11-01', 'planned_end_date' => '2026-11-05',
+    ]);
+    expect($o->planned_start_date->toDateString())->toBe('2026-11-01');
+    expect($o->planned_end_date->toDateString())->toBe('2026-11-05');
+});

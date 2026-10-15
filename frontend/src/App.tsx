@@ -35,6 +35,7 @@ import { VdsRegisterPage } from './modules/vds/VdsRegisterPage'
 import { BomsPage } from './modules/production/BomsPage'
 import { ProductionOrdersPage } from './modules/production/ProductionOrdersPage'
 import { ProductionWipPage, ProductionCostingPage, ProductionVariancePage } from './modules/production/ProductionAnalyticsPage'
+import { ProductionQcPage } from './modules/production/ProductionQcPage'
 import { AssetCategoriesPage } from './modules/assets/AssetCategoriesPage'
 import { FixedAssetsPage } from './modules/assets/FixedAssetsPage'
 import { JobWorkContractsPage } from './modules/jobwork/JobWorkContractsPage'
@@ -210,7 +211,7 @@ export default function App() {
         <Route path="production/issue" element={<ProductionOrdersPage focus="issue" />} />
         <Route path="production/wip" element={<ProductionWipPage />} />
         <Route path="production/fg-receipt" element={<ProductionOrdersPage focus="fg-receipt" />} />
-        <Route path="production/qc" element={<ProductionOrdersPage focus="qc" />} />
+        <Route path="production/qc" element={<ProductionQcPage />} />
         <Route path="production/costing" element={<ProductionCostingPage />} />
         <Route path="production/variance" element={<ProductionVariancePage />} />
 
