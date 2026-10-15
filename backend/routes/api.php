@@ -250,5 +250,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('backup/jobs', [BackupController::class, 'jobs'])->name('backup.jobs');
         Route::post('backup/run', [BackupController::class, 'run'])->name('backup.run');
         Route::get('backup/health', [BackupController::class, 'health'])->name('backup.health');
+        Route::get('backup/drive-config', [BackupController::class, 'driveConfig'])->name('backup.drive.config');
+        Route::put('backup/drive-config', [BackupController::class, 'saveDriveConfig'])->name('backup.drive.save');
     });
 });

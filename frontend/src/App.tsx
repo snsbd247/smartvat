@@ -48,6 +48,7 @@ import { WarehousesPage } from './modules/organization/WarehousesPage'
 import { CompanyConfigPage } from './modules/organization/CompanyConfigPage'
 import { UsersPage } from './modules/users/UsersPage'
 import { BackupHealthPage } from './modules/backup/BackupHealthPage'
+import { DriveSettingsPage } from './modules/backup/DriveSettingsPage'
 import { PurchaseReturnPage } from './modules/purchase/PurchaseReturnPage'
 import { SalesReturnPage } from './modules/sales/SalesReturnPage'
 import { ActivityLogsPage, LoginHistoryPage } from './modules/users/ActivityLogsPage'
@@ -130,7 +131,7 @@ export default function App() {
         {/* Backup & System Health */}
         <Route path="backup/health" element={<BackupHealthPage view="health" />} />
         <Route path="backup/history" element={<BackupHealthPage view="history" />} />
-        <Route path="backup/drive" element={<BackupHealthPage view="drive" />} />
+        <Route path="backup/drive" element={<DriveSettingsPage />} />
         <Route path="backup/retention" element={<BackupHealthPage view="retention" />} />
         <Route path="backup/restore" element={<BackupHealthPage view="restore" />} />
         <Route path="backup/logs" element={<BackupHealthPage view="logs" />} />

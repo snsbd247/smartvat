@@ -32,10 +32,19 @@ class AppServiceProvider extends ServiceProvider
     private function registerBackupServices(): void
     {
         $this->app->bind(\App\Modules\Backup\Contracts\BackupStorage::class, function () {
-            if (config('backup.driver') === 'google') {
+            // Admin-panel config (system_settings) takes precedence over env.
+            $drive = [];
+            try {
+                $drive = \App\Modules\Settings\Models\SystemSetting::get('backup.drive');
+            } catch (\Throwable) {
+                // table not migrated yet — fall back to env
+            }
+
+            $enabled = ($drive['enabled'] ?? false) || config('backup.driver') === 'google';
+            if ($enabled) {
                 return new \App\Modules\Backup\Storage\GoogleDriveStorage(
-                    config('backup.google.folder_id'),
-                    config('backup.google.credentials_json'),
+                    $drive['folder_id'] ?? config('backup.google.folder_id'),
+                    $drive['credentials_json'] ?? config('backup.google.credentials_json'),
                 );
             }
 

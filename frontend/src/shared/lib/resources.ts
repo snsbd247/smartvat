@@ -96,10 +96,14 @@ export interface BackupJob {
   size: number
   finished_at: string | null
 }
+export interface DriveConfig { enabled: boolean; folder_id: string | null; credentials_set: boolean }
 export const Backup = {
   health: () => api.get<BackupHealth>('/backup/health').then((r) => r.data),
   jobs: () => api.get<BackupJob[]>('/backup/jobs').then((r) => r.data),
   run: () => api.post('/backup/run', {}).then((r) => r.data),
+  driveConfig: () => api.get<DriveConfig>('/backup/drive-config').then((r) => r.data),
+  saveDriveConfig: (b: { enabled: boolean; folder_id?: string; credentials_json?: string }) =>
+    api.put('/backup/drive-config', b).then((r) => r.data),
 }
 export const Inventory = {
   stock: async (): Promise<StockRow[]> => {
