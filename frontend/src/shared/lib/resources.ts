@@ -469,6 +469,22 @@ export const Approvals = {
   reject: (id: number, note?: string) => api.post(`/approvals/${id}/reject`, { note }).then((r) => r.data),
 }
 
+export interface AppNotification {
+  id: number
+  type: string
+  title: string
+  message: string | null
+  link: string | null
+  read_at: string | null
+  created_at: string | null
+}
+export const Notify = {
+  list: () => api.get<AppNotification[]>('/notifications').then((r) => r.data),
+  unreadCount: () => api.get<{ count: number }>('/notifications/unread-count').then((r) => r.data.count),
+  markRead: (id: number) => api.post(`/notifications/${id}/read`, {}).then((r) => r.data),
+  markAllRead: () => api.post('/notifications/read-all', {}).then((r) => r.data),
+}
+
 export const Settings = {
   get: <T = Record<string, unknown>>(group: string) =>
     api.get<{ group: string; payload: T }>(`/settings/${group}`).then((r) => r.data.payload),

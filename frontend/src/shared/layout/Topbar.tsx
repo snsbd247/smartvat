@@ -1,5 +1,8 @@
 import { Bell, CalendarDays, Search } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import type { Company } from '../lib/api'
+import { Notify } from '../lib/resources'
 
 export function Topbar({
   companies,
@@ -12,6 +15,11 @@ export function Topbar({
   onCompanyChange: (id: number) => void
   userName: string
 }) {
+  const { data: unread = 0 } = useQuery({
+    queryKey: ['notifications-unread'],
+    queryFn: Notify.unreadCount,
+    refetchInterval: 60000,
+  })
   return (
     <header className="flex h-16 shrink-0 items-center gap-4 border-b border-slate-200 bg-white px-5">
       <div className="relative hidden flex-1 md:block">
@@ -43,16 +51,18 @@ export function Topbar({
           {new Date().getFullYear()} · This Year
         </div>
 
-        <button
-          type="button"
+        <Link
+          to="/notifications"
           className="relative rounded-lg border border-slate-200 p-2 text-muted hover:bg-slate-50"
           aria-label="Notifications"
         >
           <Bell size={16} />
-          <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white">
-            0
-          </span>
-        </button>
+          {unread > 0 && (
+            <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white">
+              {unread > 99 ? '99+' : unread}
+            </span>
+          )}
+        </Link>
 
         <div className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-full bg-sidebar text-xs font-semibold text-white">

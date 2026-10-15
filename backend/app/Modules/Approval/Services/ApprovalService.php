@@ -17,7 +17,7 @@ class ApprovalService
 
     public function request(Model $document, ?string $documentNo = null, string|float|null $amount = null): Approval
     {
-        return Approval::create([
+        $approval = Approval::create([
             'company_id' => $this->current->idOrFail(),
             'approvable_type' => $document::class,
             'approvable_id' => $document->getKey(),
@@ -26,6 +26,17 @@ class ApprovalService
             'status' => 'pending',
             'requested_by' => auth()->id(),
         ]);
+
+        // Raise a company-wide notification for approvers.
+        $label = str_replace('_', ' ', $approval->typeLabel());
+        app(\App\Modules\Notification\Services\NotificationService::class)->notify(
+            'approval',
+            ucfirst($label).' awaiting approval',
+            trim(($documentNo ? $documentNo.' ' : '').($amount !== null ? '৳ '.$amount : '')) ?: null,
+            '/approvals/purchase',
+        );
+
+        return $approval;
     }
 
     public function approve(Approval $approval): Approval

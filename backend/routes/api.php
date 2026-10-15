@@ -18,6 +18,7 @@ use App\Modules\Reporting\Http\Controllers\ReportController;
 use App\Modules\Approval\Http\Controllers\ApprovalController;
 use App\Modules\Settings\Http\Controllers\SettingController;
 use App\Modules\Document\Http\Controllers\DocumentController;
+use App\Modules\Notification\Http\Controllers\NotificationController;
 use App\Modules\Mis\Http\Controllers\MisController;
 use App\Modules\Backup\Http\Controllers\BackupController;
 use App\Modules\Organization\Http\Controllers\CompanyConfigController;
@@ -220,6 +221,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('documents', [DocumentController::class, 'store'])->name('documents.store');
         Route::get('documents/{document}', [DocumentController::class, 'download'])->name('documents.download');
         Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+
+        // In-app notifications.
+        Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread');
+        Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+        Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
 
         // Generic approval workflow (all document types).
         Route::get('approvals', [ApprovalController::class, 'index'])->name('approvals.index');
