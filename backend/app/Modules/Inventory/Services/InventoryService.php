@@ -5,6 +5,8 @@ namespace App\Modules\Inventory\Services;
 use App\Modules\Accounting\Services\AccountResolver;
 use App\Modules\Accounting\Services\PostingService;
 use App\Modules\Inventory\Models\InventoryTransaction;
+use App\Modules\Inventory\Models\StockBalance;
+use App\Modules\Inventory\Models\StockCount;
 use App\Shared\Numbering\NumberGenerator;
 use App\Shared\Support\Num;
 use App\Shared\Tenancy\CurrentCompany;
@@ -166,6 +168,78 @@ class InventoryService
             }
 
             return $txn;
+        });
+    }
+
+    /**
+     * Physical stock count. Snapshots the system quantity for each counted product,
+     * records the count sheet with per-line variance, and posts a single stock
+     * adjustment for the net differences (increases use the current average cost).
+     *
+     * @param  array{warehouse_id:int, date?:string, note?:string,
+     *   lines: array<int, array{product_id:int, counted_qty:float|string}>}  $data
+     */
+    public function physicalCount(array $data): StockCount
+    {
+        $lines = $data['lines'] ?? [];
+        if ($lines === []) {
+            throw new InvalidArgumentException('A stock count needs at least one line.');
+        }
+
+        return DB::transaction(function () use ($data, $lines) {
+            $companyId = $this->current->idOrFail();
+            $warehouseId = (int) $data['warehouse_id'];
+
+            $count = StockCount::create([
+                'company_id' => $companyId,
+                'count_no' => $this->numbers->next('stock_count', 'PCT-'),
+                'warehouse_id' => $warehouseId,
+                'date' => Carbon::parse($data['date'] ?? now())->toDateString(),
+                'status' => 'posted',
+                'note' => $data['note'] ?? null,
+                'created_by' => auth()->id(),
+            ]);
+
+            $adjLines = [];
+            foreach ($lines as $l) {
+                $productId = (int) $l['product_id'];
+                $system = (string) (StockBalance::query()
+                    ->where('product_id', $productId)
+                    ->where('warehouse_id', $warehouseId)
+                    ->where('owner_type', 'company')
+                    ->where('batch_id', 0)
+                    ->value('qty') ?? 0);
+                $counted = (string) $l['counted_qty'];
+                $variance = Num::sub($counted, $system);
+
+                $count->lines()->create([
+                    'company_id' => $companyId,
+                    'product_id' => $productId,
+                    'system_qty' => $system,
+                    'counted_qty' => $counted,
+                    'variance' => $variance,
+                ]);
+
+                if (! Num::isZero($variance)) {
+                    $adjLine = ['product_id' => $productId, 'qty' => $variance];
+                    if (Num::cmp($variance, 0) > 0) {
+                        // A surplus is valued at the current average cost (fallback 0).
+                        $adjLine['unit_cost'] = $this->stock->averageCost($productId, $warehouseId) ?: '0';
+                    }
+                    $adjLines[] = $adjLine;
+                }
+            }
+
+            if ($adjLines !== []) {
+                $this->adjustment([
+                    'warehouse_id' => $warehouseId,
+                    'date' => $count->date->toDateString(),
+                    'reference' => $count->count_no,
+                    'lines' => $adjLines,
+                ]);
+            }
+
+            return $count->load('lines');
         });
     }
 

@@ -119,6 +119,8 @@ export const Inventory = {
     api.post('/inventory/adjustments', body).then((r) => r.data),
   ledger: (params: { product_id?: number; warehouse_id?: number }) =>
     api.get<{ data: Record<string, string>[] }>('/inventory/ledger', { params }).then((r) => r.data.data),
+  physicalCount: (body: { warehouse_id: number; note?: string; lines: { product_id: number; counted_qty: number }[] }) =>
+    api.post('/inventory/physical-count', body).then((r) => r.data),
 }
 export const Sales = {
   invoice: (body: {

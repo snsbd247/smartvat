@@ -59,6 +59,7 @@ import { CashBookPage } from './modules/accounting/CashBookPage'
 import { MaterialIssuePage } from './modules/inventory/MaterialIssuePage'
 import { StockTransferPage } from './modules/inventory/StockTransferPage'
 import { StockAdjustmentPage } from './modules/inventory/StockAdjustmentPage'
+import { PhysicalCountPage } from './modules/inventory/PhysicalCountPage'
 import { StockLedgerPage } from './modules/inventory/StockLedgerPage'
 import { CostCentersPage } from './modules/accounting/CostCentersPage'
 import { FundTransferPage } from './modules/accounting/FundTransferPage'
@@ -151,7 +152,7 @@ export default function App() {
         <Route path="inventory/transfer" element={<StockTransferPage />} />
         <Route path="inventory/adjustment" element={<StockAdjustmentPage />} />
         <Route path="inventory/ledger" element={<StockLedgerPage />} />
-        <Route path="inventory/count" element={<StockAdjustmentPage title="Physical Stock Count" subtitle="Reconcile counted quantity to system stock (enter the +/− difference)" />} />
+        <Route path="inventory/count" element={<PhysicalCountPage />} />
         <Route path="inventory/valuation" element={<ReportViewPage reportKey="stock-valuation" />} />
 
         {/* Purchase */}

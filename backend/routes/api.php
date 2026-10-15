@@ -112,6 +112,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('inventory/issues', [InventoryController::class, 'issue'])->name('inventory.issue');
             Route::post('inventory/adjustments', [InventoryController::class, 'adjustment'])->name('inventory.adjustment');
             Route::post('inventory/transfers', [InventoryController::class, 'transfer'])->name('inventory.transfer');
+            Route::post('inventory/physical-count', [InventoryController::class, 'physicalCount'])->name('inventory.count');
             Route::get('inventory/stock', [InventoryController::class, 'stock'])->name('inventory.stock');
             Route::get('inventory/ledger', [InventoryController::class, 'ledger'])->name('inventory.ledger');
             Route::get('inventory/reconciliation', [InventoryController::class, 'reconciliation'])->name('inventory.reconciliation');

@@ -50,6 +50,23 @@ class InventoryController extends Controller
         return $this->ok($this->inventory->transfer($data));
     }
 
+    public function physicalCount(Request $request): JsonResponse
+    {
+        $this->authorize('inventory-operate');
+        $companyId = $this->current->id();
+
+        $data = $request->validate([
+            'warehouse_id' => ['required', \Illuminate\Validation\Rule::exists('warehouses', 'id')->where('company_id', $companyId)],
+            'date' => ['sometimes', 'date'],
+            'note' => ['nullable', 'string', 'max:255'],
+            'lines' => ['required', 'array', 'min:1'],
+            'lines.*.product_id' => ['required', \Illuminate\Validation\Rule::exists('products', 'id')->where('company_id', $companyId)],
+            'lines.*.counted_qty' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        return response()->json($this->inventory->physicalCount($data), 201);
+    }
+
     public function stock(): JsonResponse
     {
         $this->authorize('inventory-view');
