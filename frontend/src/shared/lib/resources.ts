@@ -199,6 +199,15 @@ export const Import = {
     ).then((r) => r.data),
   receive: (id: number) => api.post(`/import-shipments/${id}/receive`, {}).then((r) => r.data),
 }
+export interface AgingData {
+  rows: { party: string; current: string; d30: string; d60: string; d90: string; older: string; total: string }[]
+  totals: { current: string; d30: string; d60: string; d90: string; older: string; total: string }
+}
+export const Aging = {
+  receivable: () => api.get<AgingData>('/accounting/aging-receivable').then((r) => r.data),
+  payable: () => api.get<AgingData>('/accounting/aging-payable').then((r) => r.data),
+}
+
 export interface SalesOrderLine { id?: number; product_id: number | null; description?: string | null; qty: string | number; unit_price: string | number; line_total: string | number }
 export interface SalesOrderRow {
   id: number

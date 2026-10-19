@@ -150,6 +150,20 @@ class AccountingController extends Controller
         return response()->json($this->reports->profitAndLoss());
     }
 
+    public function agingReceivable(\App\Modules\Accounting\Services\AgingService $aging): JsonResponse
+    {
+        $this->authorize('accounting-view');
+
+        return response()->json($aging->receivables());
+    }
+
+    public function agingPayable(\App\Modules\Accounting\Services\AgingService $aging): JsonResponse
+    {
+        $this->authorize('accounting-view');
+
+        return response()->json($aging->payables());
+    }
+
     public function balanceSheet(): JsonResponse
     {
         $this->authorize('accounting-view');

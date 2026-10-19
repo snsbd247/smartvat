@@ -26,6 +26,7 @@ import { ChartOfAccountsPage } from './modules/accounting/ChartOfAccountsPage'
 import { OpeningBalancesPage } from './modules/accounting/OpeningBalancesPage'
 import { JournalEntryPage } from './modules/accounting/JournalEntryPage'
 import { ReportsPage } from './modules/reports/ReportsPage'
+import { AgingPage } from './modules/reports/AgingPage'
 import { ReportViewPage } from './modules/reports/ReportViewPage'
 import { VatRatesPage } from './modules/vat/VatRatesPage'
 import { PriceDeclarationPage } from './modules/vat/PriceDeclarationPage'
@@ -269,7 +270,7 @@ export default function App() {
         <Route path="reports/inventory" element={<ReportsPage category="inventory" />} />
         <Route path="reports/accounting" element={<ReportsPage category="accounting" />} />
         <Route path="reports/vat-vds" element={<ReportsPage category="vat-vds" />} />
-        <Route path="reports/aging" element={<ReportsPage category="aging" />} />
+        <Route path="reports/aging" element={<AgingPage />} />
         <Route path="reports/builder" element={<ReportsPage category="all" />} />
         <Route path="reports/view/:key" element={<ReportViewRoute />} />
 

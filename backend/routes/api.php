@@ -135,6 +135,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('accounting/opening-accounts', [OpeningBalanceController::class, 'accounts'])->name('acc.opening.accounts');
         Route::get('accounting/trial-balance', [AccountingController::class, 'trialBalance'])->name('acc.tb');
         Route::get('accounting/profit-loss', [AccountingController::class, 'profitAndLoss'])->name('acc.pl');
+        Route::get('accounting/aging-receivable', [AccountingController::class, 'agingReceivable'])->name('acc.aging.ar');
+        Route::get('accounting/aging-payable', [AccountingController::class, 'agingPayable'])->name('acc.aging.ap');
         Route::get('accounting/balance-sheet', [AccountingController::class, 'balanceSheet'])->name('acc.bs');
         Route::get('accounting/accounts/{account}/cash-book', [AccountingController::class, 'cashBook'])->name('acc.cashbook');
         Route::get('accounting/periods', [AccountingController::class, 'periods'])->name('acc.periods');
