@@ -323,6 +323,19 @@ export interface PriceDeclarationRow {
 }
 export const PriceDeclarations = {
   list: () => api.get<PriceDeclarationRow[]>('/vat/price-declarations').then((r) => r.data),
+  /** product_id -> current approved, effective declared price. */
+  async currentMap(): Promise<Record<number, number>> {
+    const rows = await api.get<PriceDeclarationRow[]>('/vat/price-declarations').then((r) => r.data)
+    const today = new Date().toISOString().slice(0, 10)
+    const map: Record<number, { price: number; eff: string }> = {}
+    for (const r of rows) {
+      if (r.status !== 'approved') continue
+      if (r.effective_from > today) continue
+      const prev = map[r.product_id]
+      if (!prev || r.effective_from > prev.eff) map[r.product_id] = { price: Number(r.declared_price), eff: r.effective_from }
+    }
+    return Object.fromEntries(Object.entries(map).map(([k, v]) => [Number(k), v.price]))
+  },
   create: (b: { product_id: number; declared_price: number; purchase_value?: number; effective_from?: string; note?: string }) =>
     api.post('/vat/price-declarations', b).then((r) => r.data),
   approve: (id: number) => api.patch(`/vat/price-declarations/${id}/approve`, {}).then((r) => r.data),
