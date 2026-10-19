@@ -263,9 +263,9 @@ export const NAV_GROUPS: NavGroup[] = [
     to: '/reports',
     icon: BarChart3,
     children: sub('/reports', [
-      ['sales', 'Sales Reports'],
+      ['sales', 'Profit by Product'],
       ['purchase', 'Purchase Reports'],
-      ['inventory', 'Inventory Reports'],
+      ['inventory', 'Stock Movement'],
       ['accounting', 'Accounting Reports'],
       ['vat-vds', 'VAT & VDS Reports'],
       ['aging', 'Receivable/Payable Aging'],

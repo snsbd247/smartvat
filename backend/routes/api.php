@@ -225,6 +225,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('mis/executive', [MisController::class, 'executive'])->name('mis.exec');
         Route::get('mis/dashboard', [MisController::class, 'dashboard'])->name('mis.dashboard');
         Route::get('mis/approvals', [MisController::class, 'approvals'])->name('mis.approvals');
+        Route::get('mis/profit-by-product', [MisController::class, 'profitByProduct'])->name('mis.profit');
+        Route::get('mis/stock-movement', [MisController::class, 'stockMovement'])->name('mis.movement');
 
         // Bulk CSV import for master data (products / customers / suppliers).
         Route::get('imports/{entity}/template', [CsvImportController::class, 'template'])->name('imports.template');

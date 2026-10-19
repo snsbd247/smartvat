@@ -31,4 +31,18 @@ class MisController extends Controller
 
         return response()->json(['pending' => $this->mis->approvals()]);
     }
+
+    public function profitByProduct(\App\Modules\Mis\Services\ProductReportService $svc): JsonResponse
+    {
+        $this->authorize('mis-view');
+
+        return response()->json($svc->profitByProduct());
+    }
+
+    public function stockMovement(\App\Modules\Mis\Services\ProductReportService $svc): JsonResponse
+    {
+        $this->authorize('mis-view');
+
+        return response()->json($svc->stockMovement());
+    }
 }

@@ -27,6 +27,7 @@ import { OpeningBalancesPage } from './modules/accounting/OpeningBalancesPage'
 import { JournalEntryPage } from './modules/accounting/JournalEntryPage'
 import { ReportsPage } from './modules/reports/ReportsPage'
 import { AgingPage } from './modules/reports/AgingPage'
+import { ProfitByProductPage, StockMovementPage } from './modules/reports/ProductReportsPage'
 import { ReportViewPage } from './modules/reports/ReportViewPage'
 import { VatRatesPage } from './modules/vat/VatRatesPage'
 import { PriceDeclarationPage } from './modules/vat/PriceDeclarationPage'
@@ -265,9 +266,9 @@ export default function App() {
         <Route path="approvals/vat" element={<VatUnmappedPage />} />
 
         {/* Reports hub */}
-        <Route path="reports/sales" element={<ReportsPage category="sales" />} />
+        <Route path="reports/sales" element={<ProfitByProductPage />} />
         <Route path="reports/purchase" element={<ReportsPage category="purchase" />} />
-        <Route path="reports/inventory" element={<ReportsPage category="inventory" />} />
+        <Route path="reports/inventory" element={<StockMovementPage />} />
         <Route path="reports/accounting" element={<ReportsPage category="accounting" />} />
         <Route path="reports/vat-vds" element={<ReportsPage category="vat-vds" />} />
         <Route path="reports/aging" element={<AgingPage />} />

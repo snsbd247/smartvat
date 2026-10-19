@@ -208,6 +208,11 @@ export const Aging = {
   payable: () => api.get<AgingData>('/accounting/aging-payable').then((r) => r.data),
 }
 
+export const ProductReports = {
+  profit: () => api.get<{ rows: { product: string; qty_sold: string; revenue: string; est_cost: string; profit: string; margin_pct: string }[] }>('/mis/profit-by-product').then((r) => r.data.rows),
+  movement: () => api.get<{ rows: { product: string; in_qty: string; in_value: string; out_qty: string; out_value: string; net_qty: string }[] }>('/mis/stock-movement').then((r) => r.data.rows),
+}
+
 export interface SalesOrderLine { id?: number; product_id: number | null; description?: string | null; qty: string | number; unit_price: string | number; line_total: string | number }
 export interface SalesOrderRow {
   id: number
