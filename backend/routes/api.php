@@ -12,6 +12,7 @@ use App\Modules\Manufacturing\Http\Controllers\ProductionController;
 use App\Modules\Accounting\Http\Controllers\AccountingController;
 use App\Modules\FixedAssets\Http\Controllers\FixedAssetController;
 use App\Modules\Vat\Http\Controllers\VatController;
+use App\Modules\Vat\Http\Controllers\PriceDeclarationController;
 use App\Modules\Vds\Http\Controllers\VdsController;
 use App\Modules\JobWork\Http\Controllers\JobWorkController;
 use App\Modules\Reporting\Http\Controllers\ReportController;
@@ -182,6 +183,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('vat/note-summary', [VatController::class, 'noteSummary'])->name('vat.notesummary');
         Route::get('vat/unmapped', [VatController::class, 'unmapped'])->name('vat.unmapped');
         Route::get('vat/register', [VatController::class, 'register'])->name('vat.register');
+
+        // Price (value) declarations — Mushak মূল্য ঘোষণা.
+        Route::get('vat/price-declarations', [PriceDeclarationController::class, 'index'])->name('vat.pd.index');
+        Route::post('vat/price-declarations', [PriceDeclarationController::class, 'store'])->name('vat.pd.store');
+        Route::patch('vat/price-declarations/{priceDeclaration}/approve', [PriceDeclarationController::class, 'approve'])->name('vat.pd.approve');
+        Route::get('vat/price-declarations/current/{productId}', [PriceDeclarationController::class, 'current'])->name('vat.pd.current');
 
         // VDS — configurable, verified rules; deduction / certificate / treasury deposit.
         Route::get('vds/rules', [VdsController::class, 'rules'])->name('vds.rules');

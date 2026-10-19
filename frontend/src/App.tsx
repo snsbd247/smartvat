@@ -26,6 +26,7 @@ import { JournalEntryPage } from './modules/accounting/JournalEntryPage'
 import { ReportsPage } from './modules/reports/ReportsPage'
 import { ReportViewPage } from './modules/reports/ReportViewPage'
 import { VatRatesPage } from './modules/vat/VatRatesPage'
+import { PriceDeclarationPage } from './modules/vat/PriceDeclarationPage'
 import { VatNotesPage } from './modules/vat/VatNotesPage'
 import { VatMappingsPage } from './modules/vat/VatMappingsPage'
 import { VatClassifyPage } from './modules/vat/VatClassifyPage'
@@ -201,6 +202,7 @@ export default function App() {
 
         {/* VAT */}
         <Route path="vat/configuration" element={<VatRatesPage />} />
+        <Route path="vat/price-declaration" element={<PriceDeclarationPage />} />
         <Route path="vat/catalogue" element={<VatNotesPage />} />
         <Route path="vat/registers" element={<VatMappingsPage />} />
         <Route path="vat/reconciliation" element={<VatUnmappedPage />} />

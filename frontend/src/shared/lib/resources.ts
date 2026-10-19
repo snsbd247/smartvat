@@ -311,6 +311,23 @@ export const Vat = {
   createTreatment: (b: Record<string, string>) => api.post('/vat/tax-treatments', b).then((r) => r.data),
 }
 
+export interface PriceDeclarationRow {
+  id: number
+  decl_no: string
+  product_id: number
+  declared_price: string
+  purchase_value: string | null
+  effective_from: string
+  status: 'draft' | 'approved'
+  product?: { id: number; code: string; name: string }
+}
+export const PriceDeclarations = {
+  list: () => api.get<PriceDeclarationRow[]>('/vat/price-declarations').then((r) => r.data),
+  create: (b: { product_id: number; declared_price: number; purchase_value?: number; effective_from?: string; note?: string }) =>
+    api.post('/vat/price-declarations', b).then((r) => r.data),
+  approve: (id: number) => api.patch(`/vat/price-declarations/${id}/approve`, {}).then((r) => r.data),
+}
+
 export interface VdsRule { id: number; service_category: string; rate: string; approval_status: string; verification_status: string }
 export const Vds = {
   rules: () => api.get<VdsRule[]>('/vds/rules').then((r) => r.data),

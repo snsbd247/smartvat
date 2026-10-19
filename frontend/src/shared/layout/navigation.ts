@@ -214,6 +214,7 @@ export const NAV_GROUPS: NavGroup[] = [
     icon: ReceiptText,
     children: sub('/vat', [
       ['configuration', 'VAT Configuration'],
+      ['price-declaration', 'Price Declaration (মূল্য ঘোষণা)'],
       ['catalogue', 'Mushak Form Catalogue'],
       ['registers', 'Purchase & Sales Registers'],
       ['mushak-6-3', 'Mushak 6.3'],
