@@ -223,6 +223,12 @@ export const SalesOrders = {
   confirm: (id: number) => api.post(`/sales-orders/${id}/confirm`, {}).then((r) => r.data),
   invoice: (id: number) => api.post(`/sales-orders/${id}/invoice`, {}).then((r) => r.data),
 }
+export const OpeningBalances = {
+  stock: (b: { warehouse_id: number; date?: string; lines: { product_id: number; qty: number; unit_cost: number }[] }) =>
+    api.post('/accounting/opening-stock', b).then((r) => r.data),
+  accounts: (b: { date?: string; lines: { account_id: number; debit?: number; credit?: number }[] }) =>
+    api.post('/accounting/opening-accounts', b).then((r) => r.data),
+}
 export const Journals = {
   create: (body: {
     date: string

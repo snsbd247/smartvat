@@ -22,6 +22,7 @@ import { PurchaseInvoicePage } from './modules/purchase/PurchaseInvoicePage'
 import { SupplierPaymentPage } from './modules/purchase/SupplierPaymentPage'
 import { SupplierLedgerPage } from './modules/purchase/SupplierLedgerPage'
 import { ChartOfAccountsPage } from './modules/accounting/ChartOfAccountsPage'
+import { OpeningBalancesPage } from './modules/accounting/OpeningBalancesPage'
 import { JournalEntryPage } from './modules/accounting/JournalEntryPage'
 import { ReportsPage } from './modules/reports/ReportsPage'
 import { ReportViewPage } from './modules/reports/ReportViewPage'
@@ -187,6 +188,7 @@ export default function App() {
 
         {/* Accounting */}
         <Route path="accounting/coa" element={<ChartOfAccountsPage />} />
+        <Route path="accounting/opening-balances" element={<OpeningBalancesPage />} />
         <Route path="accounting/journals" element={<JournalEntryPage />} />
         <Route path="accounting/receipts-payments" element={<CashBookPage title="Receipts & Payments" subtitle="Cash/bank account movements — money in and out" />} />
         <Route path="accounting/ledger" element={<CashBookPage title="General Ledger" subtitle="Account ledger with running balance" />} />

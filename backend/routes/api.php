@@ -10,6 +10,7 @@ use App\Modules\Sales\Http\Controllers\CustomerController;
 use App\Modules\Sales\Http\Controllers\SalesController;
 use App\Modules\Manufacturing\Http\Controllers\ProductionController;
 use App\Modules\Accounting\Http\Controllers\AccountingController;
+use App\Modules\Accounting\Http\Controllers\OpeningBalanceController;
 use App\Modules\FixedAssets\Http\Controllers\FixedAssetController;
 use App\Modules\Vat\Http\Controllers\VatController;
 use App\Modules\Vat\Http\Controllers\PriceDeclarationController;
@@ -129,6 +130,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('accounting/journals', [AccountingController::class, 'storeJournal'])->name('acc.journal.store');
         Route::post('accounting/journals/{journalEntry}/reverse', [AccountingController::class, 'reverseJournal'])->name('acc.journal.reverse');
         Route::post('accounting/fund-transfers', [AccountingController::class, 'fundTransfer'])->name('acc.fund');
+        Route::post('accounting/opening-stock', [OpeningBalanceController::class, 'stock'])->name('acc.opening.stock');
+        Route::post('accounting/opening-accounts', [OpeningBalanceController::class, 'accounts'])->name('acc.opening.accounts');
         Route::get('accounting/trial-balance', [AccountingController::class, 'trialBalance'])->name('acc.tb');
         Route::get('accounting/profit-loss', [AccountingController::class, 'profitAndLoss'])->name('acc.pl');
         Route::get('accounting/balance-sheet', [AccountingController::class, 'balanceSheet'])->name('acc.bs');

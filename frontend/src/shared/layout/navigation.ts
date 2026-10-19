@@ -194,6 +194,7 @@ export const NAV_GROUPS: NavGroup[] = [
     icon: Calculator,
     children: sub('/accounting', [
       ['coa', 'Chart of Accounts'],
+      ['opening-balances', 'Opening Balances'],
       ['journals', 'Journal Entries'],
       ['ledger', 'General Ledger'],
       ['receipts-payments', 'Receipts & Payments'],

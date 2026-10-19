@@ -141,6 +141,7 @@ function mapInventoryAccounts(Company $company): void
         'asset_disposal' => ['4400', 'income'],
         'vds_payable' => ['2200', 'liability'],
         'revaluation_reserve' => ['3100', 'equity'],
+        'opening_balance_equity' => ['3200', 'equity'],
         'asset_maintenance' => ['5210', 'expense'],
         'revaluation_loss' => ['5310', 'expense'],
     ];

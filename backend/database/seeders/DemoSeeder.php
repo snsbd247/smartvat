@@ -181,6 +181,7 @@ class DemoSeeder extends Seeder
             'asset_disposal' => '4400',
             'vds_payable' => '2200',
             'revaluation_reserve' => '3100',
+            'opening_balance_equity' => '3200',
             'asset_maintenance' => '5200',
             'revaluation_loss' => '5300',
         ];
@@ -211,6 +212,7 @@ class DemoSeeder extends Seeder
             ['2200', 'VDS Payable', 'liability'],
             ['3000', 'Share Capital', 'equity'],
             ['3100', 'Revaluation Reserve', 'equity'],
+            ['3200', 'Opening Balance Equity', 'equity'],
             ['4000', 'Sales Revenue', 'income'],
             ['4100', 'Export Sales', 'income'],
             ['4200', 'Exchange Gain/Loss', 'income'],

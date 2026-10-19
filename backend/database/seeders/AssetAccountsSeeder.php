@@ -17,6 +17,7 @@ class AssetAccountsSeeder extends Seeder
     {
         $accounts = [
             ['3100', 'Revaluation Reserve', 'equity', 'revaluation_reserve'],
+            ['3200', 'Opening Balance Equity', 'equity', 'opening_balance_equity'],
             ['5200', 'Asset Maintenance Expense', 'expense', 'asset_maintenance'],
             ['5300', 'Revaluation Loss', 'expense', 'revaluation_loss'],
         ];
