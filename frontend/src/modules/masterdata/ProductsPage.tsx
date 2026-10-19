@@ -42,7 +42,11 @@ export function ProductsPage() {
           label: 'Costing',
           type: 'select',
           default: 'weighted_average',
-          options: [{ value: 'weighted_average', label: 'Weighted Average' }],
+          options: [
+            { value: 'weighted_average', label: 'Weighted Average' },
+            { value: 'fifo', label: 'FIFO (First In, First Out)' },
+            { value: 'lifo', label: 'LIFO (Last In, First Out)' },
+          ],
         },
       ]}
     />

@@ -26,7 +26,7 @@ class StoreProductRequest extends FormRequest
             'type' => ['sometimes', Rule::in(['raw', 'finished', 'packaging', 'consumable', 'spare', 'service'])],
             'category_id' => ['nullable', Rule::exists('product_categories', 'id')->where('company_id', $companyId)],
             'base_uom' => ['sometimes', 'string', 'max:16'],
-            'costing_method' => ['sometimes', Rule::in(['weighted_average', 'fifo'])],
+            'costing_method' => ['sometimes', Rule::in(['weighted_average', 'fifo', 'lifo'])],
             'track_batches' => ['sometimes', 'boolean'],
             'reorder_level' => ['sometimes', 'numeric', 'min:0'],
             'status' => ['sometimes', Rule::in(['active', 'inactive'])],

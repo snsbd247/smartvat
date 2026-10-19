@@ -27,4 +27,6 @@ class Product extends Model
     public const COSTING_WEIGHTED_AVERAGE = 'weighted_average';
 
     public const COSTING_FIFO = 'fifo';
+
+    public const COSTING_LIFO = 'lifo';
 }

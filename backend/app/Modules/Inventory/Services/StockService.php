@@ -4,6 +4,7 @@ namespace App\Modules\Inventory\Services;
 
 use App\Modules\Inventory\Exceptions\InsufficientStockException;
 use App\Modules\Inventory\Models\StockBalance;
+use App\Modules\Inventory\Models\StockLayer;
 use App\Modules\Inventory\Models\StockMovement;
 use App\Modules\MasterData\Models\Product;
 use App\Shared\Support\Num;
@@ -64,10 +65,10 @@ class StockService
         $allowNegative = (bool) ($line['allow_negative'] ?? false);
 
         $product = Product::findOrFail($productId);
-        if ($product->costing_method !== Product::COSTING_WEIGHTED_AVERAGE) {
-            throw new RuntimeException(
-                "Costing method '{$product->costing_method}' is not yet supported; use weighted_average."
-            );
+        $method = $product->costing_method;
+        $usesLayers = in_array($method, [Product::COSTING_FIFO, Product::COSTING_LIFO], true);
+        if (! $usesLayers && $method !== Product::COSTING_WEIGHTED_AVERAGE) {
+            throw new RuntimeException("Unknown costing method '{$method}'.");
         }
 
         // Lock (or create) the balance row.
@@ -107,6 +108,21 @@ class StockService
             $newValue = Num::add($curValue, $moveValue);
             $recordedUnitCost = $unitCost;
             $signedValue = $moveValue;
+
+            if ($usesLayers) {
+                StockLayer::create([
+                    'company_id' => $companyId,
+                    'product_id' => $productId,
+                    'warehouse_id' => $warehouseId,
+                    'batch_id' => $batchId,
+                    'owner_type' => $ownerType,
+                    'owner_id' => $ownerId,
+                    'unit_cost' => $unitCost,
+                    'qty_received' => $qty,
+                    'qty_remaining' => $qty,
+                    'received_at' => now(),
+                ]);
+            }
         } else {
             // Outbound (qty negative).
             $outQty = Num::sub(0, $qty); // positive magnitude
@@ -114,11 +130,17 @@ class StockService
                 throw new InsufficientStockException($productId, $warehouseId, $curQty, $outQty);
             }
 
-            $avg = Num::cmp($curQty, 0) > 0 ? Num::div($curValue, $curQty) : Num::zero();
-            $outValue = Num::mul($outQty, $avg);
+            if ($usesLayers) {
+                // Consume layers FIFO (oldest first) or LIFO (newest first).
+                $outValue = $this->consumeLayers($companyId, $productId, $warehouseId, $batchId, $ownerType, $ownerId, $outQty, $method, $curQty, $curValue);
+            } else {
+                $avg = Num::cmp($curQty, 0) > 0 ? Num::div($curValue, $curQty) : Num::zero();
+                $outValue = Num::mul($outQty, $avg);
+            }
+
             $newQty = Num::sub($curQty, $outQty);
             $newValue = Num::sub($curValue, $outValue);
-            $recordedUnitCost = $avg;
+            $recordedUnitCost = Num::cmp($outQty, 0) > 0 ? Num::div($outValue, $outQty) : Num::zero();
             $signedValue = Num::sub(0, $outValue);
         }
 
@@ -143,6 +165,50 @@ class StockService
             'created_by' => auth()->id(),
             'created_at' => now(),
         ]);
+    }
+
+    /**
+     * Consume cost layers for an outbound movement. FIFO uses the oldest layers
+     * first, LIFO the newest. Returns the total cost (COGS) of the quantity issued.
+     */
+    private function consumeLayers(
+        int $companyId, int $productId, int $warehouseId, int $batchId,
+        string $ownerType, int $ownerId, string $outQty, string $method,
+        string $curQty, string $curValue,
+    ): string {
+        $layers = StockLayer::query()
+            ->where('company_id', $companyId)
+            ->where('product_id', $productId)
+            ->where('warehouse_id', $warehouseId)
+            ->where('batch_id', $batchId)
+            ->where('owner_type', $ownerType)
+            ->where('owner_id', $ownerId)
+            ->where('qty_remaining', '>', 0)
+            ->orderBy('received_at', $method === Product::COSTING_LIFO ? 'desc' : 'asc')
+            ->orderBy('id', $method === Product::COSTING_LIFO ? 'desc' : 'asc')
+            ->lockForUpdate()
+            ->get();
+
+        $remaining = $outQty;
+        $cost = Num::zero();
+
+        foreach ($layers as $layer) {
+            if (Num::cmp($remaining, 0) <= 0) {
+                break;
+            }
+            $take = Num::cmp((string) $layer->qty_remaining, $remaining) <= 0 ? (string) $layer->qty_remaining : $remaining;
+            $cost = Num::add($cost, Num::mul($take, (string) $layer->unit_cost));
+            $layer->update(['qty_remaining' => Num::sub((string) $layer->qty_remaining, $take)]);
+            $remaining = Num::sub($remaining, $take);
+        }
+
+        // Any shortfall (e.g. negative stock allowed) is costed at the current average.
+        if (Num::cmp($remaining, 0) > 0) {
+            $avg = Num::cmp($curQty, 0) > 0 ? Num::div($curValue, $curQty) : Num::zero();
+            $cost = Num::add($cost, Num::mul($remaining, $avg));
+        }
+
+        return $cost;
     }
 
     /** Current weighted-average unit cost for a company-owned balance. */
