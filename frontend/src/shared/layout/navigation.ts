@@ -51,6 +51,7 @@ export const NAV_GROUPS: NavGroup[] = [
     icon: Building2,
     children: sub('/organization', [
       ['company-profile', 'Company Profile'],
+      ['setup-wizard', 'Company Setup Wizard'],
       ['business-type', 'Business Type & Industry'],
       ['factory-branch', 'Factory & Branch'],
       ['warehouse', 'Warehouse'],

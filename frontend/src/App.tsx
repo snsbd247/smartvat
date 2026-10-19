@@ -51,6 +51,7 @@ import { ApprovalCenterPage } from './modules/approvals/ApprovalCenterPage'
 import { FactoriesPage } from './modules/organization/FactoriesPage'
 import { WarehousesPage } from './modules/organization/WarehousesPage'
 import { CompanyConfigPage } from './modules/organization/CompanyConfigPage'
+import { CompanySetupWizard } from './modules/organization/CompanySetupWizard'
 import { UsersPage } from './modules/users/UsersPage'
 import { BackupHealthPage } from './modules/backup/BackupHealthPage'
 import { DriveSettingsPage } from './modules/backup/DriveSettingsPage'
@@ -119,6 +120,7 @@ export default function App() {
 
         {/* Organization */}
         <Route path="organization/company-profile" element={<SettingsPage group="general" />} />
+        <Route path="organization/setup-wizard" element={<CompanySetupWizard />} />
         <Route path="organization/factory-branch" element={<FactoriesPage />} />
         <Route path="organization/warehouse" element={<WarehousesPage />} />
         <Route path="organization/financial-year" element={<PeriodsPage mode="view" />} />
