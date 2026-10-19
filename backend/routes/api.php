@@ -75,6 +75,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('users', [UserController::class, 'store'])->name('users.store');
         Route::get('security/roles', [SystemController::class, 'roles'])->name('sec.roles');
         Route::get('security/permissions', [SystemController::class, 'permissions'])->name('sec.perms');
+        Route::get('security/roles-matrix', [SystemController::class, 'rolesMatrix'])->name('sec.matrix');
+        Route::put('security/roles/{role}/permissions', [SystemController::class, 'updateRolePermissions'])->name('sec.role.perms');
+        Route::post('security/roles', [SystemController::class, 'createRole'])->name('sec.role.create');
         Route::get('security/activity-logs', [SystemController::class, 'activityLogs'])->name('sec.activity');
         Route::get('security/login-history', [SystemController::class, 'loginHistory'])->name('sec.login');
 

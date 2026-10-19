@@ -58,7 +58,8 @@ import { DriveSettingsPage } from './modules/backup/DriveSettingsPage'
 import { PurchaseReturnPage } from './modules/purchase/PurchaseReturnPage'
 import { SalesReturnPage } from './modules/sales/SalesReturnPage'
 import { ActivityLogsPage, LoginHistoryPage } from './modules/users/ActivityLogsPage'
-import { RolesPage, PermissionsPage } from './modules/users/RolesPermissionsPage'
+import { PermissionsPage } from './modules/users/RolesPermissionsPage'
+import { RolePermissionEditor } from './modules/users/RolePermissionEditor'
 import { ImportShipmentPage } from './modules/purchase/ImportShipmentPage'
 import { ExportInvoicePage } from './modules/sales/ExportInvoicePage'
 import { ExportRealizationPage } from './modules/sales/ExportRealizationPage'
@@ -129,7 +130,7 @@ export default function App() {
 
         {/* Users */}
         <Route path="users/users" element={<UsersPage />} />
-        <Route path="users/roles" element={<RolesPage />} />
+        <Route path="users/roles" element={<RolePermissionEditor />} />
         <Route path="users/permissions" element={<PermissionsPage />} />
         <Route path="users/access" element={<UsersPage />} />
         <Route path="users/login-history" element={<LoginHistoryPage />} />

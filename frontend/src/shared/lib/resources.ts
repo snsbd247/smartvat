@@ -458,11 +458,16 @@ export interface ActivityLog {
   ip_address: string | null
   created_at: string | null
 }
+export interface RolesMatrix { roles: { name: string; permissions: string[] }[]; permissions: string[] }
 export const System = {
   activityLogs: () => api.get<ActivityLog[]>('/security/activity-logs').then((r) => r.data),
   loginHistory: () => api.get<ActivityLog[]>('/security/login-history').then((r) => r.data),
   roles: () => api.get<string[]>('/security/roles').then((r) => r.data),
   permissions: () => api.get<string[]>('/security/permissions').then((r) => r.data),
+  rolesMatrix: () => api.get<RolesMatrix>('/security/roles-matrix').then((r) => r.data),
+  setRolePermissions: (role: string, permissions: string[]) =>
+    api.put(`/security/roles/${role}/permissions`, { permissions }).then((r) => r.data),
+  createRole: (name: string) => api.post('/security/roles', { name }).then((r) => r.data),
 }
 
 export interface Me {
