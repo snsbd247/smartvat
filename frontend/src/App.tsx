@@ -8,6 +8,7 @@ import { ResetPasswordPage } from './modules/auth/ResetPasswordPage'
 import { ModulePlaceholder } from './shared/components/ModulePlaceholder'
 import { useAuth } from './shared/auth/AuthContext'
 import { ProductsPage } from './modules/masterdata/ProductsPage'
+import { BulkImportPage } from './modules/masterdata/BulkImportPage'
 import { SuppliersPage } from './modules/masterdata/SuppliersPage'
 import { CustomersPage } from './modules/masterdata/CustomersPage'
 import { StockOverviewPage } from './modules/inventory/StockOverviewPage'
@@ -140,6 +141,7 @@ export default function App() {
 
         {/* Master data */}
         <Route path="master-data/products" element={<ProductsPage />} />
+        <Route path="master-data/bulk-import" element={<BulkImportPage />} />
         <Route path="master-data/uom" element={<ManagedListPage list="uom" />} />
         <Route path="master-data/bom" element={<BomsPage />} />
         <Route path="master-data/suppliers" element={<SuppliersPage />} />

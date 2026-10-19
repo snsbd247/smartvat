@@ -79,6 +79,7 @@ export const NAV_GROUPS: NavGroup[] = [
     icon: Database,
     children: sub('/master-data', [
       ['products', 'Products & Categories'],
+      ['bulk-import', 'Bulk Import (CSV)'],
       ['uom', 'Units of Measure'],
       ['bom', 'BOM & Recipes'],
       ['customers', 'Customers'],

@@ -544,6 +544,12 @@ export const Trade = {
   },
 }
 
+export interface ImportResult { entity: string; created: number; skipped: number; errors: { row: number; message: string }[] }
+export const BulkImport = {
+  template: (entity: string) => api.get<{ entity: string; header: string }>(`/imports/${entity}/template`).then((r) => r.data.header),
+  run: (entity: string, csv: string) => api.post<ImportResult>(`/imports/${entity}`, { csv }).then((r) => r.data),
+}
+
 export const Settings = {
   get: <T = Record<string, unknown>>(group: string) =>
     api.get<{ group: string; payload: T }>(`/settings/${group}`).then((r) => r.data.payload),

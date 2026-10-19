@@ -19,6 +19,7 @@ use App\Modules\JobWork\Http\Controllers\JobWorkController;
 use App\Modules\Reporting\Http\Controllers\ReportController;
 use App\Modules\Approval\Http\Controllers\ApprovalController;
 use App\Modules\Settings\Http\Controllers\SettingController;
+use App\Modules\MasterData\Http\Controllers\ImportController as CsvImportController;
 use App\Modules\Document\Http\Controllers\DocumentController;
 use App\Modules\Notification\Http\Controllers\NotificationController;
 use App\Modules\Trade\Http\Controllers\TradeController;
@@ -222,6 +223,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('mis/executive', [MisController::class, 'executive'])->name('mis.exec');
         Route::get('mis/dashboard', [MisController::class, 'dashboard'])->name('mis.dashboard');
         Route::get('mis/approvals', [MisController::class, 'approvals'])->name('mis.approvals');
+
+        // Bulk CSV import for master data (products / customers / suppliers).
+        Route::get('imports/{entity}/template', [CsvImportController::class, 'template'])->name('imports.template');
+        Route::post('imports/{entity}', [CsvImportController::class, 'run'])->name('imports.run');
 
         // Per-company settings store (general, numbering, email, master lists, …).
         Route::get('settings/{group}', [SettingController::class, 'show'])->name('settings.show');
