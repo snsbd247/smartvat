@@ -27,11 +27,13 @@ class DashboardService
         private MisService $mis,
         private InventoryReportService $invReports,
         private AccountingReportService $accReports,
+        private \App\Shared\Tenancy\CurrentCompany $current,
     ) {}
 
     public function data(): array
     {
         return [
+            'business_type' => $this->current->model()?->primaryBusinessType() ?? 'manufacturing',
             'kpis' => $this->kpis(),
             'sales_purchase_trend' => $this->trend(),
             'production_output' => $this->productionOutput(),

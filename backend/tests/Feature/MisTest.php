@@ -65,3 +65,11 @@ it('lists pending approvals', function () {
     expect($res->json('pending'))->toHaveCount(1);
     expect($res->json('pending.0.type'))->toBe('purchase_order');
 });
+
+it('reports the company business type on the dashboard', function () {
+    app(\App\Modules\Organization\Services\CompanyConfigurator::class)->apply($this->company, ['trading']);
+    \Laravel\Sanctum\Sanctum::actingAs(makeUserInCompany($this->company, 'admin'));
+
+    $this->withHeaders($this->headers)->getJson('/api/mis/dashboard')
+        ->assertOk()->assertJsonPath('business_type', 'trading');
+});

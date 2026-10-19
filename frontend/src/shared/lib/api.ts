@@ -120,6 +120,7 @@ export async function fetchExecutive(): Promise<Executive> {
 }
 
 export interface DashboardData {
+  business_type: 'manufacturing' | 'trading' | 'service'
   kpis: Executive & {
     total_sales: string
     local_sales: string
